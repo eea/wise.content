@@ -27,9 +27,12 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-
-  <utility
-      factory=".setuphandlers.HiddenProfiles"
-      name="wise.content-hiddenprofiles" />
+  <genericsetup:registerProfile
+      name="marine-wise"
+      title="wise.content (extra)"
+      directory="profiles/marine-wise"
+      description="Extra content for the Marine WISE website"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
 
 </configure>
