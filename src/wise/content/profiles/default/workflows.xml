@@ -7,10 +7,10 @@
         <type type_id="collective.cover.content">
             <bound-workflow workflow_id="wise_generic_workflow"/>
         </type>
-<!-- 
+
         <default>
             <bound-workflow workflow_id="wise_generic_workflow"/>
         </default>
- -->
+
     </bindings>
 </object>

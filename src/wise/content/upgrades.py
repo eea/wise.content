@@ -9,3 +9,10 @@ def upgrade_to_2(context):
 
     # need to reimport wise.content, it has updated workflow settings
     context.runImportStepFromProfile(default_profile, 'workflow')
+
+
+def upgrade_to_3(context):
+    logger.info("Upgrading to 3")
+
+    # need to reimport wise.content, it has updated workflow settings
+    context.runImportStepFromProfile(default_profile, 'workflow')
