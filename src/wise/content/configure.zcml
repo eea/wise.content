@@ -12,11 +12,38 @@
   <include package="plone.app.contentmenu" />
   <include package=".browser" />
   <include file="upgrades.zcml" />
+  <include file="cache.zcml" />
 
   <browser:jbot
       directory="browser/pt-overrides"
       layer="wise.content.interfaces.IWiseContentLayer"
       />
+
+  <!-- Make content types PDF Aware -->
+  <class class="collective.cover.content.Cover">
+    <implements interface="eea.pdf.interfaces.IPDFAware" />
+  </class>
+
+  <class class="plone.app.contenttypes.content.Document">
+    <implements interface="eea.pdf.interfaces.IPDFAware" />
+  </class>
+
+  <class class="plone.dexterity.content.Container">
+    <implements interface="eea.pdf.interfaces.IPDFAware" />
+  </class>
+
+  <class class="plone.dexterity.content.Container">
+    <implements interface="eea.pdf.interfaces.ICollectionPDFAware" />
+  </class>
+
+  <!-- Enable blocks transformed -->
+  <class class=".browser.overrides.PageBody">
+      <implements interface="plone.app.blocks.interfaces.IBlocksTransformEnabled" />
+  </class>
+
+  <class class=".browser.overrides.FolderBody">
+    <implements interface="plone.app.blocks.interfaces.IBlocksTransformEnabled" />
+  </class>
 
   <genericsetup:registerProfile
     name="default"

@@ -3,6 +3,9 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Task: Added eea.pdf && eea.cache configurations + eea.pdf body overrides for
+  folders and normal pages
+  [iulianpetchesi #82723]
 * Feature: Added new wise_generic_workflow with check-in/out &&
   upgrade steps/procedure
   [iulianpetchesi #85931]

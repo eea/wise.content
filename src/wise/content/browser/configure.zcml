@@ -5,6 +5,8 @@
   xmlns:z3c="http://namespaces.zope.org/z3c"
   i18n_domain="wise.content">
 
+  <include file="overrides.zcml" />
+
   <browser:page
     for="plone.dexterity.interfaces.IDexterityContainer"
     class="plone.app.contenttypes.browser.folder.FolderView"
