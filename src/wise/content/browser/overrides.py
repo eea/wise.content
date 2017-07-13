@@ -1,7 +1,6 @@
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from eea.pdf.themes.section.folder import Body as PDFBody
 from eea.pdf.themes.page.body import Body as PDFPageBody
-from eea.pdf.cache import cacheKey, ramcache
 from eea.pdf.themes.manual.manual import get_node_html
 
 
