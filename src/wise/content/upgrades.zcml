@@ -27,4 +27,13 @@
         handler=".upgrades.upgrade_to_3"
         profile="wise.content:default" />
 
+    <!-- v4 upgrade -->
+    <genericsetup:upgradeStep
+        title="Upgrade wise.content to v4"
+        description=""
+        source="3"
+        destination="4"
+        handler=".upgrades.upgrade_to_4"
+        profile="wise.content:default" />
+
 </configure>

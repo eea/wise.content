@@ -3,6 +3,8 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Feature: Added image content type override + changed text field to richtext
+  [iulianpetchesi #86898]
 * Feature: Added contact form override and recaptcha
   [iulianpetchesi #86755]
 * Task: Added eea.pdf && eea.cache configurations + eea.pdf body overrides for
