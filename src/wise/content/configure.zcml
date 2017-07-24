@@ -45,6 +45,10 @@
     <implements interface="plone.app.blocks.interfaces.IBlocksTransformEnabled" />
   </class>
 
+  <class class="plone.namedfile.field.NamedBlobImage">
+    <implements interface="plone.rfc822.interfaces.IPrimaryField" />
+  </class>
+
   <genericsetup:registerProfile
     name="default"
     title="wise.content"
@@ -75,5 +79,12 @@
     handler=".events.handle_iterate_wc_deletion"
   />
 
+  <subscriber
+    for=".contenttypes.IRichImage
+         zope.lifecycleevent.interfaces.IObjectCreatedEvent"
+    handler=".events.set_title_description"
+  />
+
+  <adapter name="getObjSize" factory=".indexers.getObjSize_image" />
 
 </configure>

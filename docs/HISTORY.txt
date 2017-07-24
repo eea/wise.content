@@ -3,6 +3,8 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Feature: Added new image content type + upgrade step + modifications
+  [iulianpetchesi #86898]
 * Feature: Added image content type override + changed text field to richtext
   [iulianpetchesi #86898]
 * Feature: Added contact form override and recaptcha

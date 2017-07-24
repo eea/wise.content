@@ -33,6 +33,27 @@
       permission="cmf.ManagePortal"
       />
 
+
+  <browser:page
+      name="view"
+      for="wise.content.contenttypes.IRichImage"
+      template="pt/richimage.pt"
+      permission="zope2.View"
+      menu="plone_displayviews"
+      title="View Image"
+      />
+
+
+  <browser:page
+      name="richimage_view_fullscreen"
+      for="wise.content.contenttypes.IRichImage"
+      template="pt/richimage_view_fullscreen.pt"
+      permission="zope2.View"
+      menu="plone_displayviews"
+      title="View Image Fullscreen"
+      />
+
+
   <subscriber
     for="plone.app.contenttypes.content.Folder
          OFS.interfaces.IObjectWillBeRemovedEvent"

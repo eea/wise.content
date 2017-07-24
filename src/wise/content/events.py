@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from plone.app.iterate.dexterity.utils import get_baseline
 from plone.app.iterate.event import WorkingCopyDeletedEvent
+from wise.content.contenttypes import IRichImage
 from zope.event import notify
 
 
@@ -15,3 +17,24 @@ def handle_iterate_wc_deletion(object, event):
     except:
         return
     notify(WorkingCopyDeletedEvent(object, baseline, relation=None))
+
+
+def set_title_description(obj, event):
+    ''' Sets title to filename if no title
+        was provided.
+        Also sets an empty unicode as description if
+        no description was provided.
+    '''
+    title = obj.title
+    if not title:
+        if IRichImage.providedBy(obj):
+            datafield = obj.image
+        else:
+            datafield = obj.file
+        if datafield:
+            filename = datafield.filename
+            obj.title = filename
+
+    description = obj.description
+    if not description:
+        obj.description = u''
