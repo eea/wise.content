@@ -3,6 +3,8 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Feature: Added link to folder in user actions
+  [iulianpetchesi #86898]
 * Feature: Added new image content type + upgrade step + modifications
   [iulianpetchesi #86898]
 * Feature: Added image content type override + changed text field to richtext

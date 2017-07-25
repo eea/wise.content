@@ -36,3 +36,12 @@ def upgrade_to_5(context):
     context.runImportStepFromProfile(default_profile, 'contentrules')
 
     logger.info("Upgrade finished.")
+
+
+def upgrade_to_6(context):
+    logger.info("Upgrading to 6")
+
+    # need to reimport wise.content, it has updated actions settings
+    context.runImportStepFromProfile(default_profile, 'actions')
+
+    logger.info("Upgrade finished.")

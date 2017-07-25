@@ -45,4 +45,13 @@
         handler=".upgrades.upgrade_to_5"
         profile="wise.content:default" />
 
+    <!-- v6 upgrade -->
+    <genericsetup:upgradeStep
+        title="Upgrade wise.content to v6"
+        description=""
+        source="5"
+        destination="6"
+        handler=".upgrades.upgrade_to_6"
+        profile="wise.content:default" />
+
 </configure>
