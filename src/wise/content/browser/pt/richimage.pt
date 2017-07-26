@@ -9,7 +9,7 @@
 
 <metal:content-description fill-slot="content-description">
   <div class="documentDescription" i18n:translate="" 
-          tal:content="python: context.html2text(context.long_description.output)"
+          tal:content="structure python: context.long_description.output"
           tal:condition="python: context.long_description.output">
   </div>
 </metal:content-description>
