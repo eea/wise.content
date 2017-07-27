@@ -54,4 +54,13 @@
         handler=".upgrades.upgrade_to_6"
         profile="wise.content:default" />
 
+    <!-- v7 upgrade -->
+    <genericsetup:upgradeStep
+        title="Upgrade wise.content to v7"
+        description=""
+        source="6"
+        destination="7"
+        handler=".upgrades.upgrade_to_7"
+        profile="wise.content:default" />
+
 </configure>

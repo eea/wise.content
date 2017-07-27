@@ -54,6 +54,17 @@
       />
 
 
+  <!-- Redmine control panel entry -->
+  <adapter factory=".misc.RedmineControlPanelAdapter" />
+
+  <browser:page
+    name="redmine-settings"
+    for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+    class=".misc.RedmineControlPanel"
+    permission="cmf.ManagePortal"
+    />
+
+
   <subscriber
     for="plone.app.contenttypes.content.Folder
          OFS.interfaces.IObjectWillBeRemovedEvent"
