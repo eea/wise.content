@@ -7,6 +7,7 @@ from Products.Five.browser import BrowserView
 from plone.app.controlpanel.form import ControlPanelForm
 from plone.app.iterate.interfaces import ICheckinCheckoutPolicy
 from plone.fieldsets.fieldsets import FormFieldsets
+from redminelib import Redmine
 from wise.content import _
 from zope.component import adapts
 from zope.interface import Interface, implements
@@ -99,3 +100,58 @@ class RedmineControlPanel(ControlPanelForm):
                     "ploneformgen form for the purpose of creating issues in "
                     "projects.")
     form_name = _('Redmine Settings')
+
+
+class IssueCreate(BrowserView):
+    """
+    The view is called via the custom script adapter in the pfg form
+    It then creates tickets in the redmine project
+
+    How to get tracker ids:
+
+    >>> trackers = redmine.tracker.all()
+    >>> trackers[index].id
+
+    Getting categories:
+
+    >>> redmine.issue_category.filter(project_id='project_id')[index].id
+
+    Getting issue statuses:
+
+    >>> redmine.issue_status.all()[index].id
+
+    Getting all projects:
+
+    >>> projects = redmine.project.all(offset=10, limit=100)
+    >>> projects
+    <redminelib.resultsets.ResourceSet object with Project resources>
+
+    More here:
+    https://python-redmine.com/resources/issue.html
+
+    """
+
+    def __call__(self, REQUEST):
+        portal_properties = getToolByName(self.context, 'portal_properties')
+        redmine_properties = portal_properties.redmine_configuration_properties
+
+        redmine_url = redmine_properties.redmine_url.encode()
+        version = redmine_properties.version
+        user_key = redmine_properties.user_api_key.encode()
+        project = redmine_properties.project.encode()
+
+        redm = Redmine(redmine_url, key=user_key, version=version)
+
+        subject = REQUEST.form.get('topic', 'generic title')
+        comments = REQUEST.form.get('comments', 'description')
+        issue_from = REQUEST.form.get('replyto', 'generic title')
+        description = comments + "\n From: " + issue_from
+
+        redm.issue.create(
+            project_id=project,  # required
+            subject=subject,  # required
+            description=description,
+            tracker_id=4,
+            status_id=1,
+            category_id=794,
+        )

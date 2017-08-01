@@ -3,6 +3,8 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Feature: Added browserview for creating the issues
+  [iulianpetchesi #86754]
 * Feature: Added redmine configuration forms
   [iulianpetchesi #86754]
 * Feature: Added link to folder in user actions

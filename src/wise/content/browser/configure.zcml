@@ -64,6 +64,12 @@
     permission="cmf.ManagePortal"
     />
 
+  <browser:page
+      class=".misc.IssueCreate"
+      for="*"
+      name="create-redmine-issue"
+      permission="cmf.ManagePortal"
+      />
 
   <subscriber
     for="plone.app.contenttypes.content.Folder
