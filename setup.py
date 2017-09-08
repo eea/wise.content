@@ -40,6 +40,7 @@ setup(
     install_requires=[
         'plone.api',
         'plone.app.contenttypes',
+        'python-redmine',
     ],
     extras_require={
         'test': [
