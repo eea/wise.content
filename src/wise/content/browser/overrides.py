@@ -1,4 +1,5 @@
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from plone.app.users.browser.personalpreferences import PasswordAccountPanel
 from eea.pdf.themes.section.folder import Body as PDFBody
 from eea.pdf.themes.page.body import Body as PDFPageBody
 from eea.pdf.themes.manual.manual import get_node_html
@@ -34,3 +35,7 @@ class PageBody(PDFPageBody):
     """ Custom PDF body
     """
     template = ViewPageTemplateFile('pt/page.body.pt')
+
+
+class PasswordAccountPanelOverride(PasswordAccountPanel):
+    template = ViewPageTemplateFile('pt/password-account-panel.pt')

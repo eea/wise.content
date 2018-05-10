@@ -3,7 +3,8 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
-* Task: Added login_form override
+* Task: Added login_form override, override the password change page so that
+  it links to eionet
   [iulianpetchesi #92502]
 * Feature: Added browserview for creating the issues
   [iulianpetchesi #86754]
