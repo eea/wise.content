@@ -1,8 +1,9 @@
-from zope.interface import provider
-from zope.schema.interfaces import IVocabularyFactory
+from zope.interface import implements, provider
+from zope.schema.interfaces import IContextSourceBinder, IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from .db import get_area_types, get_member_states, get_regions_subregions
+from wise.content.search import db
+
 from .utils import FORMS, SUBFORMS
 
 
@@ -10,16 +11,21 @@ class SubFormsVocabulary(SimpleVocabulary):
     """ An hackish vocabulary that retrieves subform names for a form
     """
 
-    def __init__(self, form_name):
-        self._form_name = form_name
+    def __init__(self, form_klass):
+        self.form_klass = form_klass
+        pass
+
+    def __call__(self, context):
+        self.context = context
 
     @property
     def _terms(self):
         terms = []
 
-        for n1, n2 in SUBFORMS.keys():
-            if n1 == self._form_name:
-                terms.append(SimpleTerm(n2, n2, n2))
+        forms = SUBFORMS[self.form_klass]
+
+        for k in forms:
+            terms.append(SimpleTerm(k, k.title, k.title))
 
         return terms
 
@@ -44,7 +50,7 @@ class SubFormsVocabulary(SimpleVocabulary):
 
 @provider(IVocabularyFactory)
 def get_member_states_vb_factory(context):
-    res = get_member_states()
+    res = db.get_member_states()
     terms = [SimpleTerm(x, x, x) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -53,7 +59,7 @@ def get_member_states_vb_factory(context):
 
 @provider(IVocabularyFactory)
 def get_region_subregions_vb_factory(context):
-    res = get_regions_subregions()
+    res = db.get_regions_subregions()
     terms = [SimpleTerm(x, x, x) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -62,70 +68,11 @@ def get_region_subregions_vb_factory(context):
 
 @provider(IVocabularyFactory)
 def get_area_type_vb_factory(context):
-    res = get_area_types()
+    res = db.get_area_types()
     terms = [SimpleTerm(x, x, x) for x in res]
     vocab = SimpleVocabulary(terms)
 
     return vocab
-
-
-# ARTICLES = [
-#     ('a81c', 'Article 8.1c (Economic and social analysis)'),
-# ]
-
-# articles_vocabulary = SimpleVocabulary(
-#     [SimpleTerm(a[0], a[0], a[1]) for a in ARTICLES]
-# )
-#
-#
-# @provider(IVocabularyFactory)
-# def articles_vocabulary_factory(context):
-#     return articles_vocabulary
-
-
-# A81A_THEMES = [
-#     'Ecosystem(s)',
-#     'Functional group(s)',
-#     'Habitat(s)',
-#     'Species(s)',
-#     'Other(s)',
-#     'NIS Inventory',
-#     'Physical',
-# ]
-#
-# a81a_themes_vocabulary = SimpleVocabulary(
-#     [SimpleTerm(a, a, a) for a in A81A_THEMES]
-# )
-
-
-# @provider(IVocabularyFactory)
-# def a81a_themes_vocabulary_factory(context):
-#     return vocab
-
-
-# A81B_THEMES = [
-#     'Extraction of fish and shellfish',
-#     'Extraction of seaweed, maerl and other',
-#     'Harzardous substances',
-#     'Hydrological processes',
-#     'Marine litter',
-#     'Microbial pathogens',
-#     'Non-indigenous species',
-#     'Underwater noise',
-#     'Nutrients',
-#     'Physical damage',
-#     'Pollutant events',
-#     'Acidification',
-# ]
-
-# a81b_themes_vocabulary = SimpleVocabulary(
-#     [SimpleTerm(a, a, a) for a in A81B_THEMES]
-# )
-
-
-@provider(IVocabularyFactory)
-def a81b_themes_vocabulary_factory(context):
-    return a81b_themes_vocabulary
 
 
 @provider(IVocabularyFactory)
@@ -135,3 +82,12 @@ def articles_vocabulary_factory(context):
     vocab = SimpleVocabulary(terms)
 
     return vocab
+
+
+@provider(IVocabularyFactory)
+def marine_unit_id_vocab_factory(context):
+    data = context.data
+    ids = db.get_marine_unit_ids(**data)
+    terms = [SimpleTerm(x, x, x) for x in ids]
+
+    return SimpleVocabulary(terms)

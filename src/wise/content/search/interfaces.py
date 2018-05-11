@@ -62,16 +62,21 @@ class IArticleSelect(Interface):
                      vocabulary="wise_search_articles")
 
 
-class IA81aSubformSelect(Interface):
-    theme = Choice(title=u"Select theme",
-                   required=False,
-                   vocabulary=SubFormsVocabulary('a81a'))
+class IMarineUnitIDSelect(Interface):
+    marine_unit_id = Choice(title=u"Select MarineUnitID",
+                            required=False,
+                            default='',
+                            vocabulary="wise_search_marine_unit_id_vocab")
+
+
+# class IA81aSubformSelect(Interface):
+#     theme = Choice(title=u"Select theme",
+#                    required=False,
+#                    vocabulary=SubFormsVocabulary(form))
 
 # wise_search_81a_themes"
-
-
-class IA81bSubformSelect(Interface):
-    theme = Choice(title=u"Select theme",
-                   required=False,
-                   default='',
-                   vocabulary="wise_search_81b_themes")
+# class IA81bSubformSelect(Interface):
+#     theme = Choice(title=u"Select theme",
+#                    required=False,
+#                    default='',
+#                    vocabulary="wise_search_81b_themes")

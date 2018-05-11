@@ -25,6 +25,12 @@
     name="wise_search_articles"
     />
 
+  <utility
+    component=".vocabulary.marine_unit_id_vocab_factory"
+    name="wise_search_marine_unit_id_vocab"
+    />
+
+
   <!-- <utility -->
   <!--   component=".vocabulary.a81a_themes_vocabulary_factory" -->
   <!--   name="wise_search_81a_themes" -->

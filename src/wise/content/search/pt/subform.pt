@@ -5,6 +5,8 @@
 
 <metal:block use-macro="context/@@ploneform-macros/actions" />
 
-<div class="subform-level-x">
-  <div tal:content="structure view/subform | nothing">subform here</div>
+<tal:def define="subform view/subform | nothing">
+<div class="subform-level-x" tal:condition="subform">
+  <div tal:content="structure subform">subform here</div>
 </div>
+</tal:def>

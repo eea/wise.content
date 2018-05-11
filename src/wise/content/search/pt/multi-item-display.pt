@@ -1,0 +1,4 @@
+<div tal:repeat="section view/get_sections">
+  <h3 tal:content="section/title">Section title here</h3>
+  <div tal:content="structure section"></div>
+</div>

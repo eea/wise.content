@@ -1,3 +1,4 @@
+from zope.schema import Choice
 
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -6,9 +7,11 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
-from .base import BaseFormUtil, ItemDisplayForm, MultiItemDisplayForm, SubForm
-from .utils import (FORMS, get_registered_subform, pivot_data, register_form,
-                    register_subform)
+from .base import (BaseFormUtil, ItemDisplay, ItemDisplayForm,
+                   MultiItemDisplayForm, SubForm)
+from .utils import (get_form, get_registered_form_sections, pivot_data,
+                    register_form, register_form_section, register_subform)
+from .vocabulary import SubFormsVocabulary
 
 
 class MainForm(Form):
@@ -26,17 +29,8 @@ class MainForm(Form):
 
         self.data, errors = self.extractData()
 
-        if all(self.data.values()):
-            self.data['MarineUnitID'] = db.get_marine_unit_id(**self.data)
-
-            if not errors and self.data['MarineUnitID']:
-                self.subform = ArticleSelectForm(
-                    self.context, self.request, self)
-
-        if errors:
-            self.status = self.formErrorsMessage
-
-            return
+        if not errors and all(self.data.values()):
+            self.subform = MarineUnitIDForm(self, self.request, self)
 
 
 SearchDemo = wrap_form(MainForm)
@@ -44,21 +38,22 @@ SearchDemo = wrap_form(MainForm)
 
 class ArticleSelectForm(SubForm):
     fields = Fields(interfaces.IArticleSelect)
-    prefix = 'article_select'
-    data = {}
-    # subform_class = ArticleSelectForm
 
     def get_subform(self):
-        klass = FORMS.get(self.data['article'])
+        klass = get_form(self.data['article'])
 
         return super(ArticleSelectForm, self).get_subform(klass)
+
+
+class MarineUnitIDForm(SubForm):
+    fields = Fields(interfaces.IMarineUnitIDSelect)
+    subform_class = ArticleSelectForm
 
 
 @register_form
 class A9Form(ItemDisplayForm, BaseFormUtil):
     title = 'Article 9 (GES determination)'
     fields = Fields(interfaces.IRecordSelect)
-    prefix = 'a9'
 
     def get_db_results(self):
         page = int(self.data.get('page')) or 0
@@ -84,8 +79,6 @@ class A9Form(ItemDisplayForm, BaseFormUtil):
 @register_form
 class A10Form(ItemDisplayForm, BaseFormUtil):
     title = 'Article 10 (Targets)'
-    fields = Fields(interfaces.IRecordSelect)
-    prefix = 'a10'
 
     def get_db_results(self):
         page = int(self.data.get('page')) or 0
@@ -120,38 +113,66 @@ class A81aForm(SubForm):
     """
 
     title = 'Article 8.1a (Analysis of the environmental status)'
-    fields = Fields(interfaces.IA81aSubformSelect)
-    prefix = 'a81a'     # prefix is important to identify available subforms
-    data = {}
+
+    @property
+    def fields(self):
+        # TODO: this can be reimplemented with simple vocab, no need for hard
+        theme = Choice(
+            __name__='theme',
+            title=u"Select theme",
+            required=False,
+            vocabulary=SubFormsVocabulary(self.__class__)
+        )
+
+        return Fields(theme)
 
     def get_subform(self):
-        klass = get_registered_subform(self)
+        klass = self.data.get('theme')
 
         return super(A81aForm, self).get_subform(klass)
 
 
-@register_subform('a81a', 'Ecosystem(s)')
-class A81aEcoSubForm(MultiItemDisplayForm, BaseFormUtil):
-    fields = Fields(interfaces.IRecordSelect)
-    prefix = 'a81a_eco_subform'
-    data = {}
+class MultiItemSubform(MultiItemDisplayForm, BaseFormUtil):
+    """ Base class for multi-item display forms.
+    """
+
+    def get_sections(self):
+        klasses = get_registered_form_sections(self)
+        views = [k(self, self.request) for k in klasses]
+
+        return views
+
+
+@register_subform(A81aForm)
+class A81aEcoSubForm(MultiItemSubform):
+    title = 'Ecosystem(s)'
+
+
+@register_subform(A81aForm)
+class A81aFunctionalGroupSubForm(MultiItemSubform):
+    title = 'Functional group(s)'
+
+
+@register_form_section(A81aEcoSubForm)
+class A81aEcosystemPressures(ItemDisplay):
+    title = 'Pressures and impacts'
 
     def get_db_results(self):
-        page = int(self.data.get('page')) or 0
+        page = self.get_page()
         muid = self.get_marine_unit_id()
         res = db.get_a10_targets(marine_unit_id=muid, page=page)
 
         return res
 
-    # def get_extra_data(self):
-    #     if not self.item:
-    #         return {}
-    #
-    #     target_id = self.item['MSFD10_Target_ID']
-    #
-    #     res = db.get_a10_feature_targets(target_id)
-    #     ft = pivot_data(res, 'FeatureType')
-    #
-    #     return [
-    #         ('Feature Types', ft),
-    #     ]
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        target_id = self.item['MSFD10_Target_ID']
+
+        res = db.get_a10_feature_targets(target_id)
+        ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Feature Types', ft),
+        ]
