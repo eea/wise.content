@@ -1,0 +1,12 @@
+<dl tal:define="item view/item">
+  <tal:rep repeat="key item/keys">
+  <dt>
+  <span tal:content="python: view.labelAsTitle(key)"
+           tal:attributes="title key">Label</span>
+  </dt>
+  <dd >
+  <span tal:content="python:item[key]"></span>
+  <em tal:condition="python: not item[key]">No value</em>
+  </dd>
+  </tal:rep>
+</dl>

@@ -1,0 +1,38 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
+  xmlns:z3c="http://namespaces.zope.org/z3c"
+  i18n_domain="wise.content">
+
+  <utility
+    component=".vocabulary.get_member_states_vb_factory"
+    name="wise_search_member_states"
+    />
+
+  <utility
+    component=".vocabulary.get_region_subregions_vb_factory"
+    name="wise_search_region_subregions"
+    />
+
+  <utility
+    component=".vocabulary.get_area_type_vb_factory"
+    name="wise_search_area_type"
+    />
+
+  <utility
+    component=".vocabulary.articles_vocabulary_factory"
+    name="wise_search_articles"
+    />
+
+  <!-- <utility -->
+  <!--   component=".vocabulary.a81a_themes_vocabulary_factory" -->
+  <!--   name="wise_search_81a_themes" -->
+  <!--   /> -->
+  <!--  -->
+  <!-- <utility -->
+  <!--   component=".vocabulary.a81b_themes_vocabulary_factory" -->
+  <!--   name="wise_search_81b_themes" -->
+  <!--   /> -->
+
+</configure>

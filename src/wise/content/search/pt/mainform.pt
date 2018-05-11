@@ -1,0 +1,38 @@
+<div id="wise-search-form">
+  <metal:block use-macro="context/@@ploneform-macros/titlelessform">
+
+    <metal:slot fill-slot="actions">
+      <metal:block use-macro="context/@@ploneform-macros/actions" />
+      <div tal:content="structure view/subform | nothing">subform here</div>
+    </metal:slot>
+
+    <metal:slot fill-slot="formtop">
+      <style>
+        #wise-search-form dl {
+        overflow: hidden;
+        }
+        #wise-search-form dt {
+        width: 20rem;
+        float: left;
+        clear: left;
+        border-right: 1px solid #CCC;
+        margin-top: 0.4rem;
+        }
+        #wise-search-form dd {
+        float: left;
+        width: 48rem;
+        border-left: 1px solid #CCC;
+        margin-left: -1px;
+        margin-top: 0.4rem;
+        background-color: #EEE;
+        padding: 0.4rem;
+        }
+        .extra-details {
+          border-top: 1px solid #CCC;
+          padding-top: 1rem;
+        }
+      </style>
+    </metal:slot>
+
+  </metal:block>
+</div>

@@ -1,0 +1,25 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
+  xmlns:z3c="http://namespaces.zope.org/z3c"
+  i18n_domain="wise.content">
+
+  <include file="utility.zcml" />
+
+  <browser:page
+    for="*"
+    name="msfd_search"
+    class=".views.SearchDemo"
+    permission="zope2.View"
+    />
+
+  <!-- <browser:page -->
+  <!--   for=".views.A9Form" -->
+  <!--   name="extras" -->
+  <!--   class=".views.FeaturePressureImpactsDetails" -->
+  <!--   permission="zope2.View" -->
+  <!--   template='pt/result&#45;tabs.pt' -->
+  <!--   /> -->
+
+</configure>

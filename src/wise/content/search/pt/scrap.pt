@@ -1,0 +1,59 @@
+<table tal:define="res view/data_rows">
+  <thead>
+    <tr>
+      <th
+        tal:repeat="label res/keys"
+        tal:content="python: view.labelAsTitle(label)">
+        Label here
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr tal:repeat="row res">
+      <td tal:repeat="cell row" tal:content="cell"></td>
+    </tr>
+  </tbody>
+</table>
+
+
+# @register_form
+# class A81bForm(SubForm):
+#     title = 'Article 8.1b (Analysis of pressures and impacts)'
+#     fields = Fields(interfaces.IA81bSubformSelect)
+#     prefix = 'a81bselect'
+#     data = {}
+#
+#     def get_subform(self):
+#         klass = THEME_FORMS.get(self.data['theme'])
+#
+#         return super(A81bForm, self).get_subform(klass)
+#
+
+# @register_theme_subform('Ecosystem(s)', 'Pressures and impacts')
+# class XXX(ItemDisplayForm, BaseFormUtil):
+#     fields = Fields(interfaces.IRecordSelect)
+#     prefix = 'a81a_eco'
+#
+#     def get_db_results(self):
+#         page = int(self.data.get('page')) or 0
+#         muid = self.get_marine_unit_id()
+#         res = db.get_a10_targets(marine_unit_id=muid, page=page)
+#
+#         return res
+#
+#     def get_extra_data(self):
+#         if not self.item:
+#             return {}
+#
+#         target_id = self.item['MSFD10_Target_ID']
+#
+#         res = db.get_a10_feature_targets(target_id)
+#         ft = pivot_data(res, 'FeatureType')
+#
+#         # res = db.get_a10_feature_targets(target_id)
+#         # criteria = pivot_data(res, 'FeatureType')
+#
+#         return [
+#             ('Feature Types', ft),
+#             # ('Criteria Indicators', criteria),
+#         ]
