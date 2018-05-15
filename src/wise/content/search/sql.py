@@ -1,8 +1,8 @@
 # coding: utf-8
-from sqlalchemy import Column, Date, DateTime, ForeignKey, Index, Integer, LargeBinary, String, Table, Unicode, text
-from sqlalchemy.orm import relationship
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, Index, Integer,
+                        LargeBinary, String, Table, Unicode, text)
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 metadata = Base.metadata

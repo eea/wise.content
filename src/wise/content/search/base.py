@@ -1,3 +1,6 @@
+import datetime
+
+from six import string_types
 from sqlalchemy import inspect
 from zope.component import queryMultiAdapter
 from zope.interface import implements
@@ -15,6 +18,8 @@ from .utils import get_registered_form_sections
 class BaseUtil(object):
     """ Generic utilities for search views
     """
+
+    value_template = ViewPageTemplateFile('pt/value-display.pt')
 
     def name_as_title(self, text):
         """ Given a "CamelCase" text, changes it to "Title Text"
@@ -37,7 +42,6 @@ class BaseUtil(object):
         parent = self
 
         while True:
-            print("looking marineunitids", self)
             ids = parent.data.get('marine_unit_ids')
 
             if ids:
@@ -47,12 +51,39 @@ class BaseUtil(object):
 
         return ids
 
+    def get_marine_unit_id(self):
+        """ Return the current selected MarineUnitID looking up data in parents
+        """
+
+        parent = self
+
+        while True:
+            mid = parent.data.get('marine_unit_id')
+
+            if mid:
+                break
+            else:
+                parent = parent.context
+
+        return mid
+
     def get_obj_fields(self, obj):
         """ Inspect an SA object and return its field names
         """
         mapper = inspect(obj)
 
         return [c.key for c in mapper.attrs]
+
+    def print_value(self, value):
+        if not value:
+            return value
+        base_values = string_types + (int, datetime.datetime, list)
+
+        if not isinstance(value, base_values):
+
+            return self.value_template(item=value)
+
+        return value
 
 
 class EmbededForm(Form, BaseUtil):
@@ -68,6 +99,7 @@ class EmbededForm(Form, BaseUtil):
     subform_class = None
 
     def __init__(self, context, request):
+        super(EmbededForm, self).__init__(context, request)
         self.__parent__ = self.context = context
         self.request = request
         self.data = {}
@@ -99,26 +131,7 @@ class EmbededForm(Form, BaseUtil):
             return extras()
 
 
-class CollectionDisplayForm(EmbededForm):
-    """ Display a collection of data (multiple rows of results)
-    """
-
-    pages = None        # a list of items to show
-
-    template = ViewPageTemplateFile('pt/collection.pt')
-
-    def __init__(self, *args, **kwargs):
-        super(CollectionDisplayForm, self).__init__(*args, **kwargs)
-
-    def update(self):
-        super(CollectionDisplayForm, self).update()
-        self.count, self.items = self.get_db_results()
-
-    def display_item(self, item):
-        return item
-
-
-class ItemDisplayForm(EmbededForm, BaseUtil):
+class ItemDisplayForm(EmbededForm):
     """ Generic form for displaying records
     """
 
@@ -129,6 +142,11 @@ class ItemDisplayForm(EmbededForm, BaseUtil):
     template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
+
+    def update(self):
+        super(ItemDisplayForm, self).update()
+        self.data['page'] = self.widgets['page'].value
+        self.count, self.item = self.get_db_results()
 
     def updateWidgets(self, prefix=None):
         super(ItemDisplayForm, self).updateWidgets()
@@ -144,32 +162,49 @@ class ItemDisplayForm(EmbededForm, BaseUtil):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = value + 1
 
-    def update(self):
-        super(ItemDisplayForm, self).update()
-        self.data['page'] = self.widgets['page'].value
-        self.set_item()
-
-    def set_item(self):
-        """ Compute the item to be displayed
-        """
-
-        self.count, self.item = self.get_db_results()
-
-        # res = self.get_db_results()
-        #
-        # try:
-        #     values = next(res)      # TODO: what if it's empty value?
-        # except StopIteration:
-        #     self.item = {}
-        # else:
-        #     keys = res.keys()
-        #     self.item = dict(zip(keys, values))
-
     def get_extra_data(self):
         return []
 
     def extras(self):
         return self.extra_data_template()
+
+    def get_page(self):
+        page = self.data.get('page')
+
+        if page:
+            return int(page)
+        else:
+            return 0
+
+
+class MultiItemDisplayForm(ItemDisplayForm):
+    template = ViewPageTemplateFile('pt/multi-item-display.pt')
+
+    fields = Fields(interfaces.IRecordSelect)
+
+    # def update(self):
+    #     super(MultiItemDisplayForm, self).update()
+    #     self.data['page'] = self.widgets['page'].value
+    #
+    # def updateWidgets(self, prefix=None):
+    #     super(MultiItemDisplayForm, self).updateWidgets()
+    #     self.widgets['page'].mode = 'hidden'
+
+    # @buttonAndHandler(u'Prev', name='prev')
+    # def handle_prev(self, action):
+    #     value = int(self.widgets['page'].value)
+    #     self.widgets['page'].value = max(value - 1, 0)
+    #
+    # @buttonAndHandler(u'Next', name='next')
+    # def handle_next(self, action):
+    #     value = int(self.widgets['page'].value)
+    #     self.widgets['page'].value = value + 1
+
+    def get_sections(self):
+        klasses = get_registered_form_sections(self)
+        views = [k(self, self.request) for k in klasses]
+
+        return views
 
 
 class ItemDisplay(BrowserView, BaseUtil):
@@ -177,8 +212,10 @@ class ItemDisplay(BrowserView, BaseUtil):
     """
 
     index = ViewPageTemplateFile('pt/simple-item-display.pt')
+
     data_template = ViewPageTemplateFile('pt/item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
+
     data = {}
 
     def __init__(self, context, request):
@@ -186,7 +223,7 @@ class ItemDisplay(BrowserView, BaseUtil):
         self.request = request
 
     def __call__(self):
-        self.set_item()
+        self.count, self.item = self.get_db_results()
 
         return self.index()
 
@@ -201,20 +238,6 @@ class ItemDisplay(BrowserView, BaseUtil):
         else:
             return 0
 
-    def set_item(self):
-        """ Compute the item to be displayed
-        """
-
-        res = self.get_db_results()
-
-        try:
-            values = next(res)      # TODO: what if it's empty value?
-        except StopIteration:
-            self.item = {}
-        else:
-            keys = res.keys()
-            self.item = dict(zip(keys, values))
-
     def get_extra_data(self):
         return []
 
@@ -222,36 +245,7 @@ class ItemDisplay(BrowserView, BaseUtil):
         return self.extra_data_template()
 
 
-class MultiItemDisplayForm(EmbededForm):
-    data_template = ViewPageTemplateFile('pt/multi-item-display.pt')
-
-    fields = Fields(interfaces.IRecordSelect)
-
-    def updateWidgets(self, prefix=None):
-        super(MultiItemDisplayForm, self).updateWidgets()
-        self.widgets['page'].mode = 'hidden'
-
-    @buttonAndHandler(u'Prev', name='prev')
-    def handle_prev(self, action):
-        value = int(self.widgets['page'].value)
-        self.widgets['page'].value = max(value - 1, 0)
-
-    @buttonAndHandler(u'Next', name='next')
-    def handle_next(self, action):
-        value = int(self.widgets['page'].value)
-        self.widgets['page'].value = value + 1
-
-    def update(self):
-        super(MultiItemDisplayForm, self).update()
-        self.data['page'] = self.widgets['page'].value
-
-
-class MultiItemSubform(MultiItemDisplayForm, BaseUtil):
-    """ Base class for multi-item display forms.
-    """
-
-    def get_sections(self):
-        klasses = get_registered_form_sections(self)
-        views = [k(self, self.request) for k in klasses]
-
-        return views
+# class MultiItemSubform(MultiItemDisplayForm):
+#     """ Base class for multi-item display forms.
+#     """
+#

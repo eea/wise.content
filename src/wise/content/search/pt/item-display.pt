@@ -1,12 +1,12 @@
 <dl tal:define="item view/item">
-  <tal:rep repeat="key python:view.get_obj_fields(view.item)">
+  <tal:rep repeat="key python:view.get_obj_fields(view.item)" tal:condition="item">
   <dt>
   <span tal:content="python: view.name_as_title(key)"
            tal:attributes="title key">Label</span>
   </dt>
-  <dd >
-  <span tal:content="item/?key"></span>
-  <em tal:condition="not: item/?key">No value</em>
+  <dd tal:define="value item/?key; value python: view.print_value(value)">
+  <span tal:content="structure value">Some value here</span>
+  <em tal:condition="not: value">No value</em>
   </dd>
   </tal:rep>
 </dl>

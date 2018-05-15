@@ -9,27 +9,31 @@
     <metal:slot fill-slot="formtop">
       <style>
         #wise-search-form dl {
-        overflow: hidden;
+          overflow: hidden;
         }
         #wise-search-form dt {
-        width: 20rem;
-        float: left;
-        clear: left;
-        border-right: 1px solid #CCC;
-        margin-top: 0.4rem;
+          width: 20rem;
+          float: left;
+          clear: left;
+          border-right: 1px solid #CCC;
+          margin-top: 0.4rem;
         }
         #wise-search-form dd {
-        float: left;
-        width: 48rem;
-        border-left: 1px solid #CCC;
-        margin-left: -1px;
-        margin-top: 0.4rem;
-        background-color: #EEE;
-        padding: 0.4rem;
+          float: left;
+          width: 48rem;
+          border-left: 1px solid #CCC;
+          margin-left: -1px;
+          margin-top: 0.4rem;
+          background-color: #EEE;
+          padding: 0.4rem;
+          overflow: auto;
         }
         .extra-details {
           border-top: 1px solid #CCC;
           padding-top: 1rem;
+        }
+        .label {
+          color: Black;
         }
       </style>
     </metal:slot>

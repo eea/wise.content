@@ -156,6 +156,9 @@ def get_a10_targets(marine_unit_id, page=0):
     total = q.count()
     item = q.offset(page).limit(1).first()
 
+    # TODO: the MSFD10_DESCrit is not ORM mapped yet
+    # this query is not finished!!!!
+
     return [total, item]
 
 #     conn = connection()
@@ -171,19 +174,13 @@ def get_a10_targets(marine_unit_id, page=0):
 # FETCH NEXT 1 ROWS ONLY
 # """), marine_unit_id=marine_unit_id, page=page)
 
-    # TODO: the MSFD10_DESCrit is not ORM mapped yet
     # this is a temporary hack to overcome this
-
-    # import pdb; pdb.set_trace()
-
-    row = next(res)
-    keys = res.keys()
-    res = dict(zip(keys, row))
-    gdci = res.pop('GESDescriptorsCriteriaIndicators')
-    obj = sql.MSFD10Target(**res)
-    obj.GESDescriptorsCriteriaIndicators = gdci
-
-    return obj
+    # row = next(res)
+    # keys = res.keys()
+    # res = dict(zip(keys, row))
+    # gdci = res.pop('GESDescriptorsCriteriaIndicators')
+    # obj = sql.MSFD10Target(**res)
+    # obj.GESDescriptorsCriteriaIndicators = gdci
 
 
 def get_a10_feature_targets(target_id):
@@ -206,3 +203,42 @@ WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
     return res
+
+
+def get_a81a_ecosystem(marine_unit_id, page=0):
+    klass = sql.MSFD8aEcosystem
+
+    sess = session()
+    q = sess.query(klass).filter(
+        klass.MarineUnitID == marine_unit_id
+    ).order_by(
+        klass.MSFD8a_Ecosystem_ID
+    )
+
+    total = q.count()
+    item = q.offset(page).limit(1).first()
+
+    return [total, item]
+
+
+def get_related_record(klass, column, rel_id):
+    sess = session()
+    q = sess.query(klass).filter(
+        getattr(klass, column) == rel_id
+    )
+    item = q.first()
+
+    return [q.count(), item]
+
+
+# def get_a81a_ecosystem_pressureimpacts(rel_id, page=0):
+#     klass = sql.MSFD8aEcosystemPressuresImpact
+#
+#     sess = session()
+#     q = sess.query(klass).filter(
+#         klass.MSFD8a_Ecosystem == rel_id
+#     ).one()
+#     item = q.first()
+#
+#     return [1, item]
+# _pressure_impacts

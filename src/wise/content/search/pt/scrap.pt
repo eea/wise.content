@@ -149,3 +149,64 @@
 # FETCH NEXT 1 ROWS ONLY
 # """), marine_unit_id=marine_unit_id, page=page)
 
+# class SubFormsVocabulary(SimpleVocabulary):
+#     """ An hackish vocabulary that retrieves subform names for a form
+#     """
+#
+#     # TODO: I'm not sure if this is needed. Its existance needs to be defended
+#
+#     def __init__(self, form_klass):
+#         self.form_klass = form_klass
+#         pass
+#
+#     def __call__(self, context):
+#         self.context = context
+#
+#     @property
+#     def _terms(self):
+#         terms = []
+#
+#         forms = SUBFORMS[self.form_klass]
+#
+#         for k in forms:
+#             terms.append(SimpleTerm(k, k.title, k.title))
+#
+#         return terms
+#
+#     @property
+#     def by_value(self):
+#         d = {}
+#
+#         for term in self._terms:
+#             d[term.value] = term
+#
+#         return d
+#
+#     @property
+#     def by_token(self):
+#         d = {}
+#
+#         for term in self._terms:
+#             d[term.token] = term
+#
+#         return d
+
+# class CollectionDisplayForm(EmbededForm):
+#     """ Display a collection of data (multiple rows of results)
+#     """
+#
+#     pages = None        # a list of items to show
+#
+#     template = ViewPageTemplateFile('pt/collection.pt')
+#
+#     def __init__(self, *args, **kwargs):
+#         super(CollectionDisplayForm, self).__init__(*args, **kwargs)
+#
+#     def update(self):
+#         super(CollectionDisplayForm, self).update()
+#         self.count, self.items = self.get_db_results()
+#
+#     def display_item(self, item):
+#         return item
+
+

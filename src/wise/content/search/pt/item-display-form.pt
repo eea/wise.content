@@ -3,7 +3,7 @@
 <div tal:content="structure view/data_template | nothing"></div>
 <div tal:content="structure view/extras | nothing"></div>
 
-Page <span tal:content="view/data/page">1</span> of <span tal:content="view/count"></span>
+Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
 
 <metal:block use-macro="context/@@ploneform-macros/actions" />
 

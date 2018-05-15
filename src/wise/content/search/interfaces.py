@@ -1,8 +1,6 @@
 from zope.interface import Attribute, Interface
 from zope.schema import Choice, Int, List  # , TextLine
 
-# from .vocabulary import SubFormsVocabulary
-
 
 class IEmbededForm(Interface):
     """ A form that is "embeded" in another form
@@ -78,16 +76,3 @@ class IMarineUnitIDSelect(Interface):
         description=u"Select one or more MarineUnitIDs that you're interested",
         vocabulary="wise_search_marine_unit_id_vocab"
     )
-
-
-# class IA81aSubformSelect(Interface):
-#     theme = Choice(title=u"Select theme",
-#                    required=False,
-#                    vocabulary=SubFormsVocabulary(form))
-
-# wise_search_81a_themes"
-# class IA81bSubformSelect(Interface):
-#     theme = Choice(title=u"Select theme",
-#                    required=False,
-#                    default='',
-#                    vocabulary="wise_search_81b_themes")
