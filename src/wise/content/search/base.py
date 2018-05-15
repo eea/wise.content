@@ -1,3 +1,4 @@
+from sqlalchemy import inspect
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
@@ -8,12 +9,18 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
+from .utils import get_registered_form_sections
 
-class BaseFormUtil(object):
+
+class BaseUtil(object):
     """ Generic utilities for search views
     """
 
-    def labelAsTitle(self, text):
+    def name_as_title(self, text):
+        """ Given a "CamelCase" text, changes it to "Title Text"
+
+        This is used to transform the database column names to usable labels
+        """
         text = text.replace('_', ' ')
 
         for l in range(len(text)-1):
@@ -23,35 +30,50 @@ class BaseFormUtil(object):
 
         return text
 
-    def get_marine_unit_id(self):
-        parent = self.parentForm
+    def get_marine_unit_ids(self):
+        """ Return the selected ids by looking up for data in parent forms
+        """
+
+        parent = self
 
         while True:
-            muid = parent.data.get('marine_unit_id')
+            print("looking marineunitids", self)
+            ids = parent.data.get('marine_unit_ids')
 
-            if muid:
+            if ids:
                 break
             else:
-                parent = parent.parentForm
+                parent = parent.context
 
-        return muid
+        return ids
+
+    def get_obj_fields(self, obj):
+        """ Inspect an SA object and return its field names
+        """
+        mapper = inspect(obj)
+
+        return [c.key for c in mapper.attrs]
 
 
-class SubForm(Form):
-    implements(interfaces.ISubForm)
+class EmbededForm(Form, BaseUtil):
+    """ Our most basic super-smart-superclass for forms
+
+    It can embed other children forms
+    """
+
+    implements(interfaces.IEmbededForm)
     ignoreContext = True
 
     template = ViewPageTemplateFile('pt/subform.pt')
     subform_class = None
 
-    def __init__(self, context, request, parentForm):
-        self.context = context
+    def __init__(self, context, request):
+        self.__parent__ = self.context = context
         self.request = request
-        self.parentForm = self.__parent__ = parentForm
         self.data = {}
 
     def update(self):
-        super(SubForm, self).update()
+        super(EmbededForm, self).update()
 
         self.data, errors = self.extractData()
 
@@ -68,7 +90,7 @@ class SubForm(Form):
         if klass is None:
             return None
 
-        return klass(self.context, self.request, self)
+        return klass(self, self.request)
 
     def extras(self):
         extras = queryMultiAdapter((self, self.request), name='extras')
@@ -77,7 +99,26 @@ class SubForm(Form):
             return extras()
 
 
-class ItemDisplayForm(SubForm):
+class CollectionDisplayForm(EmbededForm):
+    """ Display a collection of data (multiple rows of results)
+    """
+
+    pages = None        # a list of items to show
+
+    template = ViewPageTemplateFile('pt/collection.pt')
+
+    def __init__(self, *args, **kwargs):
+        super(CollectionDisplayForm, self).__init__(*args, **kwargs)
+
+    def update(self):
+        super(CollectionDisplayForm, self).update()
+        self.count, self.items = self.get_db_results()
+
+    def display_item(self, item):
+        return item
+
+
+class ItemDisplayForm(EmbededForm, BaseUtil):
     """ Generic form for displaying records
     """
 
@@ -85,6 +126,7 @@ class ItemDisplayForm(SubForm):
 
     fields = Fields(interfaces.IRecordSelect)
 
+    template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
 
@@ -111,8 +153,9 @@ class ItemDisplayForm(SubForm):
         """ Compute the item to be displayed
         """
 
+        self.count, self.item = self.get_db_results()
+
         # res = self.get_db_results()
-        self.item = self.get_db_results()
         #
         # try:
         #     values = next(res)      # TODO: what if it's empty value?
@@ -129,7 +172,7 @@ class ItemDisplayForm(SubForm):
         return self.extra_data_template()
 
 
-class ItemDisplay(BrowserView, BaseFormUtil):
+class ItemDisplay(BrowserView, BaseUtil):
     """ A not-registered view that will render inline (a database result)
     """
 
@@ -139,8 +182,7 @@ class ItemDisplay(BrowserView, BaseFormUtil):
     data = {}
 
     def __init__(self, context, request):
-        self.parentForm = context
-        self.context = context
+        self.__parent__ = self.context = context
         self.request = request
 
     def __call__(self):
@@ -152,7 +194,7 @@ class ItemDisplay(BrowserView, BaseFormUtil):
         raise NotImplementedError
 
     def get_page(self):
-        page = self.parentForm.data.get('page')
+        page = self.context.data.get('page')
 
         if page:
             return int(page)
@@ -180,7 +222,7 @@ class ItemDisplay(BrowserView, BaseFormUtil):
         return self.extra_data_template()
 
 
-class MultiItemDisplayForm(SubForm):
+class MultiItemDisplayForm(EmbededForm):
     data_template = ViewPageTemplateFile('pt/multi-item-display.pt')
 
     fields = Fields(interfaces.IRecordSelect)
@@ -202,3 +244,14 @@ class MultiItemDisplayForm(SubForm):
     def update(self):
         super(MultiItemDisplayForm, self).update()
         self.data['page'] = self.widgets['page'].value
+
+
+class MultiItemSubform(MultiItemDisplayForm, BaseUtil):
+    """ Base class for multi-item display forms.
+    """
+
+    def get_sections(self):
+        klasses = get_registered_form_sections(self)
+        views = [k(self, self.request) for k in klasses]
+
+        return views

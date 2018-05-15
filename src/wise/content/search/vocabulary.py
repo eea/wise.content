@@ -11,6 +11,8 @@ class SubFormsVocabulary(SimpleVocabulary):
     """ An hackish vocabulary that retrieves subform names for a form
     """
 
+    # TODO: I'm not sure if this is needed. Its existance needs to be defended
+
     def __init__(self, form_klass):
         self.form_klass = form_klass
         pass
@@ -85,9 +87,21 @@ def articles_vocabulary_factory(context):
 
 
 @provider(IVocabularyFactory)
-def marine_unit_id_vocab_factory(context):
+def marine_unit_ids_vocab_factory(context):
+    """ A list of MarineUnitIds based on geodata selected
+    """
     data = context.data
-    ids = db.get_marine_unit_ids(**data)
+    count, ids = db.get_marine_unit_ids(**data)
+    terms = [SimpleTerm(x, x, x) for x in ids]
+
+    return SimpleVocabulary(terms)
+
+
+@provider(IVocabularyFactory)
+def marine_unit_id_vocab_factory(context):
+    """ A list of MarineUnitIds taken from parent form selection
+    """
+    ids = context.subform.get_available_marine_unit_ids()
     terms = [SimpleTerm(x, x, x) for x in ids]
 
     return SimpleVocabulary(terms)

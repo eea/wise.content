@@ -30,6 +30,11 @@
     name="wise_search_marine_unit_id_vocab"
     />
 
+  <utility
+    component=".vocabulary.marine_unit_ids_vocab_factory"
+    name="wise_search_marine_unit_ids_vocab"
+    />
+
 
   <!-- <utility -->
   <!--   component=".vocabulary.a81a_themes_vocabulary_factory" -->

@@ -136,3 +136,16 @@
     #
     #         return
 
+    # import pdb; pdb.set_trace()
+
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT *
+# FROM MSFD9_Descriptors
+# WHERE
+# MarineUnitID = :marine_unit_id
+# ORDER BY MSFD9_Descriptor_ID
+# OFFSET :page ROWS
+# FETCH NEXT 1 ROWS ONLY
+# """), marine_unit_id=marine_unit_id, page=page)
+

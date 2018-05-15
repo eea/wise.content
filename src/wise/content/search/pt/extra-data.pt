@@ -1,34 +1,31 @@
-<!-- <div tal:define="data view/get_extra_data" class="extra&#45;details"> -->
-<!--  -->
-<!--   <div tal:repeat="info data"> -->
-<!--     <tal:section define="section python: info[1]; section_title python: info[0]"> -->
-<!--  -->
-<!--       <h4 tal:content="section_title">Section label</h4> -->
-<!--  -->
-<!--       <div tal:repeat="section_label section"> -->
-<!--         <h5 tal:content="section_label">SubSection Label</h5> -->
-<!--  -->
-<!--         <!&#45;&#45; <div tal:content="section"></div> &#45;&#45;> -->
-<!--  -->
-<!--         <tal:def define="section_data python:section[section_label]"> -->
-<!--           <table class="listing" tal:condition="section_data"> -->
-<!--             <thead> -->
-<!--               <tr tal:define="row_labels python:section_data[0].keys()"> -->
-<!--                 <th tal:repeat="l row_labels" tal:content="python:view.labelAsTitle(l)">Label</th> -->
-<!--               </tr> -->
-<!--             </thead> -->
-<!--             <tbody> -->
-<!--               <tr tal:repeat="row section_data" > -->
-<!--                 <td tal:repeat="v row/values" tal:content="v">Value</td> -->
-<!--               </tr> -->
-<!--             </tbody> -->
-<!--  -->
-<!--           </table> -->
-<!--         </tal:def> -->
-<!--  -->
-<!--       </div> -->
-<!--  -->
-<!--     </tal:section> -->
-<!--  -->
-<!--   </div> -->
-<!-- </div> -->
+<div tal:define="data view/get_extra_data" class="extra-details">
+
+  <div tal:repeat="info data">
+    <tal:section define="section python: info[1]; section_title python: info[0]">
+
+      <div tal:repeat="section_label section">
+        <h4 tal:content="string: $section_title: $section_label">SubSection Label</h4>
+
+        <tal:def define="section_data python:section[section_label]">
+          <table class="listing" tal:condition="section_data">
+            <thead>
+              <tr tal:define="row_labels python:section_data[0].keys()">
+                <th tal:repeat="l row_labels"
+                  tal:content="python:view.name_as_title(l)">Label</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr tal:repeat="row section_data" >
+                <td tal:repeat="v row/values" tal:content="v">Value</td>
+              </tr>
+            </tbody>
+
+          </table>
+        </tal:def>
+
+      </div>
+
+    </tal:section>
+
+  </div>
+</div>

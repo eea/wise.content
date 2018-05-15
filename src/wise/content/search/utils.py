@@ -13,8 +13,8 @@ def pivot_data(data, pivot):
 
 
 FORMS = {}                          # main chapter 1 article form classes
-SUBFORMS = defaultdict(list)        # store subform references
-ITEM_DISPLAYS = defaultdict(list)   # store registration for item displays
+SUBFORMS = defaultdict(set)        # store subform references
+ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
 
 
 def class_id(obj):
@@ -51,7 +51,7 @@ def register_subform(mainform):
     """
 
     def wrapper(klass):
-        SUBFORMS[mainform].append(klass)
+        SUBFORMS[mainform].add(klass)
 
         return klass
 
@@ -75,7 +75,7 @@ def register_form_section(parent_klass):
     """
 
     def wrapper(klass):
-        ITEM_DISPLAYS[parent_klass].append(klass)
+        ITEM_DISPLAYS[parent_klass].add(klass)
 
         return klass
 

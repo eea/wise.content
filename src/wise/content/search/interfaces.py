@@ -1,10 +1,10 @@
 from zope.interface import Attribute, Interface
-from zope.schema import Choice, Int  # , TextLine
+from zope.schema import Choice, Int, List  # , TextLine
 
-from .vocabulary import SubFormsVocabulary
+# from .vocabulary import SubFormsVocabulary
 
 
-class ISubForm(Interface):
+class IEmbededForm(Interface):
     """ A form that is "embeded" in another form
     """
 
@@ -13,7 +13,7 @@ class ISubForm(Interface):
         """
 
 
-class IItemDisplayForm(ISubForm):
+class IItemDisplayForm(IEmbededForm):
     data_template = Attribute(u"Template to be used to show item data")
     extra_data_template = Attribute(u"Template for any extra item data")
 
@@ -37,36 +37,47 @@ class IRecordSelect(Interface):
     page = Int(title=u'Record page', required=False, default=0)
 
 
-class IMain_Articles8910(Interface):
+class IStartArticles8910(Interface):
+    member_states = List(
+        title=u"Member state",
+        value_type=Choice(vocabulary="wise_search_member_states"),
+        required=True,
+    )
 
-    member_state = Choice(title=u"Member state",
-                          required=False,
-                          default='',
-                          vocabulary="wise_search_member_states")
+    region_subregions = List(
+        title=u"Region and Subregions",
+        value_type=Choice(vocabulary="wise_search_region_subregions"),
+        required=True,
+    )
 
-    region_subregion = Choice(title=u"Region and Subregions",
-                              required=False,
-                              default='',
-                              vocabulary="wise_search_region_subregions")
+    area_types = List(
+        title=u"Area Type",
+        value_type=Choice(vocabulary="wise_search_area_type"),
+        required=True,
+    )
 
-    area_type = Choice(title=u"Area Type",
-                       required=False,
-                       default='',
-                       vocabulary="wise_search_area_type")
+
+class IMarineUnitIDsSelect(Interface):
+    marine_unit_ids = List(
+        title=u"MarineUnitID",
+        description=u"Select one or more MarineUnitIDs that you're interested",
+        value_type=Choice(vocabulary="wise_search_marine_unit_ids_vocab")
+    )
 
 
 class IArticleSelect(Interface):
-    article = Choice(title=u"Select article",
+    article = Choice(title=u"Article",
                      required=False,
                      default='',
                      vocabulary="wise_search_articles")
 
 
 class IMarineUnitIDSelect(Interface):
-    marine_unit_id = Choice(title=u"Select MarineUnitID",
-                            required=False,
-                            default='',
-                            vocabulary="wise_search_marine_unit_id_vocab")
+    marine_unit_id = Choice(
+        title=u"MarineUnitID",
+        description=u"Select one or more MarineUnitIDs that you're interested",
+        vocabulary="wise_search_marine_unit_id_vocab"
+    )
 
 
 # class IA81aSubformSelect(Interface):
