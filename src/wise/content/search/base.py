@@ -131,6 +131,39 @@ class EmbededForm(Form, BaseUtil):
             return extras()
 
 
+class MarineUnitIDSelectForm(EmbededForm):
+    """ Base form for displaying information for a single MarineUnitID
+    """
+
+    fields = Fields(interfaces.IMarineUnitIDSelect)
+
+    def update(self):
+        # Override the default to be able to have a default marine unit id
+        super(EmbededForm, self).update()
+
+        # TODO: there needs to be a custom widget for this
+        # muids = self.widgets['marine_unit_id'].value
+        # default = None
+        #
+        # if not muids:
+        #     available = [x['value'] for x in
+        #                  self.widgets['marine_unit_id'].items()]
+        #
+        #     if available:
+        #         self.widgets['marine_unit_id'].value = default = [available[0]]
+
+        self.data, errors = self.extractData()
+
+        # if default:
+        #     self.data['marine_unit_id'] = default[0]
+
+        if not errors and not (None in self.data.values()):
+            subform = self.get_subform()
+
+            if subform is not None:
+                self.subform = subform
+
+
 class ItemDisplayForm(EmbededForm):
     """ Generic form for displaying records
     """
@@ -182,24 +215,6 @@ class MultiItemDisplayForm(ItemDisplayForm):
 
     fields = Fields(interfaces.IRecordSelect)
 
-    # def update(self):
-    #     super(MultiItemDisplayForm, self).update()
-    #     self.data['page'] = self.widgets['page'].value
-    #
-    # def updateWidgets(self, prefix=None):
-    #     super(MultiItemDisplayForm, self).updateWidgets()
-    #     self.widgets['page'].mode = 'hidden'
-
-    # @buttonAndHandler(u'Prev', name='prev')
-    # def handle_prev(self, action):
-    #     value = int(self.widgets['page'].value)
-    #     self.widgets['page'].value = max(value - 1, 0)
-    #
-    # @buttonAndHandler(u'Next', name='next')
-    # def handle_next(self, action):
-    #     value = int(self.widgets['page'].value)
-    #     self.widgets['page'].value = value + 1
-
     def get_sections(self):
         klasses = get_registered_form_sections(self)
         views = [k(self, self.request) for k in klasses]
@@ -243,9 +258,3 @@ class ItemDisplay(BrowserView, BaseUtil):
 
     def extras(self):
         return self.extra_data_template()
-
-
-# class MultiItemSubform(MultiItemDisplayForm):
-#     """ Base class for multi-item display forms.
-#     """
-#

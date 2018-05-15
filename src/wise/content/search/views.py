@@ -11,7 +11,7 @@ from z3c.form.field import Fields
 from z3c.form.form import Form
 
 from .base import (EmbededForm, ItemDisplay, ItemDisplayForm,
-                   MultiItemDisplayForm)
+                   MarineUnitIDSelectForm, MultiItemDisplayForm)
 from .utils import (get_form, pivot_data, register_form, register_form_section,
                     register_subform)
 from .vocabulary import SubFormsVocabulary
@@ -71,12 +71,11 @@ class ArticleSelectForm(EmbededForm):
 
 
 @register_form
-class A9Form(EmbededForm):
+class A9Form(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 9 form
     """
 
     title = 'Article 9 (GES determination)'
-    fields = Fields(interfaces.IMarineUnitIDSelect)
 
     def get_subform(self):
         return A9ItemDisplay(self, self.request)
