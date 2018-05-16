@@ -1,8 +1,6 @@
 from plone.z3cform.layout import wrap_form
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
-from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 
 from .base import EmbededForm, MainForm

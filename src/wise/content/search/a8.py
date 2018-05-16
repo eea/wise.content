@@ -1,5 +1,3 @@
-# from collections import defaultdict
-
 from zope.schema import Choice
 
 from wise.content.search import db, sql
