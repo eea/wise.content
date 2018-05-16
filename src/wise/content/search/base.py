@@ -13,6 +13,7 @@ from z3c.form.field import Fields
 from z3c.form.form import Form
 
 from .db import get_available_marine_unit_ids, get_item_by_marineunitid
+from .interfaces import IMainForm
 from .utils import get_registered_form_sections
 from .widget import MarineUnitIDSelectFieldWidget
 
@@ -87,6 +88,37 @@ class BaseUtil(object):
 
         return value
 
+    def get_main_form(self):
+        """ Crawl back form chain to get to the main form
+        """
+
+        context = self
+
+        while not IMainForm.providedBy(context):
+            context = context.context
+
+        return context
+
+
+class MainForm(Form):
+    """ The main forms need to inherit from this clas
+    """
+
+    implements(IMainForm)
+    template = ViewPageTemplateFile('pt/mainform.pt')
+    ignoreContext = True
+    reset_page = False
+
+    @buttonAndHandler(u'Apply filters', name='continue')
+    def handle_continue(self, action):
+        self.reset_page = True
+
+    @buttonAndHandler(u'Download as XLS', name='download')
+    def handle_download(self, action):
+        # TODO: implement this, generalize this class as a superclass
+        # TODO: implement download method here
+        pass
+
 
 class EmbededForm(Form, BaseUtil):
     """ Our most basic super-smart-superclass for forms
@@ -145,7 +177,6 @@ class MarineUnitIDSelectForm(EmbededForm):
         # Override the default to be able to have a default marine unit id
         super(EmbededForm, self).update()
 
-        # import pdb; pdb.set_trace()
         self.data, errors = self.extractData()
 
         if not errors and not (None in self.data.values()):
@@ -175,12 +206,19 @@ class ItemDisplayForm(EmbededForm):
     template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
+
     mapper_class = None     # This will be used to retrieve the item
     order_field = None      # This will be used to properly page between items
 
     def update(self):
         super(ItemDisplayForm, self).update()
-        self.data['page'] = self.widgets['page'].value
+
+        if not self.get_main_form().reset_page:
+            self.data['page'] = self.widgets['page'].value
+        else:
+            self.widgets['page'].value = 0
+            self.data['page'] = 0
+
         self.count, self.item = self.get_db_results()
 
     def updateWidgets(self, prefix=None):

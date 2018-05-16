@@ -2,6 +2,11 @@ from zope.interface import Attribute, Interface
 from zope.schema import Choice, Int, List  # , TextLine
 
 
+class IMainForm(Interface):
+    """ A marker interface to easily identify main forms
+    """
+
+
 class IEmbededForm(Interface):
     """ A form that is "embeded" in another form
     """

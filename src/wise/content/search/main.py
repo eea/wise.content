@@ -4,13 +4,12 @@ from wise.content.search import interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
-from z3c.form.form import Form
 
-from .base import EmbededForm
+from .base import EmbededForm, MainForm
 from .utils import get_form, scan
 
 
-class StartArticle8910Form(Form):
+class StartArticle8910Form(MainForm):
     """ Select the memberstate, region, area form
     """
 
@@ -19,19 +18,6 @@ class StartArticle8910Form(Form):
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
     fields['region_subregions'].widgetFactory = CheckBoxFieldWidget
     fields['area_types'].widgetFactory = CheckBoxFieldWidget
-
-    ignoreContext = True
-    template = ViewPageTemplateFile('pt/mainform.pt')
-
-    @buttonAndHandler(u'Apply filters', name='continue')
-    def handle_continue(self, action):
-        pass
-
-    @buttonAndHandler(u'Download as XLS', name='download')
-    def handle_download(self, action):
-        # TODO: implement this, generalize this class as a superclass
-        # TODO: implement download method here
-        pass
 
     def update(self):
         super(StartArticle8910Form, self).update()
