@@ -10,7 +10,7 @@
   <browser:page
     for="*"
     name="msfd_search"
-    class=".views.StartArticle8910View"
+    class=".main.StartArticle8910View"
     permission="zope2.View"
     />
 

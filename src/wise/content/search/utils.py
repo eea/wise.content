@@ -84,3 +84,15 @@ def register_form_section(parent_klass):
 
 def get_registered_form_sections(form):
     return ITEM_DISPLAYS[form.__class__]
+
+
+def scan(namespace):
+    """ Scans the namespace for modules and imports them, to activate decorator
+    """
+
+    import importlib
+    # import pkgutil
+    # import wise.content.search
+
+    name = importlib._resolve_name(namespace, 'wise.content.search', 1)
+    importlib.import_module(name)
