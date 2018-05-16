@@ -2,7 +2,7 @@ from zope.interface import implements, provider
 from zope.schema.interfaces import IContextSourceBinder, IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from wise.content.search import db
+from wise.content.search import db, sql
 
 from .utils import FORMS, SUBFORMS
 
@@ -50,31 +50,29 @@ class SubFormsVocabulary(SimpleVocabulary):
         return d
 
 
-@provider(IVocabularyFactory)
-def get_member_states_vb_factory(context):
-    res = db.get_member_states()
+def db_vocab(table, column):
+    """ Builds a vocabulary based on unique values in a column table
+    """
+    res = db.get_unique_from_table(table, column)
     terms = [SimpleTerm(x, x, x) for x in res]
     vocab = SimpleVocabulary(terms)
 
     return vocab
+
+
+@provider(IVocabularyFactory)
+def get_member_states_vb_factory(context):
+    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'MemberState')
 
 
 @provider(IVocabularyFactory)
 def get_region_subregions_vb_factory(context):
-    res = db.get_regions_subregions()
-    terms = [SimpleTerm(x, x, x) for x in res]
-    vocab = SimpleVocabulary(terms)
-
-    return vocab
+    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'RegionSubRegions')
 
 
 @provider(IVocabularyFactory)
 def get_area_type_vb_factory(context):
-    res = db.get_area_types()
-    terms = [SimpleTerm(x, x, x) for x in res]
-    vocab = SimpleVocabulary(terms)
-
-    return vocab
+    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'AreaType')
 
 
 @provider(IVocabularyFactory)

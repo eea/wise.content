@@ -210,3 +210,190 @@
 #         return item
 
 
+# def get_a9_available_marine_unit_ids(marine_unit_ids):
+#     """ Returns a list of which muid is available, of the ones provided
+#     """
+#     sess = session()
+#     q = sess.query(sql.MSFD9Descriptor.MarineUnitID).filter(
+#         sql.MSFD9Descriptor.MarineUnitID.in_(marine_unit_ids)
+#     ).distinct()
+#
+#     total = q.count()
+#
+#     return [total, q]
+
+
+# def get_a10_available_marine_unit_ids(marine_unit_ids):
+#     """ Returns a list of which muid is available, of the ones provided
+#     """
+#     sess = session()
+#     q = sess.query(sql.MSFD10Target.MarineUnitID).filter(
+#         sql.MSFD10Target.MarineUnitID.in_(marine_unit_ids)
+#     ).distinct()
+#
+#     total = q.count()
+#
+#     return [total, q]
+
+# def get_a8_available_marine_unit_ids(marine_unit_ids):
+#     """ Returns a list of which muid is available, of the ones provided
+#
+#     TODO: implement specific to A8
+#     """
+#     sess = session()
+#     q = sess.query(sql.MSFD10Target.MarineUnitID).filter(
+#         sql.MSFD10Target.MarineUnitID.in_(marine_unit_ids)
+#     ).distinct()
+#
+#     total = q.count()
+#
+#     return [total, q]
+
+
+
+    # def get_db_results(self):
+    #     page = self.get_page()
+    #     muid = self.get_marine_unit_id()
+    #
+    #     return db.get_a81a_ecosystem(marine_unit_id=muid, page=page)
+
+
+
+    # def get_db_results(self):
+    #     mid = self.context.data.get('marine_unit_id')
+    #     page = self.get_page()
+    #
+    #     return db.get_a10_targets(marine_unit_id=mid, page=page)
+    # def get_db_results(self):
+    #     mid = self.context.data.get('marine_unit_id')
+    #     page = self.get_page()
+    #
+    #     return db.get_a9_descriptors(marine_unit_id=mid, page=page)
+
+
+
+# def get_a81a_ecosystem(marine_unit_id, page=0):
+#     klass = sql.MSFD8aEcosystem
+#
+#     sess = session()
+#     q = sess.query(klass).filter(
+#         klass.MarineUnitID == marine_unit_id
+#     ).order_by(
+#         klass.MSFD8a_Ecosystem_ID
+#     )
+#
+#     total = q.count()
+#     item = q.offset(page).limit(1).first()
+#
+#     return [total, item]
+
+
+
+# def get_a81a_ecosystem_pressureimpacts(rel_id, page=0):
+#     klass = sql.MSFD8aEcosystemPressuresImpact
+#
+#     sess = session()
+#     q = sess.query(klass).filter(
+#         klass.MSFD8a_Ecosystem == rel_id
+#     ).one()
+#     item = q.first()
+#
+#     return [1, item]
+# _pressure_impacts
+
+
+# def get_a10_targets(marine_unit_id, page=0):
+#     sess = session()
+#     q = sess.query(sql.MSFD10Target).filter_by(
+#         MarineUnitID=marine_unit_id
+#     ).order_by(sql.MSFD10Target.MSFD10_Target_ID)
+#
+#     total = q.count()
+#     item = q.offset(page).limit(1).first()
+#
+#     # TODO: the MSFD10_DESCrit is not ORM mapped yet
+#     # this query is not finished!!!!
+#
+#     return [total, item]
+
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT MSFD10_Targets.*, MSFD10_DESCrit.GESDescriptorsCriteriaIndicators
+# FROM MSFD10_Targets
+# JOIN MSFD10_DESCrit
+#     ON MSFD10_Targets.MSFD10_Target_ID = MSFD10_DESCrit.MSFD10_Target
+# WHERE
+# MSFD10_Targets.MarineUnitID = :marine_unit_id
+# ORDER BY MSFD10_Targets.MSFD10_Target_ID
+# OFFSET :page ROWS
+# FETCH NEXT 1 ROWS ONLY
+# """), marine_unit_id=marine_unit_id, page=page)
+
+    # this is a temporary hack to overcome this
+    # row = next(res)
+    # keys = res.keys()
+    # res = dict(zip(keys, row))
+    # gdci = res.pop('GESDescriptorsCriteriaIndicators')
+    # obj = sql.MSFD10Target(**res)
+    # obj.GESDescriptorsCriteriaIndicators = gdci
+
+
+def get_a9_descriptors(marine_unit_id, page=0):
+    sess = session()
+    q = sess.query(sql.MSFD9Descriptor).filter(
+        sql.MSFD9Descriptor.MarineUnitID == marine_unit_id
+    ).order_by(sql.MSFD9Descriptor.MSFD9_Descriptor_ID)
+
+    total = q.count()
+    item = q.offset(page).limit(1).first()
+
+    return [total, item]
+
+
+    # res = db.get_regions_subregions()
+    # terms = [SimpleTerm(x, x, x) for x in res]
+    # vocab = SimpleVocabulary(terms)
+    #
+    # return vocab
+
+    # res = db.get_area_types()
+    # terms = [SimpleTerm(x, x, x) for x in res]
+    # vocab = SimpleVocabulary(terms)
+    #
+    # return vocab
+
+# def get_member_states():
+#     """ Returns a list of member states. Used in Articles 8, 9 and 10 searches
+#     """
+#     table = sql.t_MSFD4_GegraphicalAreasID
+#     col = table.c.MemberState
+#
+#     sess = session()
+#     res = sess.query(col).distinct().order_by(col)
+#
+#     return [x[0] for x in res]
+
+
+# def get_regions_subregions():
+#     """ Returns a list of regions and subregions.
+#     """
+#     table = sql.t_MSFD4_GegraphicalAreasID
+#     col = table.c.RegionSubRegions
+#
+#     sess = session()
+#     res = sess.query(col).distinct().order_by(col)
+#
+#     return [x[0] for x in res]
+
+
+# def get_area_types():
+#     """ Returns a list of area types.
+#     """
+#
+#     table = sql.t_MSFD4_GegraphicalAreasID
+#     col = table.c.AreaType
+#
+#     sess = session()
+#     res = sess.query(col).distinct().order_by(col)
+#
+#     return [x[0] for x in res]

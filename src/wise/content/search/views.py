@@ -21,9 +21,8 @@ class StartArticle8910Form(Form):
     """ Select the memberstate, region, area form
     """
 
-    # TODO: implement download method here
-
     fields = Fields(interfaces.IStartArticles8910)
+
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
     fields['region_subregions'].widgetFactory = CheckBoxFieldWidget
     fields['area_types'].widgetFactory = CheckBoxFieldWidget
@@ -33,6 +32,12 @@ class StartArticle8910Form(Form):
 
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):
+        pass
+
+    @buttonAndHandler(u'Download as XLS', name='download')
+    def handle_download(self, action):
+        # TODO: implement this, generalize this class as a superclass
+        # TODO: implement download method here
         pass
 
     def update(self):
@@ -52,7 +57,6 @@ class MarineUnitIDsForm(EmbededForm):
     """
 
     fields = Fields(interfaces.IMarineUnitIDsSelect)
-    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
         return ArticleSelectForm(self, self.request)
@@ -76,15 +80,10 @@ class A9Form(MarineUnitIDSelectForm):
     """
 
     title = 'Article 9 (GES determination)'
+    mapper_class = sql.MSFD9Descriptor
 
     def get_subform(self):
         return A9ItemDisplay(self, self.request)
-
-    def get_available_marine_unit_ids(self):
-        ids = self.get_marine_unit_ids()
-        count, res = db.get_a9_available_marine_unit_ids(ids)
-
-        return [x[0] for x in res]
 
     def download_results(self):
         # make results available for download
@@ -95,12 +94,10 @@ class A9Form(MarineUnitIDSelectForm):
 class A9ItemDisplay(ItemDisplayForm):
     """ The implementation for the Article 9 (GES determination) form
     """
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
-    def get_db_results(self):
-        mid = self.context.data.get('marine_unit_id')
-        page = self.get_page()
-
-        return db.get_a9_descriptors(marine_unit_id=mid, page=page)
+    mapper_class = sql.MSFD9Descriptor
+    order_field = 'MSFD9_Descriptor_ID'
 
     def get_extra_data(self):
         if not self.item:
@@ -117,22 +114,15 @@ class A9ItemDisplay(ItemDisplayForm):
 
 
 @register_form
-class A10Form(EmbededForm):
+class A10Form(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 10 form
     """
 
     title = 'Article 10 (Targets)'
-
-    fields = Fields(interfaces.IMarineUnitIDSelect)
+    mapper_class = sql.MSFD10Target
 
     def get_subform(self):
         return A10ItemDisplay(self, self.request)
-
-    def get_available_marine_unit_ids(self):
-        ids = self.get_marine_unit_ids()
-        count, res = db.get_a10_available_marine_unit_ids(ids)
-
-        return [x[0] for x in res]
 
     def download_results(self):
         # make results available for download
@@ -143,12 +133,11 @@ class A10Form(EmbededForm):
 class A10ItemDisplay(ItemDisplayForm):
     """ The implementation of the Article 10 fom
     """
+    mapper_class = sql.MSFD10Target
+    order_field = 'MSFD10_Target_ID'
 
-    def get_db_results(self):
-        mid = self.context.data.get('marine_unit_id')
-        page = self.get_page()
-
-        return db.get_a10_targets(marine_unit_id=mid, page=page)
+#     # TODO: the MSFD10_DESCrit is not ORM mapped yet
+#     # this query is not finished!!!!
 
     def get_extra_data(self):
         if not self.item:
@@ -175,7 +164,7 @@ class A81aForm(EmbededForm):
 
     @property
     def fields(self):
-        # TODO: could reimplemented with simple vocab, no need for hard
+        # TODO: could this be reimplemented with simple vocab?
         theme = Choice(
             __name__='theme',
             title=u"Select theme",
@@ -192,21 +181,14 @@ class A81aForm(EmbededForm):
 
 
 @register_subform(A81aForm)
-class A81aEcoSubForm(EmbededForm):
+class A81aEcoSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
     """
     title = 'Ecosystem(s)'
-
-    fields = Fields(interfaces.IMarineUnitIDSelect)
+    mapper_class = sql.MSFD8aEcosystem
 
     def get_subform(self):
         return A81aEcoItemDisplay(self, self.request)
-
-    def get_available_marine_unit_ids(self):
-        ids = self.get_marine_unit_ids()
-        count, res = db.get_a10_available_marine_unit_ids(ids)
-
-        return [x[0] for x in res]
 
     def download_results(self):
         # make results available for download
@@ -217,12 +199,8 @@ class A81aEcoSubForm(EmbededForm):
 class A81aEcoItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1a
     """
-
-    def get_db_results(self):
-        page = self.get_page()
-        muid = self.get_marine_unit_id()
-
-        return db.get_a81a_ecosystem(marine_unit_id=muid, page=page)
+    mapper_class = sql.MSFD8aEcosystem
+    order_field = 'MSFD8a_Ecosystem_ID'
 
 
 @register_form_section(A81aEcoItemDisplay)
@@ -230,11 +208,12 @@ class A81aEcosystemPressures(ItemDisplay):
     title = 'Pressures and impacts'
 
     def get_db_results(self):
-        return db.get_related_record(
-            sql.MSFD8aEcosystemPressuresImpact,
-            'MSFD8a_Ecosystem',
-            self.context.item.MSFD8a_Ecosystem_ID
-        )
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8aEcosystemPressuresImpact,
+                'MSFD8a_Ecosystem',
+                self.context.item.MSFD8a_Ecosystem_ID
+            )
 
 
 @register_form_section(A81aEcoItemDisplay)
@@ -242,11 +221,12 @@ class A81aEcosystemAsessment(ItemDisplay):
     title = 'Status Asessment'
 
     def get_db_results(self):
-        return db.get_related_record(
-            sql.MSFD8aEcosystemStatusAssessment,
-            'MSFD8a_Ecosystem',
-            self.context.item.MSFD8a_Ecosystem_ID
-        )
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8aEcosystemStatusAssessment,
+                'MSFD8a_Ecosystem',
+                self.context.item.MSFD8a_Ecosystem_ID
+            )
 
     def get_extra_data(self):
         if not self.item:

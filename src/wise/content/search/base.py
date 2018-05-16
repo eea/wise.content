@@ -12,7 +12,9 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
+from .db import get_available_marine_unit_ids, get_item_by_marineunitid
 from .utils import get_registered_form_sections
+from .widget import MarineUnitIDSelectFieldWidget
 
 
 class BaseUtil(object):
@@ -136,32 +138,30 @@ class MarineUnitIDSelectForm(EmbededForm):
     """
 
     fields = Fields(interfaces.IMarineUnitIDSelect)
+    fields['marine_unit_id'].widgetFactory = MarineUnitIDSelectFieldWidget
+    mapper_class = None         # what type of objects are we focused on?
 
     def update(self):
         # Override the default to be able to have a default marine unit id
         super(EmbededForm, self).update()
 
-        # TODO: there needs to be a custom widget for this
-        # muids = self.widgets['marine_unit_id'].value
-        # default = None
-        #
-        # if not muids:
-        #     available = [x['value'] for x in
-        #                  self.widgets['marine_unit_id'].items()]
-        #
-        #     if available:
-        #         self.widgets['marine_unit_id'].value = default = [available[0]]
-
+        # import pdb; pdb.set_trace()
         self.data, errors = self.extractData()
-
-        # if default:
-        #     self.data['marine_unit_id'] = default[0]
 
         if not errors and not (None in self.data.values()):
             subform = self.get_subform()
 
             if subform is not None:
                 self.subform = subform
+
+    def get_available_marine_unit_ids(self):
+        assert self.mapper_class
+        ids = self.get_marine_unit_ids()
+        count, res = get_available_marine_unit_ids(
+            ids, self.mapper_class
+        )
+
+        return [x[0] for x in res]
 
 
 class ItemDisplayForm(EmbededForm):
@@ -175,6 +175,8 @@ class ItemDisplayForm(EmbededForm):
     template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
+    mapper_class = None     # This will be used to retrieve the item
+    order_field = None      # This will be used to properly page between items
 
     def update(self):
         super(ItemDisplayForm, self).update()
@@ -209,6 +211,13 @@ class ItemDisplayForm(EmbededForm):
         else:
             return 0
 
+    def get_db_results(self):
+        page = self.get_page()
+        muid = self.get_marine_unit_id()
+
+        return get_item_by_marineunitid(self.mapper_class, self.order_field,
+                                        marine_unit_id=muid, page=page)
+
 
 class MultiItemDisplayForm(ItemDisplayForm):
     template = ViewPageTemplateFile('pt/multi-item-display.pt')
@@ -236,9 +245,14 @@ class ItemDisplay(BrowserView, BaseUtil):
     def __init__(self, context, request):
         self.__parent__ = self.context = context
         self.request = request
+        self.count = 0
+        self.item = None
 
     def __call__(self):
-        self.count, self.item = self.get_db_results()
+        res = self.get_db_results()
+
+        if res:
+            self.count, self.item = res
 
         return self.index()
 

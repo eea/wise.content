@@ -1,0 +1,34 @@
+<div tal:define="data view/get_extra_data" class="extra-details">
+
+  <div tal:repeat="info data">
+    <tal:section define="section python: info[1]; section_title python: info[0]">
+
+      <div tal:repeat="section_label section">
+        <h4 tal:content="string: $section_title: $section_label">SubSection Label</h4>
+
+        <tal:def define="section_data python:section[section_label]">
+
+          <!-- <tal:cont replace="structure python: view.print_value(section_data)"></tal:cont> -->
+
+          <table class="listing" tal:condition="section_data">
+              <thead>
+                  <tr tal:define="row_labels python:section_data[0].keys()">
+                      <th tal:repeat="l row_labels"
+                          tal:content="python:view.name_as_title(l)">Label</th>
+                    </tr>
+                </thead>
+              <tbody>
+                  <tr tal:repeat="row section_data" >
+                      <td tal:repeat="v row/values" tal:content="v">Value</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </tal:def>
+
+      </div>
+
+    </tal:section>
+
+  </div>
+</div>

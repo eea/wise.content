@@ -10,20 +10,6 @@
 
           <tal:cont replace="structure python: view.print_value(section_data)"></tal:cont>
 
-          <!-- <table class="listing" tal:condition="section_data"> -->
-            <!--   <thead> -->
-              <!--     <tr tal:define="row_labels python:section_data[0].keys()"> -->
-                <!--       <th tal:repeat="l row_labels" -->
-                  <!--         tal:content="python:view.name_as_title(l)">Label</th> -->
-                <!--     </tr> -->
-              <!--   </thead> -->
-            <!--   <tbody> -->
-              <!--     <tr tal:repeat="row section_data" > -->
-                <!--       <td tal:repeat="v row/values" tal:content="v">Value</td> -->
-                <!--     </tr> -->
-              <!--   </tbody> -->
-            <!-- </table> -->
-
         </tal:def>
 
       </div>
