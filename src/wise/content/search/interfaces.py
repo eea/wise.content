@@ -59,7 +59,6 @@ class IStartArticles8910(Interface):
         required=True,
     )
 
-
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
         title=u"MarineUnitID",
