@@ -8,10 +8,22 @@ from .utils import get_form, scan
 
 
 class StartArticle8910Form(MainForm):
-    """ Select the memberstate, region, area form
+    """ Select one of the article: 8(a,b,c,d)/9/10
     """
 
     name = 'msfd-c1'
+
+    fields = Fields(interfaces.IArticleSelect)
+
+    def get_subform(self):
+        # klass = get_form(self.data['article'])
+
+        return MemberRegionAreaForm(self, self.request)
+
+
+class MemberRegionAreaForm(EmbededForm):
+    """ Select the memberstate, region, area form
+    """
 
     fields = Fields(interfaces.IStartArticles8910)
 
@@ -19,16 +31,25 @@ class StartArticle8910Form(MainForm):
     fields['region_subregions'].widgetFactory = CheckBoxFieldWidget
     fields['area_types'].widgetFactory = CheckBoxFieldWidget
 
-    def update(self):
-        super(StartArticle8910Form, self).update()
-
-        self.data, errors = self.extractData()
-
-        if not errors and all(self.data.values()):
-            self.subform = MarineUnitIDsForm(self, self.request)
+    def get_subform(self):
+        return MarineUnitIDsForm(self, self.request)
 
 
 StartArticle8910View = wrap_form(StartArticle8910Form)
+
+
+class MarineUnitIDsForm(EmbededForm):
+    """ Select the MarineUnitID based on MemberState, Region and Area
+    """
+
+    # TODO: properly show only available marine unit ids
+    fields = Fields(interfaces.IMarineUnitIDsSelect)
+
+    def get_subform(self):
+        data = self.get_main_form().data
+        klass = get_form(data['article'])
+
+        return super(MarineUnitIDsForm, self).get_subform(klass)
 
 
 class StartArticle11Form(MainForm):
@@ -47,29 +68,6 @@ class StartArticle1314Form(MainForm):
 
 
 StartArticle1314View = wrap_form(StartArticle1314Form)
-
-
-class MarineUnitIDsForm(EmbededForm):
-    """ Select the MarineUnitID based on MemberState, Region and Area
-    """
-
-    fields = Fields(interfaces.IMarineUnitIDsSelect)
-
-    def get_subform(self):
-        return ArticleSelectForm(self, self.request)
-
-
-class ArticleSelectForm(EmbededForm):
-    """ Select one of the article: 8(a,b,c,d)/9/10
-    """
-
-    fields = Fields(interfaces.IArticleSelect)
-
-    def get_subform(self):
-        klass = get_form(self.data['article'])
-
-        return super(ArticleSelectForm, self).get_subform(klass)
-
 
 # discover and register associated views
 scan('a8')

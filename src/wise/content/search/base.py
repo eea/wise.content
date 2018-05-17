@@ -123,11 +123,33 @@ class MainForm(Form):
     def handle_download(self, action):
         # TODO: implement this, generalize this class as a superclass
         # TODO: implement download method here
-        pass
+        context = self
+
+        while not hasattr(context, 'download_results'):
+            context = context.context
+
+        # import pdb; pdb.set_trace()
+        rows = context.download_results()
 
     @property
     def title(self):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
+
+    def post_update(self):
+        # hide the download button if not needed
+        # import pdb; pdb.set_trace()
+        pass
+
+    def update(self):
+        super(MainForm, self).update()
+        self.data, self.errors = self.extractData()
+        self.subform = self.get_subform()
+        self.post_update()
+
+        # self.data, errors = self.extractData()
+        #
+        # if not errors and all(self.data.values()):
+        #     self.subform = MarineUnitIDsForm(self, self.request)
 
 
 class EmbededForm(Form, BaseUtil):
@@ -263,8 +285,11 @@ class ItemDisplayForm(EmbededForm):
         page = self.get_page()
         muid = self.get_marine_unit_id()
 
-        return get_item_by_marineunitid(self.mapper_class, self.order_field,
+        # import pdb; pdb.set_trace()
+        res = get_item_by_marineunitid(self.mapper_class, self.order_field,
                                         marine_unit_id=muid, page=page)
+
+        return res
 
 
 class MultiItemDisplayForm(ItemDisplayForm):
