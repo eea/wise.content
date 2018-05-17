@@ -11,6 +11,8 @@ class StartArticle8910Form(MainForm):
     """ Select the memberstate, region, area form
     """
 
+    name = 'msfd-c1'
+
     fields = Fields(interfaces.IStartArticles8910)
 
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
@@ -27,6 +29,24 @@ class StartArticle8910Form(MainForm):
 
 
 StartArticle8910View = wrap_form(StartArticle8910Form)
+
+
+class StartArticle11Form(MainForm):
+    """
+    """
+    name = 'msfd-c2'
+
+
+StartArticle11View = wrap_form(StartArticle11Form)
+
+
+class StartArticle1314Form(MainForm):
+    """
+    """
+    name = 'msfd-c3'
+
+
+StartArticle1314View = wrap_form(StartArticle1314Form)
 
 
 class MarineUnitIDsForm(EmbededForm):

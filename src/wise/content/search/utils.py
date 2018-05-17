@@ -12,7 +12,7 @@ def pivot_data(data, pivot):
     return out
 
 
-FORMS = {}                          # main chapter 1 article form classes
+FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
 
@@ -27,7 +27,7 @@ def class_id(obj):
 
 
 def register_form(klass):
-    """ Registers a 'main' form class
+    """ Registers a 'secondary' form class
 
     These are the forms implementing the 'Article 9 (GES determination)',
     'Article 10 (Targets)' and so on, for one of the 'chapters'.

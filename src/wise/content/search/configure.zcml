@@ -9,17 +9,23 @@
 
   <browser:page
     for="*"
-    name="msfd_search"
+    name="msfd-c1"
     class=".main.StartArticle8910View"
     permission="zope2.View"
     />
 
-  <!-- <browser:page -->
-  <!--   for=".views.A9Form" -->
-  <!--   name="extras" -->
-  <!--   class=".views.FeaturePressureImpactsDetails" -->
-  <!--   permission="zope2.View" -->
-  <!--   template='pt/result&#45;tabs.pt' -->
-  <!--   /> -->
+  <browser:page
+    for="*"
+    name="msfd-c2"
+    class=".main.StartArticle11View"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    for="*"
+    name="msfd-c3"
+    class=".main.StartArticle1314View"
+    permission="zope2.View"
+    />
 
 </configure>

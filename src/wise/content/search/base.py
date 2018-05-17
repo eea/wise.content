@@ -109,6 +109,12 @@ class MainForm(Form):
     ignoreContext = True
     reset_page = False
 
+    main_forms = (
+        ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
+        ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
+        ('msfd-c3', 'Article 13 & 14 (2015 reporting exercise)'),
+    )
+
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):
         self.reset_page = True
@@ -118,6 +124,10 @@ class MainForm(Form):
         # TODO: implement this, generalize this class as a superclass
         # TODO: implement download method here
         pass
+
+    @property
+    def title(self):
+        return [x[1] for x in self.main_forms if x[0] == self.name][0]
 
 
 class EmbededForm(Form, BaseUtil):
