@@ -18,6 +18,7 @@ class A10Form(MarineUnitIDSelectForm):
     def download_results(self):
         # make results available for download
         # TODO: to be implemented
+        import pdb; pdb.set_trace()
         pass
 
 
@@ -30,15 +31,15 @@ class A10ItemDisplay(ItemDisplayForm):
 #     # TODO: the MSFD10_DESCrit is not ORM mapped yet
 #     # this query is not finished!!!!
 
-    def get_extra_data(self):
-        if not self.item:
-            return {}
-
-        target_id = self.item.MSFD10_Target_ID
-
-        res = db.get_a10_feature_targets(target_id)
-        ft = pivot_data(res, 'FeatureType')
-
-        return [
-            ('Feature Type', ft),
-        ]
+    # def get_extra_data(self):
+    #     if not self.item:
+    #         return {}
+    #
+    #     target_id = self.item.MSFD10_Target_ID
+    #
+    #     res = db.get_a10_feature_targets(target_id)
+    #     ft = pivot_data(res, 'FeatureType')
+    #
+    #     return [
+    #         ('Feature Type', ft),
+    #     ]

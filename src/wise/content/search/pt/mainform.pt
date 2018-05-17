@@ -22,7 +22,7 @@
 
     <metal:slot fill-slot="actions">
       <metal:block use-macro="context/@@ploneform-macros/actions" />
-      <div tal:content="structure view/subform | nothing">subform here</div>
+      <div tal:content="structure view/subform_content | nothing">subform here</div>
     </metal:slot>
 
     <metal:slot fill-slot="formtop">

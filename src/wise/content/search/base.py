@@ -108,6 +108,8 @@ class MainForm(Form):
     template = ViewPageTemplateFile('pt/mainform.pt')
     ignoreContext = True
     reset_page = False
+    subform = None
+    should_download = False     # flag that signals download button is hit
 
     main_forms = (
         ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
@@ -121,35 +123,48 @@ class MainForm(Form):
 
     @buttonAndHandler(u'Download as XLS', name='download')
     def handle_download(self, action):
-        # TODO: implement this, generalize this class as a superclass
-        # TODO: implement download method here
-        context = self
-
-        while not hasattr(context, 'download_results'):
-            context = context.context
-
-        # import pdb; pdb.set_trace()
-        rows = context.download_results()
+        self.should_download = True
 
     @property
     def title(self):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
 
-    def post_update(self):
-        # hide the download button if not needed
-        # import pdb; pdb.set_trace()
-        pass
-
     def update(self):
+        print("updating")
         super(MainForm, self).update()
         self.data, self.errors = self.extractData()
-        self.subform = self.get_subform()
-        self.post_update()
 
-        # self.data, errors = self.extractData()
-        #
-        # if not errors and all(self.data.values()):
-        #     self.subform = MarineUnitIDsForm(self, self.request)
+        self.subform = self.get_subform()
+
+        if self.subform:
+            # we need to update and "execute" the subforms to be able to
+            # discover them, because the decision process regarding discovery
+            # is done in the update() method of subforms
+            print("Updating subform")
+            self.subform_content = self.subform()
+
+        action = self.find_download_action()
+
+        if action and self.should_download:
+            # TODO: need to implement this as xls response
+            self.request.response = action()
+        elif action is None:
+            del self.actions['download']
+
+    def find_download_action(self):
+        """ Look for a download method in all subform children
+        """
+
+        ctx = self
+
+        while hasattr(ctx, 'subform'):
+
+            if hasattr(ctx, 'download_results'):
+                return ctx.download_results
+
+            ctx = ctx.subform
+
+        return False
 
 
 class EmbededForm(Form, BaseUtil):

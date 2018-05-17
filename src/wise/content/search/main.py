@@ -16,9 +16,9 @@ class StartArticle8910Form(MainForm):
     fields = Fields(interfaces.IArticleSelect)
 
     def get_subform(self):
-        # klass = get_form(self.data['article'])
 
-        return MemberRegionAreaForm(self, self.request)
+        if self.data['article']:
+            return MemberRegionAreaForm(self, self.request)
 
 
 class MemberRegionAreaForm(EmbededForm):
