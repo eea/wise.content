@@ -84,7 +84,12 @@ class BaseUtil(object):
             return value
 
         if isinstance(value, string_types):
-            return LABELS.get(value, value)
+            if value in LABELS:
+                tmpl = '<span title="%s">%s</span>'
+
+                return tmpl % (value, LABELS[value])
+
+            return value
 
         base_values = string_types + (int, datetime.datetime, list)
 
@@ -222,7 +227,9 @@ class EmbededForm(Form, BaseUtil):
 
         self.data, errors = self.extractData()
 
-        if not errors and not (None in self.data.values()):
+        has_values = self.data.values() and all(self.data.values())
+
+        if (not errors) and has_values:
             subform = self.get_subform()
 
             if subform is not None:
@@ -258,7 +265,8 @@ class MarineUnitIDSelectForm(EmbededForm):
 
         self.data, errors = self.extractData()
 
-        if not errors and not (None in self.data.values()):
+        if (not (errors or (None in self.data.values()))) and \
+                self.data.values():
             subform = self.get_subform()
 
             if subform is not None:

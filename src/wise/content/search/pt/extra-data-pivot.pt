@@ -19,7 +19,8 @@
                 </thead>
               <tbody>
                   <tr tal:repeat="row section_data" >
-                      <td tal:repeat="v row/values" tal:content="v">Value</td>
+                      <td tal:repeat="v row/values"
+                        tal:content="structure python: view.print_value(v)">Value</td>
                     </tr>
                 </tbody>
             </table>

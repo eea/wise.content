@@ -24,20 +24,22 @@ def populate_labels():
 
     for line in lines:
         line = line.strip()
-        eqpos = line.find('=')
 
-        if eqpos == -1:
-            continue
+        for splitter in ['=', '\t']:
+            eqpos = line.find(splitter)
 
-        if ' ' in line[:eqpos]:
-            continue
+            if eqpos == -1:
+                continue
 
-        label, title = line.split('=', 1)
+            if ' ' in line[:eqpos]:
+                continue
 
-        if label in LABELS:
-            continue
+            label, title = line.split(splitter, 1)
 
-        LABELS[label] = title
+            if label in LABELS:
+                continue
+
+            LABELS[label] = title
 
     return
 

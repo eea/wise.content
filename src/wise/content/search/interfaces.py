@@ -59,9 +59,10 @@ class IStartArticles8910(Interface):
         required=True,
     )
 
+
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
-        title=u"MarineUnitID",
+        title=u"MarineUnitIDs",
         description=u"Select one or more MarineUnitIDs that you're interested",
         value_type=Choice(vocabulary="wise_search_marine_unit_ids_vocab")
     )
