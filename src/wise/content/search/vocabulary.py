@@ -117,7 +117,9 @@ def get_area_type_vb_factory(context):
 def articles_vocabulary_factory(context):
     # TODO: sort terms first
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
+    terms.sort()
     vocab = SimpleVocabulary(terms)
+    #import pdb; pdb.set_trace()
 
     return vocab
 
