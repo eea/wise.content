@@ -1,8 +1,8 @@
-from wise.content.search import sql
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from wise.content.search import db, sql
 
 from .base import ItemDisplayForm, MarineUnitIDSelectForm
-from .db import get_all_records
-from .utils import data_to_xls, register_form
+from .utils import data_to_xls, pivot_data, register_form
 
 
 @register_form
@@ -18,7 +18,7 @@ class A10Form(MarineUnitIDSelectForm):
 
     def download_results(self):
         muids = self.get_marine_unit_ids()
-        count, data = get_all_records(
+        count, data = db.get_all_records(
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
@@ -28,21 +28,31 @@ class A10Form(MarineUnitIDSelectForm):
 class A10ItemDisplay(ItemDisplayForm):
     """ The implementation of the Article 10 fom
     """
+
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+
     mapper_class = sql.MSFD10Target
     order_field = 'MSFD10_Target_ID'
 
 #     # TODO: the MSFD10_DESCrit is not ORM mapped yet
 #     # this query is not finished!!!!
 
-    # def get_extra_data(self):
-    #     if not self.item:
-    #         return {}
-    #
-    #     target_id = self.item.MSFD10_Target_ID
-    #
-    #     res = db.get_a10_feature_targets(target_id)
-    #     ft = pivot_data(res, 'FeatureType')
-    #
-    #     return [
-    #         ('Feature Type', ft),
-    #     ]
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        target_id = self.item.MSFD10_Target_ID
+
+        res = db.get_a10_feature_targets(target_id)
+        ft = pivot_data(res, 'FeatureType')
+
+        res = db.get_a10_criteria_indicators(target_id)
+        res = {
+            '':
+            [{'GESDescriptorsCriteriaIndicators': x[0]} for x in res]
+        }
+
+        return [
+            ('Feature Type', ft),
+            ('Criteria Indicators', res),
+        ]

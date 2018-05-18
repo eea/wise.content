@@ -128,8 +128,8 @@ def get_a10_criteria_indicators(target_id):
     # TODO: this is not used right now, should be used, why it's not used
     conn = connection()
     res = conn.execute(text("""
-SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
-FROM MarineDB.dbo.MSFD10_FeaturesPressures
+SELECT DISTINCT GESDescriptorsCriteriaIndicators
+FROM MarineDB.dbo.MSFD10_DESCrit
 WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
