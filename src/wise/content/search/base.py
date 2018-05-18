@@ -1,6 +1,3 @@
-import datetime
-
-from six import string_types
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
@@ -14,8 +11,7 @@ from z3c.form.form import Form
 
 from .db import get_available_marine_unit_ids, get_item_by_marineunitid
 from .interfaces import IMainForm
-from .utils import get_obj_fields, get_registered_form_sections
-from .vocabulary import LABELS
+from .utils import get_obj_fields, get_registered_form_sections, print_value
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -80,28 +76,7 @@ class BaseUtil(object):
         return get_obj_fields(obj)
 
     def print_value(self, value):
-        if not value:
-            return value
-
-        if isinstance(value, string_types):
-            if value in LABELS:
-                tmpl = '<span title="%s">%s</span>'
-
-                return tmpl % (value, LABELS[value])
-
-            return value
-
-        base_values = string_types + (int, datetime.datetime, list)
-
-        if not isinstance(value, base_values):
-
-            # TODO: right now we're not showing complex, table-like values
-            # Activate below to show tables
-            # return self.value_template(item=value)
-
-            return '&lt;hidden&gt;'
-
-        return value
+        return print_value(value)
 
     def get_main_form(self):
         """ Crawl back form chain to get to the main form
@@ -159,13 +134,13 @@ class MainForm(Form):
     def render(self):
         download_action = self.find_download_action()
 
-        if download_action is None:
+        if download_action in (None, False):
             del self.actions['download']
 
         if download_action and self.should_download:
             # TODO: need to implement this as xls response
 
-            data = self.download_action()
+            data = download_action()
 
             sh = self.request.response.setHeader
             sh('Content-Type', 'application/vnd.ms-excel')

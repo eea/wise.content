@@ -1,6 +1,8 @@
+import datetime
 from collections import defaultdict
 from io import BytesIO
 
+from six import string_types
 from sqlalchemy import inspect
 
 import xlsxwriter
@@ -20,6 +22,7 @@ def pivot_data(data, pivot):
 FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
+LABELS = {}                        # vocabulary of labels
 
 
 def class_id(obj):
@@ -103,6 +106,31 @@ def scan(namespace):
     importlib.import_module(name)
 
 
+def print_value(value):
+    if not value:
+        return value
+
+    if isinstance(value, string_types):
+        if value in LABELS:
+            tmpl = '<span title="%s">%s</span>'
+
+            return tmpl % (value, LABELS[value])
+
+        return value
+
+    base_values = string_types + (int, datetime.datetime, list)
+
+    if not isinstance(value, base_values):
+
+        # TODO: right now we're not showing complex, table-like values
+        # Activate below to show tables
+        # return self.value_template(item=value)
+
+        return '&lt;hidden&gt;'
+
+    return value
+
+
 def data_to_xls(data):
 
     # Create a workbook and add a worksheet.
@@ -120,8 +148,11 @@ def data_to_xls(data):
 
     for j, row in enumerate(data):
         for i, f in enumerate(fields):
-            # TODO: check value type
-            value = unicode(getattr(row, f))
+            value = getattr(row, f)
+
+            if not isinstance(value, string_types + (float, int, type(None))):
+                value = 'not exported'
+
             worksheet.write(j + 1, i, value)
 
     workbook.close()

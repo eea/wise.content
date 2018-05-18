@@ -58,6 +58,9 @@ class StartArticle11Form(MainForm):
     """
     name = 'msfd-c2'
 
+    def get_subform(self):
+        return None
+
 
 StartArticle11View = wrap_form(StartArticle11Form)
 
@@ -66,6 +69,9 @@ class StartArticle1314Form(MainForm):
     """
     """
     name = 'msfd-c3'
+
+    def get_subform(self):
+        return None
 
 
 StartArticle1314View = wrap_form(StartArticle1314Form)

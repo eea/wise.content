@@ -6,9 +6,7 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from wise.content.search import db, sql
 
-from .utils import FORMS, SUBFORMS
-
-LABELS = {}
+from .utils import FORMS, LABELS, SUBFORMS
 
 
 def populate_labels():
@@ -121,7 +119,6 @@ def articles_vocabulary_factory(context):
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
     terms.sort()
     vocab = SimpleVocabulary(terms)
-    #import pdb; pdb.set_trace()
 
     return vocab
 
