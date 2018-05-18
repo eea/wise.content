@@ -85,7 +85,11 @@ class BaseUtil(object):
 
         if not isinstance(value, base_values):
 
-            return self.value_template(item=value)
+            # TODO: right now we're not showing complex, table-like values
+            # Activate below to show tables
+            # return self.value_template(item=value)
+
+            return '<hidden>'
 
         return value
 
