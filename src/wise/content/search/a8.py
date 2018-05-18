@@ -878,3 +878,171 @@ class A81bMarineLitterImpacts(ItemDisplay):
                 self.context.item.MSFD8b_Litter_ID
             )
 # endregion Marine litter
+
+
+# region Microbial pathogens
+class A81bMicrobialItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bMicrobialPathogen
+    order_field = 'MSFD8b_MicrobialPathogens_ID'
+
+
+@register_subform(A81bForm)
+class A81bMicrobialSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Microbial pathogens'
+    mapper_class = sql.MSFD8bMicrobialPathogen
+
+    def get_subform(self):
+        return A81bMicrobialItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bMicrobialItemDisplay)
+class A81aMicrobialAssessment(ItemDisplay):
+    title = 'Asessment of microbial pathogens'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bMicrobialPathogensAssesment,
+                'MSFD8b_MicrobialPathogens',
+                self.context.item.MSFD8b_MicrobialPathogens_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bMicrobialPathogensAssesmentIndicator,
+            'MSFD8b_MicrobialPathogens_Assesment',
+            self.item.MSFD8b_MicrobialPathogens_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+
+#  TODO
+# MSFD8bMicrobialPathogensActivity is not directly related to
+# MSFD8b_MicrobialPathogens table
+# needs to be joined with MSFD8bMicrobialPathogensActivityDescription table first
+# @register_form_section(A81bMicrobialItemDisplay)
+# class A81bMicrobialActivities(ItemDisplay):
+#     title = 'Activities producing microbial pathogens'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bMicrobialPathogensActivity,
+#                 'MSFD8b_MicrobialPathogens',
+#                 self.context.item.MSFD8b_MicrobialPathogens_ID
+#             )
+
+
+# TODO
+# missing table MSFD8bMicrobialPathogenSumInfo2ImpactedElement ??
+# @register_form_section(A81bMicrobialItemDisplay)
+# class A81bMicrobialImpacts(ItemDisplay):
+#     title = 'Impacts produced by the microbial pathogens'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bMicrobialPathogenSumInfo2ImpactedElement,
+#                 'MSFD8b_MicrobialPathogens',
+#                 self.context.item.MSFD8b_MicrobialPathogens_ID
+#             )
+# endregion Microbial pathogens
+
+
+# region Non-indigenous species
+class A81bNonIndigenousItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bNI
+    order_field = 'MSFD8b_NIS_ID'
+
+
+@register_subform(A81bForm)
+class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Non-indigenous species'
+    mapper_class = sql.MSFD8bNI
+
+    def get_subform(self):
+        return A81bNonIndigenousItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bNonIndigenousItemDisplay)
+class A81aNonIndigenousAssessment(ItemDisplay):
+    title = 'Asessment of non-indigenous species'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bNISAssesment,
+                'MSFD8b_NIS',
+                self.context.item.MSFD8b_NIS_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bNISAssesmentIndicator,
+            'MSFD8b_NIS_Assesment',
+            self.item.MSFD8b_NIS_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+
+#  TODO
+# MSFD8bNISActivity is not directly related to
+# MSFD8b_NIS table
+# needs to be joined with MSFD8bNISActivityDescription table first
+# @register_form_section(A81bNonIndigenousItemDisplay)
+# class A81bNonIndigenousActivities(ItemDisplay):
+#     title = 'Activities producing non-indigenous species'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bNISActivity,
+#                 'MSFD8b_NIS',
+#                 self.context.item.MSFD8b_NIS_ID
+#             )
+
+
+@register_form_section(A81bNonIndigenousItemDisplay)
+class A81bNonIndigenousImpacts(ItemDisplay):
+    title = 'Impacts produced by non-indigenous species'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bNISSumInfo2ImpactedElement,
+                'MSFD8b_NIS',
+                self.context.item.MSFD8b_NIS_ID
+            )
+# endregion Non-indigenous species
