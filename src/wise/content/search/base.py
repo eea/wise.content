@@ -131,7 +131,6 @@ class MainForm(Form):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
 
     def update(self):
-        print("updating")
         super(MainForm, self).update()
         self.data, self.errors = self.extractData()
 
@@ -143,13 +142,13 @@ class MainForm(Form):
             # is done in the update() method of subforms
             self.subform_content = self.subform()
 
-        self.download_action = self.find_download_action()
+    def render(self):
+        download_action = self.find_download_action()
 
-        if self.download_action is None:
+        if download_action is None:
             del self.actions['download']
 
-    def render(self):
-        if self.download_action and self.should_download:
+        if download_action and self.should_download:
             # TODO: need to implement this as xls response
 
             data = self.download_action()
@@ -181,6 +180,9 @@ class MainForm(Form):
 class MainFormWrapper(FormWrapper):
     """ Override mainform wrapper to be able to return XLS file
     """
+
+    index = ViewPageTemplateFile('pt/layout.pt')
+
     def render(self):
         if 'text/html' not in self.request.response.getHeader('Content-Type'):
             return self.contents
