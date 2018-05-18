@@ -35,7 +35,8 @@ class A81aForm(EmbededForm):
 
         return super(A81aForm, self).get_subform(klass)
 
-#region Ecosystem(s)
+
+# region Ecosystem(s)
 @register_subform(A81aForm)
 class A81aEcoSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -98,10 +99,11 @@ class A81aEcosystemAsessment(ItemDisplay):
         return [
             ('Status Indicator', {'Feature': item}),
         ]
-#endregion Ecosystem
+
+# endregion Ecosystem
 
 
-#region Functional Group(s)
+# region Functional Group(s)
 @register_subform(A81aForm)
 class A81aFunctSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -123,6 +125,7 @@ class A81aFunctItemDisplay(MultiItemDisplayForm):
     """
     mapper_class = sql.MSFD8aFunctional
     order_field = 'MSFD8a_Functional_ID'
+
 
 @register_form_section(A81aFunctItemDisplay)
 class A81aFunctionalGroupPressures(ItemDisplay):
@@ -163,10 +166,10 @@ class A81aFunctionalGroupAsessment(ItemDisplay):
         return [
             ('Status Indicator', {'Feature': item}),
         ]
-#endregion Functional Group
+# endregion Functional Group
 
 
-#region Habitat(s)
+# region Habitat(s)
 @register_subform(A81aForm)
 class A81aHabitatSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -188,6 +191,7 @@ class A81aHabitatItemDisplay(MultiItemDisplayForm):
     """
     mapper_class = sql.MSFD8aHabitat
     order_field = 'MSFD8a_Habitat_ID'
+
 
 @register_form_section(A81aHabitatItemDisplay)
 class A81aHabitatPressures(ItemDisplay):
@@ -229,10 +233,10 @@ class A81aHabitatAsessment(ItemDisplay):
             ('Status Indicator', {'Feature': item}),
         ]
 
-#endregion Habitat(s)
+# endregion Habitat(s)
 
 
-#region Species(s)
+# region Species(s)
 @register_subform(A81aForm)
 class A81aSpeciesSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -254,6 +258,7 @@ class A81aSpeciesItemDisplay(MultiItemDisplayForm):
     """
     mapper_class = sql.MSFD8aSpecy
     order_field = 'MSFD8a_Species_ID'
+
 
 @register_form_section(A81aSpeciesItemDisplay)
 class A81aSpeciesPressures(ItemDisplay):
@@ -295,10 +300,10 @@ class A81aSpeciesAsessment(ItemDisplay):
             ('Status Indicator', {'Feature': item}),
         ]
 
-#endregion Species(s)
+# endregion Species(s)
 
 
-#region Other(s)
+# region Other(s)
 @register_subform(A81aForm)
 class A81aOtherSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -362,10 +367,10 @@ class A81aOtherAsessment(ItemDisplay):
             ('Status Indicator', {'Feature': item}),
         ]
 
-#endregion Other(s)
+# endregion Other(s)
 
 
-#region Nis Inventory(s)
+# region Nis Inventory(s)
 @register_subform(A81aForm)
 class A81aNisSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -396,10 +401,10 @@ class A81aNisItemDisplay(MultiItemDisplayForm):
     #             self.item.MSFD8a_NISInventory_ID
     #         )
 
-#endregion Nis Inventory(s)
+# endregion Nis Inventory(s)
 
 
-#region Physical
+# region Physical
 @register_subform(A81aForm)
 class A81aPhysicalSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1a form
@@ -430,10 +435,7 @@ class A81aPhysicalItemDisplay(MultiItemDisplayForm):
     #             self.item.MSFD8a_NISInventory_ID
     #         )
 
-#endregion Physical
-
-
-
+# endregion Physical
 
 
 @register_form
@@ -462,7 +464,8 @@ class A81bForm(EmbededForm):
 
         return super(A81bForm, self).get_subform(klass)
 
-#region Extraction of fish and shellfish
+
+# region Extraction of fish and shellfish
 class A81bExtractionFishItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1b
     """
@@ -513,9 +516,12 @@ class A81aExtractionFishAssessment(ItemDisplay):
             ('Assesment Indicator', {'Feature': item}),
         ]
 
+
 #  TODO
-# MSFD8bExtractionFishShellfishActivity is not directly related to MSFD8b_ExtractionFishShellfish table
-# needs to be joined with MSFD8bExtractionFishShellfishActivityDescription table first
+# MSFD8bExtractionFishShellfishActivity is not directly related to
+# MSFD8b_ExtractionFishShellfish table
+# needs to be joined with MSFD8bExtractionFishShellfishActivityDescription
+# table first
 # @register_form_section(A81bExtractionFishItemDisplay)
 # class A81bExtractionFishActivities(ItemDisplay):
 #     title = 'Activities producing'
@@ -540,10 +546,10 @@ class A81bExtractionFishImpacts(ItemDisplay):
                 'MSFD8b_ExtractionFishShellfish',
                 self.context.item.MSFD8b_ExtractionFishShellfish_ID
             )
-#endregion Extraction of fish and shellfish
+# endregion Extraction of fish and shellfish
 
 
-#region Extraction of seaweed, maerl and other
+# region Extraction of seaweed, maerl and other
 class A81bExtractionSeaweedItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1b
     """
@@ -594,10 +600,11 @@ class A81aExtractionSeaweedAssessment(ItemDisplay):
             ('Assesment Indicator', {'Feature': item}),
         ]
 
-#  TODO
+# TODO
 # MSFD8bExtractionSeaweedMaerlOtherActivity is not directly related to
 # MSFD8b_ExtractionSeaweedMaerlOther table
-# needs to be joined with MSFD8bExtractionSeaweedMaerlOtherActivityDescription table first
+# needs to be joined with MSFD8bExtractionSeaweedMaerlOtherActivityDescription
+# table first
 # @register_form_section(A81bExtractionSeaweedItemDisplay)
 # class A81bExtractionSeaweedActivities(ItemDisplay):
 #     title = 'Activities producing'
@@ -622,10 +629,10 @@ class A81bExtractionSeaweedImpacts(ItemDisplay):
                 'MSFD8b_ExtractionSeaweedMaerlOther',
                 self.context.item.MSFD8b_ExtractionSeaweedMaerlOther_ID
             )
-#endregion Extraction of seaweed, maerl and other
+# endregion Extraction of seaweed, maerl and other
 
 
-#region Hazardous substances
+# region Hazardous substances
 class A81bHazardousItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1b
     """
@@ -679,7 +686,8 @@ class A81aHazardousAssessment(ItemDisplay):
 #  TODO
 # MSFD8bHazardousSubstancesActivity is not directly related to
 # MSFD8b_HazardousSubstances table
-# needs to be joined with MSFD8bHazardousSubstancesActivityDescription table first
+# needs to be joined with MSFD8bHazardousSubstancesActivityDescription table
+# first
 # @register_form_section(A81bHazardousItemDisplay)
 # class A81bHazardousActivities(ItemDisplay):
 #     title = 'Activities producing hazardous substances'
@@ -704,10 +712,10 @@ class A81bHazardousImpacts(ItemDisplay):
                 'MSFD8b_HazardousSubstances',
                 self.context.item.MSFD8b_HazardousSubstances_ID
             )
-#endregion Hazardous substances
+# endregion Hazardous substances
 
 
-#region Hydrological processes
+# region Hydrological processes
 class A81bHydroItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1b
     """
@@ -732,7 +740,7 @@ class A81bHydroSubForm(MarineUnitIDSelectForm):
 
 
 @register_form_section(A81bHydroItemDisplay)
-class A81aHazardousAssessment(ItemDisplay):
+class A81aHydroAssessment(ItemDisplay):
     title = 'Asessment of hydrological processes'
 
     def get_db_results(self):
@@ -761,7 +769,8 @@ class A81aHazardousAssessment(ItemDisplay):
 #  TODO
 # MSFD8bHydrologicalProcessesActivity is not directly related to
 # MSFD8b_HydrologicalProcesses table
-# needs to be joined with MSFD8bHydrologicalProcessesActivityDescription table first
+# needs to be joined with MSFD8bHydrologicalProcessesActivityDescription table
+# first
 # @register_form_section(A81bHydroItemDisplay)
 # class A81bHydroActivities(ItemDisplay):
 #     title = 'Activities producing hydrological processes'
@@ -786,10 +795,10 @@ class A81bHydroImpacts(ItemDisplay):
                 'MSFD8b_HydrologicalProcesses',
                 self.context.item.MSFD8b_HydrologicalProcesses_ID
             )
-#endregion Hydrological processes
+# endregion Hydrological processes
 
 
-#region Marine litter
+# region Marine litter
 class A81bMarineLitterItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1b
     """
@@ -868,5 +877,4 @@ class A81bMarineLitterImpacts(ItemDisplay):
                 'MSFD8b_Litter',
                 self.context.item.MSFD8b_Litter_ID
             )
-#endregion Marine litter
-
+# endregion Marine litter
