@@ -42,6 +42,7 @@ setup(
 
         'zope.sqlalchemy',
         'pymssql',
+        'xlsxwriter',
     ],
     extras_require={
         'test': [

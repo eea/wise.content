@@ -1,10 +1,10 @@
 import datetime
 
 from six import string_types
-from sqlalchemy import inspect
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
+from plone.z3cform.layout import FormWrapper
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import interfaces
@@ -14,7 +14,7 @@ from z3c.form.form import Form
 
 from .db import get_available_marine_unit_ids, get_item_by_marineunitid
 from .interfaces import IMainForm
-from .utils import get_registered_form_sections
+from .utils import get_obj_fields, get_registered_form_sections
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -45,6 +45,8 @@ class BaseUtil(object):
         parent = self
 
         while True:
+            if not hasattr(parent, 'data'):
+                return []
             ids = parent.data.get('marine_unit_ids')
 
             if ids:
@@ -73,9 +75,8 @@ class BaseUtil(object):
     def get_obj_fields(self, obj):
         """ Inspect an SA object and return its field names
         """
-        mapper = inspect(obj)
 
-        return [c.key for c in mapper.attrs]
+        return get_obj_fields(obj)
 
     def print_value(self, value):
         if not value:
@@ -140,16 +141,26 @@ class MainForm(Form):
             # we need to update and "execute" the subforms to be able to
             # discover them, because the decision process regarding discovery
             # is done in the update() method of subforms
-            print("Updating subform")
             self.subform_content = self.subform()
 
-        action = self.find_download_action()
+        self.download_action = self.find_download_action()
 
-        if action and self.should_download:
-            # TODO: need to implement this as xls response
-            self.request.response = action()
-        elif action is None:
+        if self.download_action is None:
             del self.actions['download']
+
+    def render(self):
+        if self.download_action and self.should_download:
+            # TODO: need to implement this as xls response
+
+            data = self.download_action()
+
+            sh = self.request.response.setHeader
+            sh('Content-Type', 'application/vnd.ms-excel')
+            sh('Content-Disposition', 'attachment; filename=marinedb.xls')
+
+            return data.read()
+
+        return super(MainForm, self).render()
 
     def find_download_action(self):
         """ Look for a download method in all subform children
@@ -165,6 +176,16 @@ class MainForm(Form):
             ctx = ctx.subform
 
         return False
+
+
+class MainFormWrapper(FormWrapper):
+    """ Override mainform wrapper to be able to return XLS file
+    """
+    def render(self):
+        if 'text/html' not in self.request.response.getHeader('Content-Type'):
+            return self.contents
+
+        return super(MainFormWrapper, self).render()
 
 
 class EmbededForm(Form, BaseUtil):
@@ -300,9 +321,8 @@ class ItemDisplayForm(EmbededForm):
         page = self.get_page()
         muid = self.get_marine_unit_id()
 
-        # import pdb; pdb.set_trace()
         res = get_item_by_marineunitid(self.mapper_class, self.order_field,
-                                        marine_unit_id=muid, page=page)
+                                       marine_unit_id=muid, page=page)
 
         return res
 

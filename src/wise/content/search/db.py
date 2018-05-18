@@ -144,3 +144,10 @@ def get_related_record(klass, column, rel_id):
     item = q.first()
 
     return [q.count(), item]
+
+
+def get_all_records(mapper_class, *conditions):
+    sess = session()
+    q = sess.query(mapper_class).filter(*conditions)
+
+    return [q.count(), q]

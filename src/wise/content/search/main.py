@@ -3,7 +3,7 @@ from wise.content.search import interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, MainForm
+from .base import EmbededForm, MainForm, MainFormWrapper
 from .utils import get_form, scan
 
 
@@ -35,7 +35,7 @@ class MemberRegionAreaForm(EmbededForm):
         return MarineUnitIDsForm(self, self.request)
 
 
-StartArticle8910View = wrap_form(StartArticle8910Form)
+StartArticle8910View = wrap_form(StartArticle8910Form, MainFormWrapper)
 
 
 class MarineUnitIDsForm(EmbededForm):

@@ -1,4 +1,9 @@
 from collections import defaultdict
+from io import BytesIO
+
+from sqlalchemy import inspect
+
+import xlsxwriter
 
 
 def pivot_data(data, pivot):
@@ -96,3 +101,36 @@ def scan(namespace):
 
     name = importlib._resolve_name(namespace, 'wise.content.search', 1)
     importlib.import_module(name)
+
+
+def data_to_xls(data):
+
+    # Create a workbook and add a worksheet.
+    out = BytesIO()
+    workbook = xlsxwriter.Workbook(out, {'in_memory': True})
+    worksheet = workbook.add_worksheet()
+
+    row0 = data[0]
+    fields = sorted(get_obj_fields(row0))
+
+    # write titles
+
+    for i, f in enumerate(fields):
+        worksheet.write(0, i, f)
+
+    for j, row in enumerate(data):
+        for i, f in enumerate(fields):
+            # TODO: check value type
+            value = unicode(getattr(row, f))
+            worksheet.write(j + 1, i, value)
+
+    workbook.close()
+    out.seek(0)
+
+    return out
+
+
+def get_obj_fields(obj):
+    mapper = inspect(obj)
+
+    return [c.key for c in mapper.attrs]
