@@ -15,6 +15,7 @@ from z3c.form.form import Form
 from .db import get_available_marine_unit_ids, get_item_by_marineunitid
 from .interfaces import IMainForm
 from .utils import get_obj_fields, get_registered_form_sections
+from .vocabulary import LABELS
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -81,6 +82,10 @@ class BaseUtil(object):
     def print_value(self, value):
         if not value:
             return value
+
+        if isinstance(value, string_types):
+            return LABELS.get(value, value)
+
         base_values = string_types + (int, datetime.datetime, list)
 
         if not isinstance(value, base_values):
@@ -89,7 +94,7 @@ class BaseUtil(object):
             # Activate below to show tables
             # return self.value_template(item=value)
 
-            return '<hidden>'
+            return '&lt;hidden&gt;'
 
         return value
 

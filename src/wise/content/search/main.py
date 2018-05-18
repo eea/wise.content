@@ -44,6 +44,7 @@ class MarineUnitIDsForm(EmbededForm):
 
     # TODO: properly show only available marine unit ids
     fields = Fields(interfaces.IMarineUnitIDsSelect)
+    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
         data = self.get_main_form().data

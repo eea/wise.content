@@ -1,10 +1,48 @@
-from zope.interface import implements, provider
-from zope.schema.interfaces import IContextSourceBinder, IVocabularyFactory
+from lxml.etree import parse
+from pkg_resources import resource_filename
+from zope.interface import provider
+from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from wise.content.search import db, sql
 
 from .utils import FORMS, SUBFORMS
+
+LABELS = {}
+
+
+def populate_labels():
+    lines = []
+    f = resource_filename('wise.content',
+                          'search/data/MSCommon_1p0.xsd')
+    e = parse(f)
+
+    for node in e.xpath('//xs:documentation',
+                        namespaces={'xs': "http://www.w3.org/2001/XMLSchema"}):
+        text = node.text.strip()
+        lines.extend(text.split('\n'))
+
+    for line in lines:
+        line = line.strip()
+        eqpos = line.find('=')
+
+        if eqpos == -1:
+            continue
+
+        if ' ' in line[:eqpos]:
+            continue
+
+        label, title = line.split('=', 1)
+
+        if label in LABELS:
+            continue
+
+        LABELS[label] = title
+
+    return
+
+
+populate_labels()
 
 
 class SubFormsVocabulary(SimpleVocabulary):
@@ -54,7 +92,7 @@ def db_vocab(table, column):
     """ Builds a vocabulary based on unique values in a column table
     """
     res = db.get_unique_from_table(table, column)
-    terms = [SimpleTerm(x, x, x) for x in res]
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
     return vocab
@@ -103,3 +141,10 @@ def marine_unit_id_vocab_factory(context):
     terms = [SimpleTerm(x, x, x) for x in ids]
 
     return SimpleVocabulary(terms)
+
+
+# labels_vocabulary = SimpleVocabulary([SimpleTerm(k, k, v) for k, v in
+#                                       LABELS.items()])
+#
+# def labels_vocabulary_factory(context):
+#     return labels_vocabulary
