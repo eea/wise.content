@@ -156,7 +156,7 @@ class A81aFunctionalGroupAsessment(ItemDisplay):
         count, item = db.get_related_record(
             sql.MSFD8aFunctionalStatusIndicator,
             'MSFD8a_Functional_StatusAssessment',
-            self.item.MSFD8a_Ecosystem_StatusAssessment_ID
+            self.item.MSFD8a_Functional_StatusAssessment_ID
         )
         # ft = pivot_data(res, 'FeatureType')
 
@@ -230,3 +230,643 @@ class A81aHabitatAsessment(ItemDisplay):
         ]
 
 #endregion Habitat(s)
+
+
+#region Species(s)
+@register_subform(A81aForm)
+class A81aSpeciesSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1a form
+    """
+    title = 'Species(s)'
+    mapper_class = sql.MSFD8aSpecy
+
+    def get_subform(self):
+        return A81aSpeciesItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+class A81aSpeciesItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1a
+    """
+    mapper_class = sql.MSFD8aSpecy
+    order_field = 'MSFD8a_Species_ID'
+
+@register_form_section(A81aSpeciesItemDisplay)
+class A81aSpeciesPressures(ItemDisplay):
+    title = 'Pressures and impacts'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8aSpeciesPressuresImpact,
+                'MSFD8a_Species',
+                self.context.item.MSFD8a_Species_ID
+            )
+
+
+@register_form_section(A81aSpeciesItemDisplay)
+class A81aSpeciesAsessment(ItemDisplay):
+    title = 'Status Asessment'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8aSpeciesStatusAssessment,
+                'MSFD8a_Species',
+                self.context.item.MSFD8a_Species_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8aSpeciesStatusIndicator,
+            'MSFD8a_Species_StatusAssessment',
+            self.item.MSFD8a_Species_StatusAssessment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Status Indicator', {'Feature': item}),
+        ]
+
+#endregion Species(s)
+
+
+#region Other(s)
+@register_subform(A81aForm)
+class A81aOtherSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1a form
+    """
+    title = 'Other(s)'
+    mapper_class = sql.MSFD8aOther
+
+    def get_subform(self):
+        return A81aOtherItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+class A81aOtherItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1a
+    """
+    mapper_class = sql.MSFD8aOther
+    order_field = 'MSFD8a_Other_ID'
+# TODO
+# MSFD8aOtherPressuresImpact table is missing?
+# @register_form_section(A81aOtherItemDisplay)
+# class A81aOtherPressures(ItemDisplay):
+#     title = 'Pressures and impacts'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8aOtherPressuresImpact,
+#                 'MSFD8a_Other',
+#                 self.context.item.MSFD8a_Other_ID
+#             )
+
+
+@register_form_section(A81aOtherItemDisplay)
+class A81aOtherAsessment(ItemDisplay):
+    title = 'Status Asessment'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8aOtherStatusAssessment,
+                'MSFD8a_Other',
+                self.context.item.MSFD8a_Other_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8aOtherStatusIndicator,
+            'MSFD8a_Other_StatusAssessment',
+            self.item.MSFD8a_Other_StatusAssessment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Status Indicator', {'Feature': item}),
+        ]
+
+#endregion Other(s)
+
+
+#region Nis Inventory(s)
+@register_subform(A81aForm)
+class A81aNisSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1a form
+    """
+    title = 'NIS Inventory'
+    mapper_class = sql.MSFD8aNISInventory
+
+    def get_subform(self):
+        return A81aNisItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+class A81aNisItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1a
+    """
+    mapper_class = sql.MSFD8aNISInventory
+    order_field = 'MSFD8a_NISInventory_ID'
+
+    # def get_db_results(self):
+    #     # if self.context.item:
+    #         return db.get_related_record(
+    #             self.mapper_class,
+    #             'MarineUnitID',
+    #             self.item.MSFD8a_NISInventory_ID
+    #         )
+
+#endregion Nis Inventory(s)
+
+
+#region Physical
+@register_subform(A81aForm)
+class A81aPhysicalSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1a form
+    """
+    title = 'Physical'
+    mapper_class = sql.MSFD8aPhysical
+
+    def get_subform(self):
+        return A81aPhysicalItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+class A81aPhysicalItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1a
+    """
+    mapper_class = sql.MSFD8aPhysical
+    order_field = 'MSFD8a_Physical_ID'
+
+    # def get_db_results(self):
+    #     # if self.context.item:
+    #         return db.get_related_record(
+    #             self.mapper_class,
+    #             'MarineUnitID',
+    #             self.item.MSFD8a_NISInventory_ID
+    #         )
+
+#endregion Physical
+
+
+
+
+
+@register_form
+class A81bForm(EmbededForm):
+    """ Main form for A81b.
+
+    Allows selecting between Extraction of fish, seaweed, etc
+    """
+
+    title = 'Article 8.1b (Analysis of pressure impacts)'
+
+    @property
+    def fields(self):
+        # TODO: could this be reimplemented with simple vocab?
+        theme = Choice(
+            __name__='theme',
+            title=u"Select theme",
+            required=False,
+            vocabulary=SubFormsVocabulary(self.__class__)
+        )
+
+        return Fields(theme)
+
+    def get_subform(self):
+        klass = self.data.get('theme')
+
+        return super(A81bForm, self).get_subform(klass)
+
+#region Extraction of fish and shellfish
+class A81bExtractionFishItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bExtractionFishShellfish
+    order_field = 'MSFD8b_ExtractionFishShellfish_ID'
+
+
+@register_subform(A81bForm)
+class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Extraction of fish and shellfish'
+    mapper_class = sql.MSFD8bExtractionFishShellfish
+
+    def get_subform(self):
+        return A81bExtractionFishItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bExtractionFishItemDisplay)
+class A81aExtractionFishAssessment(ItemDisplay):
+    title = 'Asessment of extraction'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bExtractionFishShellfishAssesment,
+                'MSFD8b_ExtractionFishShellfish',
+                self.context.item.MSFD8b_ExtractionFishShellfish_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bExtractionFishShellfishAssesmentIndicator,
+            'MSFD8b_ExtractionFishShellfish_Assesment',
+            self.item.MSFD8b_ExtractionFishShellfish_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+#  TODO
+# MSFD8bExtractionFishShellfishActivity is not directly related to MSFD8b_ExtractionFishShellfish table
+# needs to be joined with MSFD8bExtractionFishShellfishActivityDescription table first
+# @register_form_section(A81bExtractionFishItemDisplay)
+# class A81bExtractionFishActivities(ItemDisplay):
+#     title = 'Activities producing'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bExtractionFishShellfishActivity,
+#                 'MSFD8b_ExtractionFishShellfish',
+#                 self.context.item.MSFD8b_ExtractionFishShellfish_ID
+#             )
+
+
+@register_form_section(A81bExtractionFishItemDisplay)
+class A81bExtractionFishImpacts(ItemDisplay):
+    title = 'Impacts produced'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bExtractionFishShellfishSumInfo2ImpactedElement,
+                'MSFD8b_ExtractionFishShellfish',
+                self.context.item.MSFD8b_ExtractionFishShellfish_ID
+            )
+#endregion Extraction of fish and shellfish
+
+
+#region Extraction of seaweed, maerl and other
+class A81bExtractionSeaweedItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bExtractionSeaweedMaerlOther
+    order_field = 'MSFD8b_ExtractionSeaweedMaerlOther_ID'
+
+
+@register_subform(A81bForm)
+class A81bExtractionSeaweedSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Extraction of seaweed, maerl and other'
+    mapper_class = sql.MSFD8bExtractionSeaweedMaerlOther
+
+    def get_subform(self):
+        return A81bExtractionSeaweedItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bExtractionSeaweedItemDisplay)
+class A81aExtractionSeaweedAssessment(ItemDisplay):
+    title = 'Asessment of extraction'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bExtractionSeaweedMaerlOtherAssesment,
+                'MSFD8b_ExtractionSeaweedMaerlOther',
+                self.context.item.MSFD8b_ExtractionSeaweedMaerlOther_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bExtractionSeaweedMaerlOtherAssesmentIndicator,
+            'MSFD8b_ExtractionSeaweedMaerlOther_Assesment',
+            self.item.MSFD8b_ExtractionSeaweedMaerlOther_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+#  TODO
+# MSFD8bExtractionSeaweedMaerlOtherActivity is not directly related to
+# MSFD8b_ExtractionSeaweedMaerlOther table
+# needs to be joined with MSFD8bExtractionSeaweedMaerlOtherActivityDescription table first
+# @register_form_section(A81bExtractionSeaweedItemDisplay)
+# class A81bExtractionSeaweedActivities(ItemDisplay):
+#     title = 'Activities producing'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bExtractionSeaweedMaerlOtherActivity,
+#                 'MSFD8b_ExtractionSeaweedMaerlOther',
+#                 self.context.item.MSFD8b_ExtractionSeaweedMaerlOther_ID
+#             )
+
+
+@register_form_section(A81bExtractionSeaweedItemDisplay)
+class A81bExtractionSeaweedImpacts(ItemDisplay):
+    title = 'Impacts produced'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bExtractionSeaweedMaerlOtherSumInfo2ImpactedElement,
+                'MSFD8b_ExtractionSeaweedMaerlOther',
+                self.context.item.MSFD8b_ExtractionSeaweedMaerlOther_ID
+            )
+#endregion Extraction of seaweed, maerl and other
+
+
+#region Hazardous substances
+class A81bHazardousItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bHazardousSubstance
+    order_field = 'MSFD8b_HazardousSubstances_ID'
+
+
+@register_subform(A81bForm)
+class A81bHazardousSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Hazardous substances'
+    mapper_class = sql.MSFD8bHazardousSubstance
+
+    def get_subform(self):
+        return A81bHazardousItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bHazardousItemDisplay)
+class A81aHazardousAssessment(ItemDisplay):
+    title = 'Asessment of hazardous substances'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bHazardousSubstancesAssesment,
+                'MSFD8b_HazardousSubstances',
+                self.context.item.MSFD8b_HazardousSubstances_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bHazardousSubstancesAssesmentIndicator,
+            'MSFD8b_HazardousSubstances_Assesment',
+            self.item.MSFD8b_HazardousSubstances_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+#  TODO
+# MSFD8bHazardousSubstancesActivity is not directly related to
+# MSFD8b_HazardousSubstances table
+# needs to be joined with MSFD8bHazardousSubstancesActivityDescription table first
+# @register_form_section(A81bHazardousItemDisplay)
+# class A81bHazardousActivities(ItemDisplay):
+#     title = 'Activities producing hazardous substances'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bHazardousSubstancesActivity,
+#                 'MSFD8b_HazardousSubstances',
+#                 self.context.item.MSFD8b_HazardousSubstances_ID
+#             )
+
+
+@register_form_section(A81bHazardousItemDisplay)
+class A81bHazardousImpacts(ItemDisplay):
+    title = 'Impacts produced by the hazardous substances'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bHazardousSubstancesSumInfo2ImpactedElement,
+                'MSFD8b_HazardousSubstances',
+                self.context.item.MSFD8b_HazardousSubstances_ID
+            )
+#endregion Hazardous substances
+
+
+#region Hydrological processes
+class A81bHydroItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bHydrologicalProcess
+    order_field = 'MSFD8b_HydrologicalProcesses_ID'
+
+
+@register_subform(A81bForm)
+class A81bHydroSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Hydrological processes'
+    mapper_class = sql.MSFD8bHydrologicalProcess
+
+    def get_subform(self):
+        return A81bHydroItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bHydroItemDisplay)
+class A81aHazardousAssessment(ItemDisplay):
+    title = 'Asessment of hydrological processes'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bHydrologicalProcessesAssesment,
+                'MSFD8b_HydrologicalProcesses',
+                self.context.item.MSFD8b_HydrologicalProcesses_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bHydrologicalProcessesAssesmentIndicator,
+            'MSFD8b_HydrologicalProcesses_Assesment',
+            self.item.MSFD8b_HydrologicalProcesses_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+#  TODO
+# MSFD8bHydrologicalProcessesActivity is not directly related to
+# MSFD8b_HydrologicalProcesses table
+# needs to be joined with MSFD8bHydrologicalProcessesActivityDescription table first
+# @register_form_section(A81bHydroItemDisplay)
+# class A81bHydroActivities(ItemDisplay):
+#     title = 'Activities producing hydrological processes'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bHydrologicalProcessesActivity,
+#                 'MSFD8b_HydrologicalProcesses',
+#                 self.context.item.MSFD8b_HydrologicalProcesses_ID
+#             )
+
+
+@register_form_section(A81bHydroItemDisplay)
+class A81bHydroImpacts(ItemDisplay):
+    title = 'Impacts produced by the hydrological processes'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bHydrologicalProcessesSumInfo2ImpactedElement,
+                'MSFD8b_HydrologicalProcesses',
+                self.context.item.MSFD8b_HydrologicalProcesses_ID
+            )
+#endregion Hydrological processes
+
+
+#region Marine litter
+class A81bMarineLitterItemDisplay(MultiItemDisplayForm):
+    """ Group the multiple items together for A8.1b
+    """
+    mapper_class = sql.MSFD8bLitter
+    order_field = 'MSFD8b_Litter_ID'
+
+
+@register_subform(A81bForm)
+class A81bMarineLitterSubForm(MarineUnitIDSelectForm):
+    """ Select the MarineUnitID for the Article 8.1b form
+    """
+    title = 'Marine litter'
+    mapper_class = sql.MSFD8bLitter
+
+    def get_subform(self):
+        return A81bMarineLitterItemDisplay(self, self.request)
+
+    def download_results(self):
+        # make results available for download
+        # TODO: to be implemented
+        pass
+
+
+@register_form_section(A81bMarineLitterItemDisplay)
+class A81aMarineLitterAssessment(ItemDisplay):
+    title = 'Asessment of marine litter'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bLitterAssesment,
+                'MSFD8b_Litter',
+                self.context.item.MSFD8b_Litter_ID
+            )
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        count, item = db.get_related_record(
+            sql.MSFD8bLitterAssesmentIndicator,
+            'MSFD8b_Litter_Assesment',
+            self.item.MSFD8b_Litter_Assesment_ID
+        )
+        # ft = pivot_data(res, 'FeatureType')
+
+        return [
+            ('Assesment Indicator', {'Feature': item}),
+        ]
+
+#  TODO
+# MSFD8bLitterActivity is not directly related to
+# MSFD8b_Litter table
+# needs to be joined with MSFD8bLitterActivityDescription table first
+# @register_form_section(A81bHydroItemDisplay)
+# class A81bMarineLitterActivities(ItemDisplay):
+#     title = 'Activities producing marine litter'
+#
+#     def get_db_results(self):
+#         if self.context.item:
+#             return db.get_related_record(
+#                 sql.MSFD8bLitterActivity,
+#                 'MSFD8b_Litter',
+#                 self.context.item.MSFD8b_Litter_ID
+#             )
+
+
+@register_form_section(A81bMarineLitterItemDisplay)
+class A81bMarineLitterImpacts(ItemDisplay):
+    title = 'Impacts produced by the marine litter'
+
+    def get_db_results(self):
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8bLitterSumInfo2ImpactedElement,
+                'MSFD8b_Litter',
+                self.context.item.MSFD8b_Litter_ID
+            )
+#endregion Marine litter
+
