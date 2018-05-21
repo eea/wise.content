@@ -1,14 +1,16 @@
 <div id="wise-search-form">
-  <ul>
+  <ul class="nav nav-pills">
     <tal:rep tal:repeat="info view/main_forms">
     <li tal:define="name python:info[0];
       title python: info[1];
       active python: view.name == name"
      tal:attributes="class python: active and 'tab-active'"
       >
+
       <a href=""
          tal:attributes="href string:./@@${name}"
          tal:content="title"></a>
+
     </li>
     </tal:rep>
   </ul>
@@ -19,7 +21,7 @@
 
 
   <div tal:content="view/get_all_mainforms"></div>
-
+    <span> aaaa </span>
     <metal:slot fill-slot="actions">
       <metal:block use-macro="context/@@ploneform-macros/actions" />
       <div tal:content="structure view/subform_content | nothing">subform here</div>
@@ -47,12 +49,94 @@
           padding: 0.4rem;
           overflow: auto;
         }
+
+        #wise-search-form ul
+        {
+           list-style-type: none !important;
+           display: table;
+           margin-left: 0;
+           width: 100%;
+           overflow: hidden;
+           border-bottom: 1px solid #337ab7;
+        }
+
+        #wise-search-form ul li {
+           background-color: #eeeeee;
+           /*width: 30%;*/
+           display: table-cell;
+           list-style-type: none !important;
+           border-top-left-radius: 10px;
+           border-top-right-radius: 10px;
+           border-bottom-left-radius: 0;
+           border-bottom-right-radius: 0;
+           padding-bottom: 99999px;
+           margin-bottom: -99999px;
+           margin-left:2px;
+        }
+
+        #wise-search-form ul li:hover {
+           border-top-left-radius: 10px;
+           border-top-right-radius: 10px;
+           border-bottom-left-radius: 0;
+           border-bottom-right-radius: 0;
+           background: #337ab7;
+        }
+
+        #wise-search-form .nav li a {
+           word-wrap: break-word;
+           border-top-left-radius: 10px;
+           border-top-right-radius: 10px;
+           border-bottom-left-radius: 0;
+           border-bottom-right-radius: 0;
+        }
+
+        #wise-search-form .nav li a:hover {
+            background: #337ab7;
+            color: white;
+        }
+
+        #wise-search-form .nav li {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+
+        }
+
+        #wise-search-form .nav .tab-active {
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          background: #337ab7;
+        }
+
+        #wise-search-form .nav .tab-active a {
+          color: white;
+        }
+
         .extra-details {
           border-top: 1px solid #CCC;
           padding-top: 1rem;
         }
         .label {
           color: Black;
+        }
+
+
+        @media (max-width: 767px){
+            #wise-search-form ul {
+                padding-top: 10px;
+            }
+
+            #wise-search-form ul li {
+              padding-bottom: 0;
+              margin-bottom: 0;
+              width: 100%;
+              margin-bottom: 2px;
+              border-top-left-radius: 0px;
+              border-top-right-radius: 0px;
+              border-bottom-left-radius: 0;
+              border-bottom-right-radius: 0;
+            }
         }
       </style>
     </metal:slot>
