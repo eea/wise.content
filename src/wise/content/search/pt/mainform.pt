@@ -53,8 +53,8 @@
         #wise-search-form ul
         {
            list-style-type: none !important;
-           display: table;
-           margin-left: 0;
+           margin: 0 auto;
+
            width: 100%;
            overflow: hidden;
            border-bottom: 1px solid #337ab7;
@@ -62,16 +62,18 @@
 
         #wise-search-form ul li {
            background-color: #eeeeee;
-           /*width: 30%;*/
-           display: table-cell;
+
            list-style-type: none !important;
            border-top-left-radius: 10px;
            border-top-right-radius: 10px;
            border-bottom-left-radius: 0;
            border-bottom-right-radius: 0;
+
+           margin: 0 auto;
+           margin-right: 2px;
            padding-bottom: 99999px;
            margin-bottom: -99999px;
-           margin-left:2px;
+
         }
 
         #wise-search-form ul li:hover {
@@ -121,8 +123,14 @@
           color: Black;
         }
 
+        @media (min-width: 967px) and (max-width: 1024px){
+            #wise-search-form ul li {
+                width: 30%;
+            }
+        }
 
-        @media (max-width: 767px){
+
+        @media (max-width: 969px){
             #wise-search-form ul {
                 padding-top: 10px;
             }
