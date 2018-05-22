@@ -39,6 +39,7 @@
           border-right: 1px solid #CCC;
           margin-top: 0.4rem;
         }
+
         #wise-search-form dd {
           float: left;
           width: 48rem;
@@ -47,6 +48,7 @@
           margin-top: 0.4rem;
           background-color: #EEE;
           padding: 0.4rem;
+          max-height: 200px;
           overflow: auto;
         }
 
@@ -216,6 +218,11 @@
               border-top-right-radius: 0px;
               border-bottom-left-radius: 0;
               border-bottom-right-radius: 0;
+            }
+
+            #wise-search-form dd {
+                max-height: auto;
+                max-width: 100%;
             }
         }
       </style>
