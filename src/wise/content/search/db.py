@@ -80,13 +80,13 @@ def get_marine_unit_ids(**data):
     return (query.count(), l)
 
 
-def get_item_by_marineunitid(mapper_class,
-                             order_field, marine_unit_id, page=0):
-    # this assumes that all mappers have the MarineUnitID column
+def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
+    # Paged retrieval of items based on conditions
+    page = kwargs.get('page', 0)
     sess = session()
     order_field = getattr(mapper_class, order_field)
     q = sess.query(mapper_class).filter(
-        mapper_class.MarineUnitID == marine_unit_id
+        *conditions
     ).order_by(order_field)
 
     total = q.count()

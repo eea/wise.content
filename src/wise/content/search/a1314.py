@@ -5,7 +5,7 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, MainForm
+from .base import EmbededForm, ItemDisplayForm, MainForm
 
 
 class StartArticle1314Form(MainForm):
@@ -21,15 +21,19 @@ class StartArticle1314Form(MainForm):
         mc = sql.MSFD13ReportingInfo
         conditions = []
 
-        report_type = self.context.data.get('report_type')
+        report_type = self.data.get('report_type')
 
         if report_type:
             conditions.append(mc.ReportType == report_type)
 
-        region = self.context.data.get('Region')
+        region = self.data.get('region')
 
         if region:
             conditions.append(mc.Region == region)
+
+        res = db.get_unique_from_mapper(mc, 'MarineUnitID', *conditions)
+
+        return (len(res), res)
 
 
 class MarineUnitIDsForm(EmbededForm):
@@ -41,14 +45,11 @@ class MarineUnitIDsForm(EmbededForm):
     fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-
-
-        if self.data.get('MarineUnitID'):
-            conditions.append(mc.MarineUnitID == self.data['MarineUnitID'])
+        mc = sql.MSFD13ReportingInfo
 
         count, res = db.get_all_records(
             mc.ID,
-            *conditions
+            mc.MarineUnitID.in_(self.data.get('marine_unit_ids', []))
         )
         self.data['report_ids'] = [x[0] for x in res]
 
@@ -72,5 +73,44 @@ class UniqueCodesForm(EmbededForm):
     fields['unique_codes'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return None
-        # return MarineUnitIDsForm(self, self.request)
+        return A1314ItemDisplay(self, self.request)
+
+
+class A1314ItemDisplay(ItemDisplayForm):
+    """ The implementation for the Article 9 (GES determination) form
+    """
+    # extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+
+    mapper_class = sql.MSFD13MeasuresInfo
+    order_field = 'ID'
+
+    def get_db_results(self):
+        page = self.get_page()
+        mc = self.mapper_class
+
+        res = db.get_item_by_conditions(
+            mc, self.order_field,
+            mc.UniqueCode.in_(self.context.data.get('unique_codes', [])),
+            page=page,
+        )
+
+        return res
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        report_id = self.item.ReportID
+        mc = sql.MSFD13ReportInfoFurtherInfo
+
+        count, item = db.get_related_record(mc, 'ReportID', report_id)
+
+        return [
+             # TODO: this needs more work
+            ('Report Info', vars(item)
+             #  {
+             #     # 'ReportType': item.ReportType,
+             #     # 'URL': item.URL
+             # }
+             )
+        ]
