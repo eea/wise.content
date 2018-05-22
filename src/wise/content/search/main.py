@@ -77,6 +77,7 @@ class StartArticle1314Form(MainForm):
 StartArticle1314View = wrap_form(StartArticle1314Form)
 
 # discover and register associated views
-scan('a8')
+scan('a8ac')
+scan('a8b')
 scan('a9')
 scan('a10')
