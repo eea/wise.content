@@ -51,13 +51,13 @@ def get_unique_from_table(table, column):
     return [x[0] for x in res]
 
 
-def get_unique_from_mapper(table, column):
+def get_unique_from_mapper(mapper_class, column, *conditions):
     """ Retrieves unique values for a mapper class
     """
-    col = getattr(table, column)
+    col = getattr(mapper_class, column)
 
     sess = session()
-    res = sess.query(col).distinct().order_by(col)
+    res = sess.query(col).filter(*conditions).distinct().order_by(col)
 
     return [x[0] for x in res]
 

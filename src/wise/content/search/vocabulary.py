@@ -103,7 +103,7 @@ def db_vocab(table, column):
         res = db.get_unique_from_table(table, column)
     else:
         res = db.get_unique_from_mapper(table, column)
-    res = [u(x).strip() for x in res]
+    res = [x.strip() for x in res]
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -139,8 +139,14 @@ def articles_vocabulary_factory(context):
 def marine_unit_ids_vocab_factory(context):
     """ A list of MarineUnitIds based on geodata selected
     """
-    data = context.data
-    count, ids = db.get_marine_unit_ids(**data)
+
+    if hasattr(context, 'get_available_marine_unit_ids'):
+        count, ids = context.get_available_marine_unit_ids()
+
+    else:
+        data = context.data
+        count, ids = db.get_marine_unit_ids(**data)
+
     terms = [SimpleTerm(x, x, x) for x in ids]
 
     return SimpleVocabulary(terms)
@@ -157,25 +163,39 @@ def marine_unit_id_vocab_factory(context):
 
 
 @provider(IVocabularyFactory)
-def wise_search_a1314_report_types(context):
+def a1314_report_types(context):
     return db_vocab(sql.MSFD13ReportingInfo, 'ReportType')
 
 
 @provider(IVocabularyFactory)
-def wise_search_a1314_regions(context):
+def a1314_regions(context):
     return db_vocab(sql.MSFD13ReportingInfo, 'Region')
 
 
-@provider(IVocabularyFactory)
-def wise_search_a1314_marine_unit_id(context):
-    return db_vocab(sql.MSFD13ReportingInfo, 'MarineUnitID')
+# @provider(IVocabularyFactory)
+# def a1314_marine_unit_id(context):
+#     return db_vocab(sql.MSFD13ReportingInfo, 'MarineUnitID')
 
 
 @provider(IVocabularyFactory)
-def wise_search_a1314_unique_codes(context):
-    data = context.data
-    import pdb; pdb.set_trace()
-    count, ids = db.get_marine_unit_ids(**data)
-    terms = [SimpleTerm(x, x, x) for x in ids]
+def a1314_unique_codes(context):
+    codes = context.data.get('unique_codes')
+    terms = [
+        SimpleTerm(code, code, u'%s - %s' % (code, name))
+
+        for code, name in codes
+    ]
+
+    return SimpleVocabulary(terms)
+
+
+@provider(IVocabularyFactory)
+def a1314_marine_unit_ids(context):
+    codes = context.data.get('unique_codes')
+    terms = [
+        SimpleTerm(code, code, u'%s - %s' % (code, name))
+
+        for code, name in codes
+    ]
 
     return SimpleVocabulary(terms)

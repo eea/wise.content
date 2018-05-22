@@ -73,11 +73,11 @@ class IStartArticles1314(Interface):
         required=True,
     )
 
-    marine_unit_id = Choice(
-        title=u"MarineUnitID",
-        description=u"Select one or more MarineUnitIDs that you're interested",
-        vocabulary="wise_search_a1314_marine_unit_id"
-    )
+    # marine_unit_id = Choice(
+    #     title=u"MarineUnitID",
+    #     description=u"Select one or more MarineUnitIDs that you're interested",
+    #     vocabulary="wise_search_a1314_marine_unit_id"
+    # )
 
 
 class IMarineUnitIDsSelect(Interface):

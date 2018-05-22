@@ -36,22 +36,22 @@
     />
 
   <utility
-    component=".vocabulary.wise_search_a1314_report_types"
+    component=".vocabulary.a1314_report_types"
     name="wise_search_a1314_report_types"
     />
 
   <utility
-    component=".vocabulary.wise_search_a1314_regions"
+    component=".vocabulary.a1314_regions"
     name="wise_search_a1314_regions"
     />
 
   <utility
-    component=".vocabulary.wise_search_a1314_marine_unit_id"
+    component=".vocabulary.a1314_marine_unit_ids"
     name="wise_search_a1314_marine_unit_id"
     />
 
   <utility
-    component=".vocabulary.wise_search_a1314_unique_codes"
+    component=".vocabulary.a1314_unique_codes"
     name="wise_search_a1314_unique_codes"
     />
 
