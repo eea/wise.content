@@ -46,11 +46,6 @@
     />
 
   <utility
-    component=".vocabulary.a1314_marine_unit_ids"
-    name="wise_search_a1314_marine_unit_id"
-    />
-
-  <utility
     component=".vocabulary.a1314_unique_codes"
     name="wise_search_a1314_unique_codes"
     />

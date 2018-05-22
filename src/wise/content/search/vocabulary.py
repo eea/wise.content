@@ -172,25 +172,8 @@ def a1314_regions(context):
     return db_vocab(sql.MSFD13ReportingInfo, 'Region')
 
 
-# @provider(IVocabularyFactory)
-# def a1314_marine_unit_id(context):
-#     return db_vocab(sql.MSFD13ReportingInfo, 'MarineUnitID')
-
-
 @provider(IVocabularyFactory)
 def a1314_unique_codes(context):
-    codes = context.data.get('unique_codes')
-    terms = [
-        SimpleTerm(code, code, u'%s - %s' % (code, name))
-
-        for code, name in codes
-    ]
-
-    return SimpleVocabulary(terms)
-
-
-@provider(IVocabularyFactory)
-def a1314_marine_unit_ids(context):
     codes = context.data.get('unique_codes')
     terms = [
         SimpleTerm(code, code, u'%s - %s' % (code, name))

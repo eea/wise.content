@@ -9,7 +9,7 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
-from .db import get_available_marine_unit_ids, get_item_by_marineunitid
+from .db import get_available_marine_unit_ids, get_item_by_conditions
 from .interfaces import IMainForm
 from .utils import get_obj_fields, get_registered_form_sections, print_value
 from .widget import MarineUnitIDSelectFieldWidget
@@ -318,8 +318,11 @@ class ItemDisplayForm(EmbededForm):
         page = self.get_page()
         muid = self.get_marine_unit_id()
 
-        res = get_item_by_marineunitid(self.mapper_class, self.order_field,
-                                       marine_unit_id=muid, page=page)
+        res = get_item_by_conditions(
+            self.mapper_class, self.order_field,
+            self.mapper_class.MarineUnitID == muid,
+            page=page,
+        )
 
         return res
 
