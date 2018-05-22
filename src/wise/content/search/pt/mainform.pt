@@ -76,7 +76,7 @@
         }
 
         #wise-search-form .field > span .option:nth-child(even) {
-          background-color: #eeeeff;
+          background-color: #f0f6f9;
         }
 
         .option {
