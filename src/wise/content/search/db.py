@@ -51,6 +51,17 @@ def get_unique_from_table(table, column):
     return [x[0] for x in res]
 
 
+def get_unique_from_mapper(table, column):
+    """ Retrieves unique values for a mapper class
+    """
+    col = getattr(table, column)
+
+    sess = session()
+    res = sess.query(col).distinct().order_by(col)
+
+    return [x[0] for x in res]
+
+
 def get_marine_unit_ids(**data):
     """ Return a list of available MarineUnitIDs for the query
     """
@@ -125,7 +136,6 @@ WHERE MSFD10_Target = :target_id
 
 
 def get_a10_criteria_indicators(target_id):
-    # TODO: this is not used right now, should be used, why it's not used
     conn = connection()
     res = conn.execute(text("""
 SELECT DISTINCT GESDescriptorsCriteriaIndicators

@@ -60,11 +60,31 @@ class IStartArticles8910(Interface):
     )
 
 
+class IStartArticles1314(Interface):
+    report_type = Choice(
+        title=u"Report Type",
+        vocabulary="wise_search_a1314_report_types",
+        required=True,
+    )
+
+    region = Choice(
+        title=u"Region",
+        vocabulary="wise_search_a1314_regions",
+        required=True,
+    )
+
+    marine_unit_id = Choice(
+        title=u"MarineUnitID",
+        description=u"Select one or more MarineUnitIDs that you're interested",
+        vocabulary="wise_search_a1314_marine_unit_id"
+    )
+
+
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
         title=u"MarineUnitIDs",
         description=u"Select one or more MarineUnitIDs that you're interested",
-        value_type=Choice(vocabulary="wise_search_marine_unit_ids_vocab")
+        value_type=Choice(vocabulary="wise_search_marine_unit_ids")
     )
 
 
@@ -79,5 +99,13 @@ class IMarineUnitIDSelect(Interface):
     marine_unit_id = Choice(
         title=u"MarineUnitID",
         description=u"Select one or more MarineUnitIDs that you're interested",
-        vocabulary="wise_search_marine_unit_id_vocab"
+        vocabulary="wise_search_marine_unit_id"
+    )
+
+
+class IA1314UniqueCodes(Interface):
+    unique_codes = List(
+        title=u"Unique Codes",
+        description=u"Select one or more Unique Codes that you're interested",
+        value_type=Choice(vocabulary="wise_search_a1314_unique_codes")
     )

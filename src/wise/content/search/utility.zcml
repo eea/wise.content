@@ -27,27 +27,32 @@
 
   <utility
     component=".vocabulary.marine_unit_id_vocab_factory"
-    name="wise_search_marine_unit_id_vocab"
+    name="wise_search_marine_unit_id"
     />
 
   <utility
     component=".vocabulary.marine_unit_ids_vocab_factory"
-    name="wise_search_marine_unit_ids_vocab"
+    name="wise_search_marine_unit_ids"
     />
 
-  <!-- <utility -->
-  <!--   component=".vocabulary.labels_vocabulary_factory" -->
-  <!--   name="wise_search_labels" -->
-  <!--   /> -->
+  <utility
+    component=".vocabulary.wise_search_a1314_report_types"
+    name="wise_search_a1314_report_types"
+    />
 
-  <!-- <utility -->
-  <!--   component=".vocabulary.a81a_themes_vocabulary_factory" -->
-  <!--   name="wise_search_81a_themes" -->
-  <!--   /> -->
-  <!--  -->
-  <!-- <utility -->
-  <!--   component=".vocabulary.a81b_themes_vocabulary_factory" -->
-  <!--   name="wise_search_81b_themes" -->
-  <!--   /> -->
+  <utility
+    component=".vocabulary.wise_search_a1314_regions"
+    name="wise_search_a1314_regions"
+    />
+
+  <utility
+    component=".vocabulary.wise_search_a1314_marine_unit_id"
+    name="wise_search_a1314_marine_unit_id"
+    />
+
+  <utility
+    component=".vocabulary.wise_search_a1314_unique_codes"
+    name="wise_search_a1314_unique_codes"
+    />
 
 </configure>

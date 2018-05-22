@@ -1,5 +1,7 @@
 from lxml.etree import parse
 from pkg_resources import resource_filename
+from six import u
+from sqlalchemy.sql.schema import Table
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -10,6 +12,11 @@ from .utils import FORMS, LABELS, SUBFORMS
 
 
 def populate_labels():
+    """ Read XSD files and populates a vocabulary of term->label
+
+    Note: there labels are pretty ad-hoc defined in the xsd file as
+    documentation tags, so this method is imprecise.
+    """
     lines = []
     f = resource_filename('wise.content',
                           'search/data/MSCommon_1p0.xsd')
@@ -91,7 +98,12 @@ class SubFormsVocabulary(SimpleVocabulary):
 def db_vocab(table, column):
     """ Builds a vocabulary based on unique values in a column table
     """
-    res = db.get_unique_from_table(table, column)
+
+    if isinstance(table, Table):
+        res = db.get_unique_from_table(table, column)
+    else:
+        res = db.get_unique_from_mapper(table, column)
+    res = [u(x).strip() for x in res]
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -144,8 +156,26 @@ def marine_unit_id_vocab_factory(context):
     return SimpleVocabulary(terms)
 
 
-# labels_vocabulary = SimpleVocabulary([SimpleTerm(k, k, v) for k, v in
-#                                       LABELS.items()])
-#
-# def labels_vocabulary_factory(context):
-#     return labels_vocabulary
+@provider(IVocabularyFactory)
+def wise_search_a1314_report_types(context):
+    return db_vocab(sql.MSFD13ReportingInfo, 'ReportType')
+
+
+@provider(IVocabularyFactory)
+def wise_search_a1314_regions(context):
+    return db_vocab(sql.MSFD13ReportingInfo, 'Region')
+
+
+@provider(IVocabularyFactory)
+def wise_search_a1314_marine_unit_id(context):
+    return db_vocab(sql.MSFD13ReportingInfo, 'MarineUnitID')
+
+
+@provider(IVocabularyFactory)
+def wise_search_a1314_unique_codes(context):
+    data = context.data
+    import pdb; pdb.set_trace()
+    count, ids = db.get_marine_unit_ids(**data)
+    terms = [SimpleTerm(x, x, x) for x in ids]
+
+    return SimpleVocabulary(terms)
