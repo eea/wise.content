@@ -1,5 +1,5 @@
 <div id="wise-search-form">
-  <ul class="nav nav-pills">
+  <ul class="nav nav-pills topnav">
     <tal:rep tal:repeat="info view/main_forms">
     <li tal:define="name python:info[0];
       title python: info[1];
@@ -21,7 +21,7 @@
 
 
   <div tal:content="view/get_all_mainforms"></div>
-    <span> aaaa </span>
+
     <metal:slot fill-slot="actions">
       <metal:block use-macro="context/@@ploneform-macros/actions" />
       <div tal:content="structure view/subform_content | nothing">subform here</div>
@@ -32,6 +32,7 @@
         #wise-search-form dl {
           overflow: hidden;
         }
+
         #wise-search-form dt {
           width: 20rem;
           float: left;
@@ -52,17 +53,98 @@
           overflow: auto;
         }
 
-        #wise-search-form ul
+        #wise-search-form ul.nav {
+          list-style-type: none !important;
+          display: inline-block;
+          border-bottom: none;
+          overflow: hidden;
+        }
+
+        #wise-search-form ul.nav li {
+          list-style-type: none !important;
+          display: inline-block;
+          float: left;
+          border: none;
+          background-color: #eeeeee;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+
+          transition: background-color 0.5s ease-in;
+          -webkit-transition: background-color 0.5 ease-out;
+          -moz-transition: background-color 0.5s ease-out;
+          -o-transition: background-color 0.5s ease-out;
+
+          padding-bottom: 99999px;
+          margin-bottom: -99999px;
+        }
+
+        #wise-search-form ul li:not(:first-child) {
+          margin-left: 2px;
+        }
+
+        #wise-search-form ul.nav li:hover {
+          background-color: #006699;
+          border-right: none;
+          color:white;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          transition: background-color 0.5s ease-in;
+          -webkit-transition: background-color 0.5 ease-in;
+          -moz-transition: background-color 0.5s ease-in;
+          -o-transition: background-color 0.5s ease-in;
+        }
+
+        #wise-search-form ul.nav li.active,
+        #wise-search-form ul.nav li.active:hover
+          {
+          background-color: #337ab7;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+
+        }
+
+        #wise-search-form ul.nav li.active a {
+          background-color: transparent;
+          border: none;
+          color: white;
+        }
+
+        #wise-search-form ul.nav li a {
+          border: none;
+          margin: 0 auto;
+
+        }
+        #wise-search-form ul.nav li a:hover {
+          background-color: transparent;
+          color: white;
+          border:none;
+          
+        }
+
+        #wise-search-form ul.nav li.active a:hover {
+          color: white;
+          background-color: transparent;
+          border:none;
+        }
+
+        #wise-search-form > ul.topnav
         {
            list-style-type: none !important;
            margin: 0 auto;
-
            width: 100%;
            overflow: hidden;
            border-bottom: 1px solid #337ab7;
         }
 
-        #wise-search-form ul li {
+        #wise-search-form > ul.topnav li {
            background-color: #eeeeee;
 
            list-style-type: none !important;
@@ -97,7 +179,7 @@
           box-shadow: 0 1px 2px rgba(3,3,3,0.05);
           -webkit-box-shadow: 0 1px 2px rgba(3,3,3,0.05);
           -moz-box-shadow: 0 1px 2px rgba(3,3,3,0.05);
-          padding: 0.5em;
+          padding: 6px;
           border-radius: 3px;
           display: inline-block;
           position: relative;
@@ -119,11 +201,13 @@
 
         .option input[type='checkbox']:checked:after {
           content: '\2714';
-          font-size: 14px;
+          font-size: 13px;
           position: absolute;
           top: 0px;
-          left: 2px;
+
+          left: 1px;
           color: #99a1a7;
+          line-height: 12px;
         }
 
         .option label {
@@ -147,7 +231,7 @@
             max-height: 150px;
         }
 
-        #wise-search-form ul li:hover {
+        #wise-search-form > ul.topnav li:hover {
            border-top-left-radius: 10px;
            border-top-right-radius: 10px;
            border-bottom-left-radius: 0;
@@ -155,7 +239,7 @@
            background: #337ab7;
         }
 
-        #wise-search-form .nav li a {
+        #wise-search-form ul.topnav li a {
            word-wrap: break-word;
            border-top-left-radius: 10px;
            border-top-right-radius: 10px;
@@ -163,18 +247,18 @@
            border-bottom-right-radius: 0;
         }
 
-        #wise-search-form .nav li a:hover {
+        #wise-search-form ul.topnav li a:hover {
             background: #337ab7;
             color: white;
         }
 
-        #wise-search-form .nav li {
+        #wise-search-form ul.topnav li {
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
 
         }
 
-        #wise-search-form .nav .tab-active {
+        #wise-search-form > ul.topnav .tab-active {
           border-top-left-radius: 10px;
           border-top-right-radius: 10px;
           border-bottom-left-radius: 0;
@@ -182,7 +266,7 @@
           background: #337ab7;
         }
 
-        #wise-search-form .nav .tab-active a {
+        #wise-search-form > ul.topnav .tab-active a {
           color: white;
         }
 
@@ -194,22 +278,24 @@
           color: Black;
         }
 
+
+
         #wise-search-form div.formControls {
             margin-left: 0;
         }
 
         @media (min-width: 967px) and (max-width: 1024px){
-            #wise-search-form ul li {
+            #wise-search-form > ul.topnav li {
                 width: 30%;
             }
         }
 
         @media (max-width: 969px){
-            #wise-search-form ul {
+            #wise-search-form > ul.topnav {
                 padding-top: 10px;
             }
 
-            #wise-search-form ul li {
+            #wise-search-form > ul.topnav li {
               padding-bottom: 0;
               margin-bottom: 0;
               width: 100%;
