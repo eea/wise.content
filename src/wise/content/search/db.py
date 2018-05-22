@@ -146,6 +146,16 @@ def get_related_record(klass, column, rel_id):
     return [q.count(), item]
 
 
+def get_related_record_join(klass, klass_join, column, rel_id):
+    sess = session()
+    q = sess.query(klass).join(klass_join).filter(
+        getattr(klass_join, column) == rel_id
+    )
+    item = q.first()
+
+    return [q.count(), item]
+
+
 def get_all_records(mapper_class, *conditions):
     sess = session()
     q = sess.query(mapper_class).filter(*conditions)
