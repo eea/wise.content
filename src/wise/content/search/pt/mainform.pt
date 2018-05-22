@@ -126,7 +126,7 @@
           background-color: transparent;
           color: white;
           border:none;
-          
+
         }
 
         #wise-search-form ul.nav li.active a:hover {
@@ -173,6 +173,7 @@
         }
 
         .option input[type='checkbox'] {
+          text-overflow: ellipsis;
           -webkit-appearance: none;
           background-color: #fafafa;
           border: 1px solid #cdcece;
