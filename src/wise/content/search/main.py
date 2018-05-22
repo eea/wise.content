@@ -3,6 +3,8 @@ from wise.content.search import interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
+from .a11 import StartArticle11Form
+from .a1314 import StartArticle1314Form
 from .base import EmbededForm, MainForm, MainFormWrapper
 from .utils import get_form, scan
 
@@ -53,27 +55,7 @@ class MarineUnitIDsForm(EmbededForm):
         return super(MarineUnitIDsForm, self).get_subform(klass)
 
 
-class StartArticle11Form(MainForm):
-    """
-    """
-    name = 'msfd-c2'
-
-    def get_subform(self):
-        return None
-
-
 StartArticle11View = wrap_form(StartArticle11Form)
-
-
-class StartArticle1314Form(MainForm):
-    """
-    """
-    name = 'msfd-c3'
-
-    def get_subform(self):
-        return None
-
-
 StartArticle1314View = wrap_form(StartArticle1314Form)
 
 # discover and register associated views

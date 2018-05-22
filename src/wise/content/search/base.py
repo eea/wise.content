@@ -123,13 +123,16 @@ class MainForm(Form):
         super(MainForm, self).update()
         self.data, self.errors = self.extractData()
 
-        self.subform = self.get_subform()
+        has_values = self.data.values() and all(self.data.values())
 
-        if self.subform:
-            # we need to update and "execute" the subforms to be able to
-            # discover them, because the decision process regarding discovery
-            # is done in the update() method of subforms
-            self.subform_content = self.subform()
+        if has_values:
+            self.subform = self.get_subform()
+
+            if self.subform:
+                # we need to update and "execute" the subforms to be able to
+                # discover them, because the decision process regarding
+                # discovery is done in the update() method of subforms
+                self.subform_content = self.subform()
 
     def render(self):
         download_action = self.find_download_action()
