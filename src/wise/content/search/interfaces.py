@@ -74,6 +74,14 @@ class IStartArticles1314(Interface):
     )
 
 
+class IStartArticle11(Interface):
+    monitoring_programme_types = List(
+        title=u"Monitoring programme Type",
+        value_type=Choice(vocabulary="wise_search_monitoring_programme_vb_factory"),
+        required=True
+    )
+
+
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
         title=u"MarineUnitIDs",
