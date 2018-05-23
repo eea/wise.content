@@ -445,11 +445,11 @@ class A81cForm(MarineUnitIDSelectForm):
 
     Class for Article 8.1c Economic and social analysis
     """
-    title = '8.1c asd'
+    title = '8.1c (Economic and social analysis)'
     mapper_class = sql.MSFD8cUs
 
     def get_subform(self):
-        return None
+        return A81cEconomicItemDisplay(self, self.request)
 
 
 class A81cEconomicItemDisplay(MultiItemDisplayForm):
@@ -458,13 +458,20 @@ class A81cEconomicItemDisplay(MultiItemDisplayForm):
     mapper_class = sql.MSFD8cUs
     order_field = 'MSFD8c_Uses_ID'
 
+    # TODO: need to filter on topic
+
 
 @register_form_section(A81cEconomicItemDisplay)
 class A81cEconomicPressures(ItemDisplay):
     title = 'Pressures produces by the activities'
 
     def get_db_results(self):
-        return None
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8cPressure,
+                'MSFD8c_Uses_ID',
+                self.context.item.MSFD8c_Uses_ID
+            )
 
 
 @register_form_section(A81cEconomicItemDisplay)
@@ -472,4 +479,9 @@ class A81aEconomicDependencies(ItemDisplay):
     title = 'Dependencies of activities on features'
 
     def get_db_results(self):
-        return None
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8cDepend,
+                'MSFD8c_Uses_ID',
+                self.context.item.MSFD8c_Uses_ID
+            )
