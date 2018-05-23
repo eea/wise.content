@@ -467,7 +467,7 @@ class A81cForm(MarineUnitIDSelectForm):
 
     Class for Article 8.1c Economic and social analysis
     """
-    title = '8.1c (Economic and social analysis)'
+    title = 'Article 8.1c (Economic and social analysis)'
     mapper_class = sql.MSFD8cUs
 
     def get_subform(self):

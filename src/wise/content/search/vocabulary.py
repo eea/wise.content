@@ -1,6 +1,5 @@
 from lxml.etree import parse
 from pkg_resources import resource_filename
-from six import u
 from sqlalchemy.sql.schema import Table
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
@@ -133,9 +132,8 @@ def get_area_type_vb_factory(context):
 
 @provider(IVocabularyFactory)
 def articles_vocabulary_factory(context):
-    # TODO: sort terms first
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
-    terms.sort()
+    terms.sort(key=lambda t: t.token)
     vocab = SimpleVocabulary(terms)
 
     return vocab
