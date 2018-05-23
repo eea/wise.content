@@ -6,6 +6,8 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm, MainForm
+from .db import get_all_records
+from .utils import data_to_xls
 
 
 class StartArticle1314Form(MainForm):
@@ -68,6 +70,8 @@ class UniqueCodesForm(EmbededForm):
     """ Select the unique codes
     """
 
+    css_class = "left-side-form"
+
     fields = Fields(interfaces.IA1314UniqueCodes)
 
     fields['unique_codes'].widgetFactory = CheckBoxFieldWidget
@@ -83,6 +87,14 @@ class A1314ItemDisplay(ItemDisplayForm):
 
     mapper_class = sql.MSFD13MeasuresInfo
     order_field = 'ID'
+
+    def download_results(self):
+        muids = self.context.data.get('unique_codes', [])
+        count, data = get_all_records(
+            self.mapper_class, self.mapper_class.UniqueCode.in_(muids)
+        )
+
+        return data_to_xls(data)
 
     def get_db_results(self):
         page = self.get_page()

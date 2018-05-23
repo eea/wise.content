@@ -167,7 +167,8 @@ class MainForm(Form):
 
             ctx = ctx.subform
 
-        return False
+        if hasattr(ctx, 'download_results'):
+            return ctx.download_results
 
 
 class MainFormWrapper(FormWrapper):
