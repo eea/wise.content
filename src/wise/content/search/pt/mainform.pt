@@ -58,6 +58,7 @@
           display: inline-block;
           border-bottom: none;
           overflow: hidden;
+          margin-left: 0;
         }
 
         #wise-search-form ul.nav li {
@@ -135,6 +136,10 @@
           border:none;
         }
 
+        #wise-search-form .tab-content {
+          border-top: 1px solid rgb(204, 204, 204);
+        }
+
         #wise-search-form > ul.topnav
         {
            list-style-type: none !important;
@@ -173,7 +178,7 @@
         }
 
         .option input[type='checkbox'] {
-          text-overflow: ellipsis;
+          margin-left: 2px;
           -webkit-appearance: none;
           background-color: #fafafa;
           border: 1px solid #cdcece;
@@ -212,11 +217,16 @@
         }
 
         .option label {
+          max-width: 80%;
+
           margin-bottom: 0;
           height: 100%;
           display: inline-block;
           vertical-align: middle;
           margin-bottom: 8px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .option label span{
