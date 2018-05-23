@@ -104,6 +104,13 @@ def db_vocab(table, column):
     else:
         res = db.get_unique_from_mapper(table, column)
     res = [x.strip() for x in res]
+    # res_strip = []
+    # for x in res:
+    #     try:
+    #         res_strip.append(x.strip().encode('utf8'))
+    #     except:
+    #         res_strip.append(x.strip())
+    import pdb; pdb.set_trace()
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -133,6 +140,11 @@ def articles_vocabulary_factory(context):
     vocab = SimpleVocabulary(terms)
 
     return vocab
+
+
+@provider(IVocabularyFactory)
+def monitoring_programme_vb_factory(context):
+    return db_vocab(sql.MSFD11MPType, 'Description')
 
 
 @provider(IVocabularyFactory)

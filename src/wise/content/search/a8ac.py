@@ -5,7 +5,8 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
-from .utils import register_form, register_form_section, register_subform
+from .utils import (data_to_xls, register_form, register_form_section,
+                    register_subform)
 from .vocabulary import SubFormsVocabulary
 
 
@@ -48,9 +49,12 @@ class A81aEcoSubForm(MarineUnitIDSelectForm):
         return A81aEcoItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aEcoItemDisplay(MultiItemDisplayForm):
@@ -115,9 +119,12 @@ class A81aFunctSubForm(MarineUnitIDSelectForm):
         return A81aFunctItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aFunctItemDisplay(MultiItemDisplayForm):
@@ -181,9 +188,12 @@ class A81aHabitatSubForm(MarineUnitIDSelectForm):
         return A81aHabitatItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aHabitatItemDisplay(MultiItemDisplayForm):
@@ -248,9 +258,12 @@ class A81aSpeciesSubForm(MarineUnitIDSelectForm):
         return A81aSpeciesItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aSpeciesItemDisplay(MultiItemDisplayForm):
@@ -315,9 +328,12 @@ class A81aOtherSubForm(MarineUnitIDSelectForm):
         return A81aOtherItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aOtherItemDisplay(MultiItemDisplayForm):
@@ -382,9 +398,12 @@ class A81aNisSubForm(MarineUnitIDSelectForm):
         return A81aNisItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aNisItemDisplay(MultiItemDisplayForm):
@@ -416,9 +435,12 @@ class A81aPhysicalSubForm(MarineUnitIDSelectForm):
         return A81aPhysicalItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aPhysicalItemDisplay(MultiItemDisplayForm):
@@ -445,11 +467,11 @@ class A81cForm(MarineUnitIDSelectForm):
 
     Class for Article 8.1c Economic and social analysis
     """
-    title = '8.1c asd'
+    title = '8.1c (Economic and social analysis)'
     mapper_class = sql.MSFD8cUs
 
     def get_subform(self):
-        return None
+        return A81cEconomicItemDisplay(self, self.request)
 
 
 class A81cEconomicItemDisplay(MultiItemDisplayForm):
@@ -458,13 +480,20 @@ class A81cEconomicItemDisplay(MultiItemDisplayForm):
     mapper_class = sql.MSFD8cUs
     order_field = 'MSFD8c_Uses_ID'
 
+    # TODO: need to filter on topic
+
 
 @register_form_section(A81cEconomicItemDisplay)
 class A81cEconomicPressures(ItemDisplay):
     title = 'Pressures produces by the activities'
 
     def get_db_results(self):
-        return None
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8cPressure,
+                'MSFD8c_Uses_ID',
+                self.context.item.MSFD8c_Uses_ID
+            )
 
 
 @register_form_section(A81cEconomicItemDisplay)
@@ -472,4 +501,9 @@ class A81aEconomicDependencies(ItemDisplay):
     title = 'Dependencies of activities on features'
 
     def get_db_results(self):
-        return None
+        if self.context.item:
+            return db.get_related_record(
+                sql.MSFD8cDepend,
+                'MSFD8c_Uses_ID',
+                self.context.item.MSFD8c_Uses_ID
+            )

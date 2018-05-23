@@ -5,7 +5,8 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
-from .utils import register_form, register_form_section, register_subform
+from .utils import (data_to_xls, register_form, register_form_section,
+                    register_subform)
 from .vocabulary import SubFormsVocabulary
 
 
@@ -55,9 +56,12 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
         return A81bExtractionFishItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bExtractionFishItemDisplay)
@@ -140,9 +144,12 @@ class A81bExtractionSeaweedSubForm(MarineUnitIDSelectForm):
         return A81bExtractionSeaweedItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bExtractionSeaweedItemDisplay)
@@ -224,9 +231,12 @@ class A81bHazardousSubForm(MarineUnitIDSelectForm):
         return A81bHazardousItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bHazardousItemDisplay)
@@ -308,9 +318,12 @@ class A81bHydroSubForm(MarineUnitIDSelectForm):
         return A81bHydroItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bHydroItemDisplay)
@@ -392,9 +405,12 @@ class A81bMarineLitterSubForm(MarineUnitIDSelectForm):
         return A81bMarineLitterItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bMarineLitterItemDisplay)
@@ -475,9 +491,12 @@ class A81bMicrobialSubForm(MarineUnitIDSelectForm):
         return A81bMicrobialItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bMicrobialItemDisplay)
@@ -561,9 +580,12 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
         return A81bNonIndigenousItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bNonIndigenousItemDisplay)
@@ -645,9 +667,12 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
         return A81bNoiseItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bNoiseItemDisplay)
@@ -726,9 +751,12 @@ class A81bNutrientSubForm(MarineUnitIDSelectForm):
         return A81bNoiseItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bNutrientItemDisplay)
@@ -807,9 +835,12 @@ class A81bPhysicalDamageSubForm(MarineUnitIDSelectForm):
         return A81bPhysicalDamageItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bPhysicalDamageItemDisplay)
@@ -888,9 +919,12 @@ class A81bPhysicalLosSubForm(MarineUnitIDSelectForm):
         return A81bPhysicalLosItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bPhysicalLosItemDisplay)
@@ -969,9 +1003,12 @@ class A81bPollutantEventSubForm(MarineUnitIDSelectForm):
         return A81bPollutantEventItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 @register_form_section(A81bPollutantEventItemDisplay)
@@ -1050,9 +1087,12 @@ class A81bAcidificationSubForm(MarineUnitIDSelectForm):
         return A81bAcidificationItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
