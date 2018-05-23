@@ -5,7 +5,8 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
-from .utils import register_form, register_form_section, register_subform
+from .utils import (data_to_xls, register_form, register_form_section,
+                    register_subform)
 from .vocabulary import SubFormsVocabulary
 
 
@@ -48,9 +49,12 @@ class A81aEcoSubForm(MarineUnitIDSelectForm):
         return A81aEcoItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aEcoItemDisplay(MultiItemDisplayForm):
@@ -115,9 +119,12 @@ class A81aFunctSubForm(MarineUnitIDSelectForm):
         return A81aFunctItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aFunctItemDisplay(MultiItemDisplayForm):
@@ -181,9 +188,12 @@ class A81aHabitatSubForm(MarineUnitIDSelectForm):
         return A81aHabitatItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aHabitatItemDisplay(MultiItemDisplayForm):
@@ -248,9 +258,12 @@ class A81aSpeciesSubForm(MarineUnitIDSelectForm):
         return A81aSpeciesItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aSpeciesItemDisplay(MultiItemDisplayForm):
@@ -315,9 +328,12 @@ class A81aOtherSubForm(MarineUnitIDSelectForm):
         return A81aOtherItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aOtherItemDisplay(MultiItemDisplayForm):
@@ -382,9 +398,12 @@ class A81aNisSubForm(MarineUnitIDSelectForm):
         return A81aNisItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aNisItemDisplay(MultiItemDisplayForm):
@@ -416,9 +435,12 @@ class A81aPhysicalSubForm(MarineUnitIDSelectForm):
         return A81aPhysicalItemDisplay(self, self.request)
 
     def download_results(self):
-        # make results available for download
-        # TODO: to be implemented
-        pass
+        muids = self.get_marine_unit_ids()
+        count, data = db.get_all_records(
+            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        return data_to_xls(data)
 
 
 class A81aPhysicalItemDisplay(MultiItemDisplayForm):
