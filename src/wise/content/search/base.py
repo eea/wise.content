@@ -99,6 +99,7 @@ class MainForm(Form):
     ignoreContext = True
     reset_page = False
     subform = None
+    subform_content = None
     should_download = False     # flag that signals download button is hit
 
     main_forms = (
@@ -236,6 +237,8 @@ class MarineUnitIDSelectForm(EmbededForm):
     fields = Fields(interfaces.IMarineUnitIDSelect)
     fields['marine_unit_id'].widgetFactory = MarineUnitIDSelectFieldWidget
     mapper_class = None         # what type of objects are we focused on?
+
+    css_class = "left-side-form"
 
     def update(self):
         # Override the default to be able to have a default marine unit id

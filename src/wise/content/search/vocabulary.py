@@ -110,7 +110,6 @@ def db_vocab(table, column):
     #         res_strip.append(x.strip().encode('utf8'))
     #     except:
     #         res_strip.append(x.strip())
-    import pdb; pdb.set_trace()
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 

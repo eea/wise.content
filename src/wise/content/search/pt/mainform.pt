@@ -1,37 +1,48 @@
 <div id="wise-search-form">
-  <ul class="nav nav-pills topnav">
-    <tal:rep tal:repeat="info view/main_forms">
-    <li tal:define="name python:info[0];
+  <div id="wise-search-form-top">
+    <ul class="nav nav-pills topnav">
+      <tal:rep tal:repeat="info view/main_forms">
+      <li tal:define="name python:info[0];
       title python: info[1];
       active python: view.name == name"
-     tal:attributes="class python: active and 'tab-active'"
-      >
+        tal:attributes="class python: active and 'tab-active'"
+        >
+        <a href=""
+           tal:attributes="href string:./@@${name}"
+           tal:content="title"></a>
+      </li>
+      </tal:rep>
+    </ul>
 
-      <a href=""
-         tal:attributes="href string:./@@${name}"
-         tal:content="title"></a>
+    <h2 tal:content="view/title">Title here</h2>
+    <div tal:condition="not: view/subform_content">
+      Please refine your search.
+    </div>
+  </div>
 
-    </li>
-    </tal:rep>
-  </ul>
+  <div class="wise-search-form-container">
+    <metal:block use-macro="context/@@ploneform-macros/titlelessform">
 
-  <h2 tal:content="view/title">Title here</h2>
-
-  <metal:block use-macro="context/@@ploneform-macros/titlelessform">
-
-
-  <div tal:content="view/get_all_mainforms"></div>
-
-    <metal:slot fill-slot="actions">
-      <metal:block use-macro="context/@@ploneform-macros/actions" />
-      <div tal:content="structure view/subform_content | nothing">subform here</div>
+    <metal:slot fill-slot="fields">
+    <div class="form-right-side">
+      <metal:block use-macro="context/@@ploneform-macros/fields" ></metal:block>
+    </div>
     </metal:slot>
 
-    <metal:slot fill-slot="formtop">
+    <metal:slot fill-slot="actions">
+    <div tal:content="structure view/subform_content | nothing">subform here</div>
+
+
+    <div class="form-right-side">
+      <metal:block use-macro="context/@@ploneform-macros/actions" />
+    </div>
+      </metal:slot>
+
+      <metal:css fill-slot="formtop">
       <style>
-        #wise-search-form dl {
-          overflow: hidden;
-        }
+#wise-search-form dl {
+  overflow: hidden;
+}
 
         #wise-search-form dt {
           width: 20rem;
@@ -102,7 +113,7 @@
 
         #wise-search-form ul.nav li.active,
         #wise-search-form ul.nav li.active:hover
-          {
+        {
           background-color: #337ab7;
 
           border-top-left-radius: 10px;
@@ -142,26 +153,26 @@
 
         #wise-search-form > ul.topnav
         {
-           list-style-type: none !important;
-           margin: 0 auto;
-           width: 100%;
-           overflow: hidden;
-           border-bottom: 1px solid #337ab7;
+          list-style-type: none !important;
+          margin: 0 auto;
+          width: 100%;
+          overflow: hidden;
+          border-bottom: 1px solid #337ab7;
         }
 
         #wise-search-form > ul.topnav li {
-           background-color: #eeeeee;
+          background-color: #eeeeee;
 
-           list-style-type: none !important;
-           border-top-left-radius: 10px;
-           border-top-right-radius: 10px;
-           border-bottom-left-radius: 0;
-           border-bottom-right-radius: 0;
+          list-style-type: none !important;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
 
-           margin: 0 auto;
-           margin-right: 2px;
-           padding-bottom: 99999px;
-           margin-bottom: -99999px;
+          margin: 0 auto;
+          margin-right: 2px;
+          padding-bottom: 99999px;
+          margin-bottom: -99999px;
         }
 
         #wise-search-form .field > span .option:nth-child(even) {
@@ -169,8 +180,8 @@
         }
 
         .option {
-            display: block;
-            width: 100%;
+          display: block;
+          width: 100%;
         }
 
         .option input[type='checkbox'] {
@@ -193,7 +204,7 @@
 
         .option input[type='checkbox']:active,
         .option input[type='checkbox']:checked:active {
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
         }
 
         .option input[type='checkbox']:checked {
@@ -234,38 +245,38 @@
         }
 
         .field > span {
-            display: block;
-            position: relative;
-            overflow-y: auto;
-            overflow-x: hidden;
-            height: 100%;
-            max-height: 150px;
+          display: block;
+          position: relative;
+          overflow-y: auto;
+          overflow-x: hidden;
+          height: 100%;
+          max-height: 150px;
         }
 
         #wise-search-form > ul.topnav li:hover {
-           border-top-left-radius: 10px;
-           border-top-right-radius: 10px;
-           border-bottom-left-radius: 0;
-           border-bottom-right-radius: 0;
-           background: #337ab7;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          background: #337ab7;
         }
 
         #wise-search-form ul.topnav li a {
-           word-wrap: break-word;
-           border-top-left-radius: 10px;
-           border-top-right-radius: 10px;
-           border-bottom-left-radius: 0;
-           border-bottom-right-radius: 0;
+          word-wrap: break-word;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
         }
 
         #wise-search-form ul.topnav li a:hover {
-            background: #337ab7;
-            color: white;
+          background: #337ab7;
+          color: white;
         }
 
         #wise-search-form ul.topnav li {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
 
         }
 
@@ -292,38 +303,39 @@
 
 
         #wise-search-form div.formControls {
-            margin-left: 0;
+          margin-left: 0;
         }
 
         @media (min-width: 967px) and (max-width: 1024px){
-            #wise-search-form > ul.topnav li {
-                width: 30%;
-            }
+          #wise-search-form > ul.topnav li {
+            width: 30%;
+          }
         }
 
         @media (max-width: 969px){
-            #wise-search-form > ul.topnav {
-                padding-top: 10px;
-            }
+          #wise-search-form > ul.topnav {
+            padding-top: 10px;
+          }
 
-            #wise-search-form > ul.topnav li {
-              padding-bottom: 0;
-              margin-bottom: 0;
-              width: 100%;
-              margin-bottom: 2px;
-              border-top-left-radius: 0px;
-              border-top-right-radius: 0px;
-              border-bottom-left-radius: 0;
-              border-bottom-right-radius: 0;
-            }
+          #wise-search-form > ul.topnav li {
+            padding-bottom: 0;
+            margin-bottom: 0;
+            width: 100%;
+            margin-bottom: 2px;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
 
-            #wise-search-form dd {
-                max-height: auto;
-                max-width: 100%;
-            }
+          #wise-search-form dd {
+            max-height: auto;
+            max-width: 100%;
+          }
         }
       </style>
-    </metal:slot>
+      </metal:css>
 
-  </metal:block>
+    </metal:block>
+  </div>
 </div>
