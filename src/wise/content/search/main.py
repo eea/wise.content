@@ -55,8 +55,8 @@ class MarineUnitIDsForm(EmbededForm):
         return super(MarineUnitIDsForm, self).get_subform(klass)
 
 
-StartArticle11View = wrap_form(StartArticle11Form)
-StartArticle1314View = wrap_form(StartArticle1314Form)
+StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
+StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 
 # discover and register associated views
 scan('a8ac')
