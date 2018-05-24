@@ -1,7 +1,22 @@
 <div tal:define="data view/get_extra_data" class="extra-details">
 
-  <div tal:repeat="info data">
+  <div tal:repeat="info data" >
+
     <tal:section define="section python: info[1]; section_title python: info[0]">
+
+    <h4 tal:content="section_title">Section title</h4>
+
+    <ul class="nav nav-tabs" id="tabs2" role="tablist" >
+        <li class="nav-item" tal:repeat="section_label section">
+            <a class="nav-link" tal:define="utitle section_label"
+               tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
+    href python:'#' + utitle.replace(' ', '_').lower();
+    aria-controls python:utitle.replace(' ', '_').lower()"
+               data-toggle="tab"
+               role="tab"
+               aria-selected="true" tal:content="section_label">Section title here</a>
+        </li>
+    </ul>
 
       <div tal:repeat="section_label section">
         <h4 tal:content="string: $section_title: $section_label">SubSection Label</h4>
