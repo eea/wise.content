@@ -1,10 +1,5 @@
 <div class="subform">
   <metal:block use-macro="context/@@ploneform-macros/fields" />
-
-
-  <!-- <div tal:content="structure view/data_template | nothing"></div> -->
-  <!-- <div tal:content="structure view/extras | nothing"></div> -->
-
   <metal:block use-macro="context/@@ploneform-macros/actions" />
 
   <tal:def define="subform view/subform | nothing">

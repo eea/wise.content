@@ -7,18 +7,6 @@ from sqlalchemy import inspect
 
 import xlsxwriter
 
-
-def pivot_data(data, pivot):
-    out = defaultdict(list)
-
-    for row in data:
-        d = dict(row)
-        p = d.pop(pivot)
-        out[p].append(d)
-
-    return out
-
-
 FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
@@ -126,7 +114,8 @@ def print_value(value):
         # Activate below to show tables
         # return self.value_template(item=value)
 
-        return '&lt;hidden&gt;'
+        return None
+        # return '&lt;hidden&gt;'
 
     return value
 
@@ -164,4 +153,15 @@ def data_to_xls(data):
 def get_obj_fields(obj):
     mapper = inspect(obj)
 
-    return [c.key for c in mapper.attrs]
+    return sorted([c.key for c in mapper.attrs])
+
+
+def pivot_data(data, pivot):
+    out = defaultdict(list)
+
+    for row in data:
+        d = dict(row)
+        p = d.pop(pivot)
+        out[p].append(d)
+
+    return out

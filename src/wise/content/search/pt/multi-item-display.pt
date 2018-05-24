@@ -3,22 +3,17 @@
 <div tal:content="structure view/data_template | nothing"></div>
 <div tal:content="structure view/extras | nothing"></div>
 
-<!--<div tal:repeat="section view/get_sections">
-  <h3 tal:content="section/title">Section title here</h3>
-  <div tal:content="structure section"></div>
-</div>-->
-
 <div id="tabs-wrapper">
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" id="tabs" role="tablist" >
     <li class="nav-item" tal:repeat="section view/get_sections">
       <a class="nav-link" tal:define="utitle section/title"
-         tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
-         href python:'#' + utitle.replace(' ', '_').lower();
-         aria-controls python:utitle.replace(' ', '_').lower()"
-         data-toggle="tab"
-         role="tab"
-         aria-selected="true" tal:content="section/title">Section title here</a>
+        tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
+        href python:'#' + utitle.replace(' ', '_').lower();
+        aria-controls python:utitle.replace(' ', '_').lower()"
+        data-toggle="tab"
+        role="tab"
+        aria-selected="true" tal:content="section/title">Section title here</a>
     </li>
   </ul>
 
@@ -26,23 +21,23 @@
   <div class="tab-content" id="tabContents" >
     <tal:loop repeat="section view/get_sections">
       <div class="tab-pane fade"
-           tal:define="utitle section/title"
-           tal:attributes="id python:utitle.replace(' ', '_').lower()"
-           role="tabpanel"
-           tal:content="structure section"
-      >...</div>
+        tal:define="utitle section/title"
+        tal:attributes="id python:utitle.replace(' ', '_').lower()"
+        role="tabpanel"
+        tal:content="structure section"
+        >...</div>
     </tal:loop>
   </div>
 </div>
 
-
+<!-- TODO: redo this section -->
 Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
 
 <metal:block use-macro="context/@@ploneform-macros/actions" />
 
 <tal:def define="subform view/subform | nothing">
-<div class="subform-level-x" tal:condition="subform">
-  <div tal:content="structure subform">subform here</div>
-</div>
+  <div class="subform-level-x" tal:condition="subform">
+    <div tal:content="structure subform">subform here</div>
+  </div>
 </tal:def>
 

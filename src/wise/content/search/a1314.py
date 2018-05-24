@@ -1,6 +1,7 @@
 """ Forms and views for Article 13-14 search
 """
 
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
@@ -83,7 +84,7 @@ class UniqueCodesForm(EmbededForm):
 class A1314ItemDisplay(ItemDisplayForm):
     """ The implementation for the Article 9 (GES determination) form
     """
-    # extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
 
     mapper_class = sql.MSFD13MeasuresInfo
     order_field = 'ID'
@@ -117,12 +118,4 @@ class A1314ItemDisplay(ItemDisplayForm):
 
         count, item = db.get_related_record(mc, 'ReportID', report_id)
 
-        return [
-             # TODO: this needs more work
-            ('Report Info', vars(item)
-             #  {
-             #     # 'ReportType': item.ReportType,
-             #     # 'URL': item.URL
-             # }
-             )
-        ]
+        return ('Report info', item)
