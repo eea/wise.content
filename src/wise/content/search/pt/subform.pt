@@ -1,4 +1,4 @@
-<div>
+<div class="subform">
   <metal:block use-macro="context/@@ploneform-macros/fields" />
 
 
