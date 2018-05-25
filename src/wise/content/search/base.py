@@ -35,6 +35,12 @@ class BaseUtil(object):
 
         return text
 
+    def form_name(self):
+        """ Returns an auto-generated form name, based on class name
+        """
+
+        return self.__class__.__name__.lower()
+
     def get_marine_unit_ids(self):
         """ Return the selected ids by looking up for data in parent forms
         """
