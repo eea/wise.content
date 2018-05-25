@@ -1,45 +1,35 @@
 <div tal:define="data view/get_extra_data" class="extra-details">
+    <tal:block tal:repeat="info data" >
+        <tal:section define="section python: info[1]; section_title python: info[0]">
+            <h4 tal:content="section_title">Section title</h4>
 
-    <div class="tabs-wrapper">
-        <ul  class="nav nav-tabs" id="tabs2" role="tablist"  >
-            <tal:block tal:repeat="info data">
-                <tal:section define="section python: info[1]; section_title python: info[0]">
-                            <tal:block tal:repeat="section_label section">
-                                <li class="nav-item">
+            <div class="tabs-wrapper" >
+                <ul  class="nav nav-tabs" id="tabs2" role="tablist" tal:condition="python: len(info[1]) > 1" >
+                    <tal:block tal:repeat="section_label section">
+                        <li class="nav-item">
 
-                                    <a class="nav-link" tal:define="utitle python: section_label or section_title"
-                                       tal:attributes="id python:utitle.replace(' ', '_').replace('/','-').lower() + '-tab';
-                                        href python:'#' + utitle.replace(' ', '_').replace('/','-').lower();
-                                        aria-controls python:utitle.replace(' ', '_').lower()"
-                                       data-toggle="tab"
-                                       role="tab"
-                                       aria-selected="true" tal:content="utitle"
+                            <a class="nav-link" tal:define="utitle python: section_label or section_title"
+                               tal:attributes="id python:utitle.replace(' ', '_').replace('/','-').lower() + '-tab';
+                                href python:'#' + utitle.replace(' ', '_').replace('/','-').lower();
+                                aria-controls python:utitle.replace(' ', '_').lower()"
+                               data-toggle="tab"
+                               role="tab"
+                               aria-selected="true" tal:content="utitle"
 
-                                    >Section title here</a>
-                                </li>
+                            >Section title here</a>
+                        </li>
+                    </tal:block>
+                </ul>
 
-                            </tal:block>
-
-                </tal:section>
-
-            </tal:block>
-        </ul>
-        <div tal:attributes="class string:tab-content;id string:tabContents2">
-        <tal:block tal:repeat="info data" >
-            <tal:section define="section python: info[1]; section_title python: info[0]">
-
-                    <tal:block tal:repeat="section_label section" >
-
+                <div tal:attributes="class string:tab-content;id string:tabContents2">
+                    <tal:block tal:repeat="section_label section" tal:define="istab python: 'tab-pane fade' if( len(info[1]) > 1) else ''" >
                         <div
                              tal:define="utitle python:section_label or section_title;"
                              tal:attributes="id python: utitle.replace(' ', '_').replace('/','-').lower();
-                             class string: tab-pane fade"
+                             class string: ${istab}"
                              role="tabpanel"
                         >
-
-                            <h4 tal:content="section_title" tal:condition="python: not section_label">Section title</h4>
-                            <h4 tal:content="string: $section_title: $section_label" tal:condition="python: section_label">SubSection Label</h4>
-
+                            <!--<h4 tal:content="string: $section_title: $section_label" tal:condition="python: section_label">SubSection Label</h4>-->
                             <tal:def define="section_data python:section[section_label]">
                             <table class="listing" tal:condition="section_data">
                                 <thead>
@@ -57,16 +47,15 @@
                             </table>
                                 <!-- <tal:cont replace="structure python: view.print_value(section_data)"></tal:cont> -->
                             </tal:def>
-
                         </div>
 
                     </tal:block>
                     <!-- tal:repeat : section -->
 
-            </tal:section>
-        </tal:block>
-        </div>
-        <!-- tabs-wrapper -->
-    </div>
+                </div>
+                <!-- tabs-wrapper -->
+            </div>
 
+        </tal:section>
+    </tal:block>
 </div>

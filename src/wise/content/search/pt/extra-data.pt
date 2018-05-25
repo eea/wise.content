@@ -1,20 +1,23 @@
 <div tal:define="data view/get_extra_data" class="extra-details">
 
   <div tal:repeat="info data">
-    <tal:section define="section python: info[1]; section_title python: info[0]">
+    <tal:block tal:condition="python: len(data) > 1">
+      <tal:section define="section python: info[1]; section_title python: info[0]">
 
-      <div tal:repeat="section_label section">
-        <h4 tal:content="string: $section_title: $section_label">SubSection Label</h4>
+        <div tal:repeat="section_label section">
+          <h4 tal:content="string: $section_title: $section_label">SubSection Label</h4>
 
-        <tal:def define="section_data python:section[section_label]">
+          <tal:def define="section_data python:section[section_label]">
 
-          <tal:cont replace="structure python: view.print_value(section_data)"></tal:cont>
+            <tal:cont replace="structure python: view.print_value(section_data)"></tal:cont>
 
-        </tal:def>
+          </tal:def>
 
-      </div>
+        </div>
 
-    </tal:section>
+      </tal:section>
+    </tal:block>
+
 
   </div>
 </div>

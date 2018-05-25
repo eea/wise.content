@@ -5,16 +5,22 @@
 
 <div id="tabs-wrapper">
   <!-- Nav tabs -->
-  <ul class="nav nav-tabs" id="tabs" role="tablist" >
-    <li class="nav-item" tal:repeat="section view/get_sections">
-      <a class="nav-link" tal:define="utitle section/title"
-        tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
+  <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+    <tal:block tal:repeat="section view/get_sections">
+
+      <li class="nav-item">
+        <a class="nav-link" tal:define="utitle section/title"
+           tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
         href python:'#' + utitle.replace(' ', '_').lower();
         aria-controls python:utitle.replace(' ', '_').lower()"
-        data-toggle="tab"
-        role="tab"
-        aria-selected="true" tal:content="section/title">Section title here</a>
-    </li>
+           data-toggle="tab"
+           role="tab"
+           aria-selected="true"
+           tal:content="section/title">Section title here</a>
+
+      </li>
+    </tal:block>
+
   </ul>
 
   <!-- Tab panes -->
