@@ -40,4 +40,3 @@ Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of
     <div tal:content="structure subform">subform here</div>
   </div>
 </tal:def>
-
