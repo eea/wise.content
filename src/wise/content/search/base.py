@@ -1,3 +1,4 @@
+from sqlalchemy.inspection import inspect
 from zope.browserpage.viewpagetemplatefile import \
     ViewPageTemplateFile as Z3ViewPageTemplateFile
 from zope.component import queryMultiAdapter
@@ -243,6 +244,7 @@ class MarineUnitIDSelectForm(EmbededForm):
     """ Base form for displaying information for a single MarineUnitID
     """
 
+    template = ViewPageTemplateFile('pt/marine-unit-id-form.pt')
     fields = Fields(interfaces.IMarineUnitIDSelect)
     fields['marine_unit_id'].widgetFactory = MarineUnitIDSelectFieldWidget
     mapper_class = None         # what type of objects are we focused on?
@@ -320,8 +322,7 @@ class ItemDisplayForm(EmbededForm):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = max(value - 1, 0)
 
-    @buttonAndHandler(u'Next',
-                      name='next', condition=lambda form: form.show_next())
+    @buttonAndHandler(u'Next', name='next')
     def handle_next(self, action):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = value + 1
@@ -351,6 +352,11 @@ class ItemDisplayForm(EmbededForm):
         )
 
         return res
+
+    def item_title(self, item):
+        state = inspect(item)
+
+        return (item.__class__.__name__, state.identity[0])
 
 
 class MultiItemDisplayForm(ItemDisplayForm):
