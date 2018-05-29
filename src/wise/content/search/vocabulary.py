@@ -18,7 +18,7 @@ def populate_labels():
     """
     lines = []
     f = resource_filename('wise.content',
-                          'search/data/MSCommon_1p0.xsd')
+                          'search/data/MSFDreporting_TermLists_20180406.csv')
     e = parse(f)
 
     for node in e.xpath('//xs:documentation',
