@@ -1,3 +1,5 @@
+from zope.browserpage.viewpagetemplatefile import \
+    ViewPageTemplateFile as Z3ViewPageTemplateFile
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
@@ -249,7 +251,7 @@ class MarineUnitIDSelectForm(EmbededForm):
 
     def update(self):
         # Override the default to be able to have a default marine unit id
-        super(EmbededForm, self).update()
+        super(MarineUnitIDSelectForm, self).update()        # EmbededForm
 
         self.data, errors = self.extractData()
 
@@ -259,6 +261,13 @@ class MarineUnitIDSelectForm(EmbededForm):
 
             if subform is not None:
                 self.subform = subform
+
+    def updateWidgets(self, prefix=None):
+        """ """
+        super(MarineUnitIDSelectForm, self).updateWidgets(prefix=prefix)
+
+        widget = self.widgets["marine_unit_id"]
+        widget.template = Z3ViewPageTemplateFile("pt/marine-widget.pt")
 
     def get_available_marine_unit_ids(self):
         assert self.mapper_class
@@ -296,6 +305,12 @@ class ItemDisplayForm(EmbededForm):
 
         self.count, self.item = self.get_db_results()
 
+        if self.count == self.data['page']:
+            del self.actions['next']
+
+        if self.data['page'] == 0:
+            del self.actions['prev']
+
     def updateWidgets(self, prefix=None):
         super(ItemDisplayForm, self).updateWidgets()
         self.widgets['page'].mode = 'hidden'
@@ -305,7 +320,8 @@ class ItemDisplayForm(EmbededForm):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = max(value - 1, 0)
 
-    @buttonAndHandler(u'Next', name='next')
+    @buttonAndHandler(u'Next',
+                      name='next', condition=lambda form: form.show_next())
     def handle_next(self, action):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = value + 1

@@ -14,7 +14,7 @@
       </tal:rep>
     </ul>
 
-    <h2 tal:content="view/title">Title here</h2>
+    <!-- <h2 tal:content="view/title">Title here</h2> -->
     <div tal:condition="not: view/subform_content">
       Please refine your search.
     </div>
