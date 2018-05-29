@@ -19,10 +19,13 @@
   <div tal:content="structure view/data_template | nothing"></div>
   <div tal:content="structure view/extras | nothing"></div>
 
-  <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing">
-    <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
+  <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing" style="position: relative;">
+
+    <input type="submit" tal:replace="structure prev" tal:condition="prev" />
     Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
-    <input type="submit" tal:replace="structure next" tal:condition="next"/>
+
+    <input type="submit" tal:replace="structure next" tal:condition="next" />
+
   </div>
 
   <tal:def define="subform view/subform | nothing">
