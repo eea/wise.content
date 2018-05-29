@@ -2,13 +2,17 @@
   tal:define="css_class view/css_class | string:"
   tal:attributes="class string:item-subform subform ${css_class};
                   id view/form_name">
+  <tal:block tal:condition="python: view.item ">
+    <tal:block tal:condition="python: view.item_title(view.item)">
+      <h4 tal:define="info python: view.item_title(view.item)">
+        Record
+         <span tal:replace="python: info[0]">Class</span>
+         #
+         <span tal:replace="python: info[1]">10</span>
+      </h4>
+    </tal:block>
+  </tal:block>
 
-  <h4 tal:define="info python: view.item_title(view.item)">
-    Record
-    <span tal:replace="python: info[0]">Class</span>
-    #
-    <span tal:replace="python: info[1]">10</span>
-  </h4>
 
   <metal:block use-macro="context/@@ploneform-macros/fields" />
 

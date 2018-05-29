@@ -2,32 +2,38 @@
   tal:define="css_class view/css_class | string:"
   tal:attributes="class string:subform ${css_class}; id view/form_name">
 
-  <div>Previous</div>
+  <div style="margin-top: 10px;margin-bottom: 10px;">
+    <input id="form-buttons-prev" name="form.buttons.prev" class="submit-widget button-field btn" value="Prev" type="submit"
+        style="margin-right: 20px;" />
 
-  <tal:widgets repeat="widget view/widgets/values">
-  <div
-               tal:define="hidden python:widget.mode == 'hidden'"
-               tal:omit-tag="hidden">
+    <tal:widgets repeat="widget view/widgets/values">
+      <div
+              tal:define="hidden python:widget.mode == 'hidden'"
+              tal:omit-tag="hidden" style="display: inline-block;">
 
-    <div class="field"
-         tal:define="error widget/error;
+        <div class="field" style="border: none; margin: 0 auto;"
+             tal:define="error widget/error;
          hidden python:widget.mode == 'hidden';"
-         tal:attributes="class python:'field' + (error and ' error' or '')">
+             tal:attributes="class python:'field' + (error and ' error' or '');">
+          <div tal:condition="error"
+               tal:content="structure error/render">
+            Error
+          </div>
 
-      <div tal:condition="error"
-         tal:content="structure error/render">
-        Error
+          <div class="widget" style="margin: 0; display: inline;">
+            <input type="text" tal:replace="structure widget/render" />
+          </div>
+        </div>
+
       </div>
+    </tal:widgets>
 
-      <div class="widget">
-        <input type="text" tal:replace="structure widget/render" />
-      </div>
-    </div>
-
+    <input id="form-buttons-next" name="form.buttons.next" class="submit-widget button-field btn" value="Next" type="submit"
+           style="margin-left: 20px;"    />
   </div>
-  </tal:widgets>
 
-  <div>Next</div>
+
+
 
   <metal:block use-macro="context/@@ploneform-macros/actions" />
 
