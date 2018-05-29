@@ -2,9 +2,8 @@
   tal:define="css_class view/css_class | string:"
   tal:attributes="class string:subform ${css_class}; id view/form_name">
 
-  <div style="margin-top: 10px;margin-bottom: 10px;">
-    <input id="form-buttons-prev" name="form.buttons.prev" class="submit-widget button-field btn" value="Prev" type="submit"
-        style="margin-right: 20px;" />
+  <div style="margin-top: 10px;margin-bottom: 10px;" id="marine-widget-top">
+    <span id="form-buttons-prev-top"></span>
 
     <tal:widgets repeat="widget view/widgets/values">
       <div
@@ -28,8 +27,7 @@
       </div>
     </tal:widgets>
 
-    <input id="form-buttons-next" name="form.buttons.next" class="submit-widget button-field btn" value="Next" type="submit"
-           style="margin-left: 20px;"    />
+    <span id="form-buttons-next-top"></span>
   </div>
 
 
