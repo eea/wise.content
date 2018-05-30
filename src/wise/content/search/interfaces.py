@@ -88,7 +88,8 @@ class IMarineUnitIDsSelect(Interface):
         title=u"MarineUnitIDs",
         # description=u"Select one or more MarineUnitIDs that you're
         # interested",
-        value_type=Choice(vocabulary="wise_search_marine_unit_ids")
+        value_type=Choice(vocabulary="wise_search_marine_unit_ids"),
+        required=False
     )
 
 
@@ -104,6 +105,7 @@ class IMarineUnitIDSelect(Interface):
         title=u"MarineUnitID",
         # description=u"Select one or more MarineUnitIDs that you're
         # interested",
+        required=False,
         vocabulary="wise_search_marine_unit_id"
     )
 
@@ -113,5 +115,6 @@ class IA1314UniqueCodes(Interface):
         title=u"Unique Codes",
         # description=u"Select one or more Unique Codes that you're
         # interested",
+        required=False,
         value_type=Choice(vocabulary="wise_search_a1314_unique_codes")
     )
