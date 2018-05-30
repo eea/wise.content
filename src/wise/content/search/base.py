@@ -1,3 +1,4 @@
+from sqlalchemy.inspection import inspect
 from zope.browserpage.viewpagetemplatefile import \
     ViewPageTemplateFile as Z3ViewPageTemplateFile
 from zope.component import queryMultiAdapter
@@ -109,10 +110,11 @@ class MainForm(Form):
     subform = None
     subform_content = None
     should_download = False     # flag that signals download button is hit
+    # method = 'get'
 
     main_forms = (
         ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
-        ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
+        # ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
         ('msfd-c3', 'Article 13 & 14 (2015 reporting exercise)'),
     )
 
@@ -127,6 +129,21 @@ class MainForm(Form):
     @property
     def title(self):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
+
+    def extractData(self):
+        """ Override to be able to provide defaults
+        """
+        data, errors = super(MainForm, self).extractData()
+
+        for k, v in data.items():
+            if not v:
+                default = getattr(self, 'default_' + k, None)
+
+                if default:
+                    data[k] = default()
+                    self.widgets[k].value = data[k]
+
+        return data, errors
 
     def update(self):
         super(MainForm, self).update()
@@ -243,6 +260,7 @@ class MarineUnitIDSelectForm(EmbededForm):
     """ Base form for displaying information for a single MarineUnitID
     """
 
+    template = ViewPageTemplateFile('pt/marine-unit-id-form.pt')
     fields = Fields(interfaces.IMarineUnitIDSelect)
     fields['marine_unit_id'].widgetFactory = MarineUnitIDSelectFieldWidget
     mapper_class = None         # what type of objects are we focused on?
@@ -320,8 +338,7 @@ class ItemDisplayForm(EmbededForm):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = max(value - 1, 0)
 
-    @buttonAndHandler(u'Next',
-                      name='next', condition=lambda form: form.show_next())
+    @buttonAndHandler(u'Next', name='next')
     def handle_next(self, action):
         value = int(self.widgets['page'].value)
         self.widgets['page'].value = value + 1
@@ -351,6 +368,11 @@ class ItemDisplayForm(EmbededForm):
         )
 
         return res
+
+    def item_title(self, item):
+        state = inspect(item)
+
+        return (item.__class__.__name__, state.identity[0])
 
 
 class MultiItemDisplayForm(ItemDisplayForm):

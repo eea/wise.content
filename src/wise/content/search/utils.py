@@ -4,6 +4,8 @@ from io import BytesIO
 
 from six import string_types
 from sqlalchemy import inspect
+from zope.component import getUtility
+from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
 
@@ -165,3 +167,13 @@ def pivot_data(data, pivot):
         out[p].append(d)
 
     return out
+
+
+def default_value_from_field(context, field):
+    """ Get the defaulf value for a choice field
+    """
+    name = field.field.vocabularyName
+    vocab = getUtility(IVocabularyFactory, name=name)(context)
+    term = vocab._terms[0]
+
+    return term.value

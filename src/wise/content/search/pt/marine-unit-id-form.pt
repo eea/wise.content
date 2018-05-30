@@ -1,0 +1,43 @@
+<div
+  tal:define="css_class view/css_class | string:"
+  tal:attributes="class string:subform ${css_class}; id view/form_name">
+
+  <div style="margin-top: 10px;margin-bottom: 16px; position: relative;" id="marine-widget-top">
+    <span id="form-buttons-prev-top" ></span>
+
+    <tal:widgets repeat="widget view/widgets/values">
+      <div
+              tal:define="hidden python:widget.mode == 'hidden'"
+              tal:omit-tag="hidden" style="display: inline-block;">
+
+        <div class="field" style="border: none; margin: 0 auto;"
+             tal:define="error widget/error;
+         hidden python:widget.mode == 'hidden';"
+             tal:attributes="class python:'field' + (error and ' error' or '');">
+          <div tal:condition="error"
+               tal:content="structure error/render">
+            Error
+          </div>
+
+          <div class="widget" style="margin: 0; display: inline;">
+            <input type="text" tal:replace="structure widget/render" />
+          </div>
+        </div>
+
+      </div>
+    </tal:widgets>
+
+    <span id="form-buttons-next-top" style="margin-left: 20px; position:absolute; right: 0;"></span>
+  </div>
+
+
+
+
+  <metal:block use-macro="context/@@ploneform-macros/actions" />
+
+  <tal:def define="subform view/subform | nothing">
+  <div tal:condition="subform">
+    <div tal:content="structure subform">subform here</div>
+  </div>
+  </tal:def>
+</div>

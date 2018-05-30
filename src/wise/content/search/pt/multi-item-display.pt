@@ -1,5 +1,16 @@
 <metal:block use-macro="context/@@ploneform-macros/fields" />
 
+<tal:block tal:condition="python: view.item ">
+<tal:block tal:condition="python: view.item_title(view.item)">
+<h3 tal:define="info python: view.item_title(view.item)">
+  Record:
+  <span tal:replace="python: info[0]">Class</span>
+  #
+  <span tal:replace="python: info[1]">10</span>
+</h3>
+</tal:block>
+</tal:block>
+
 <div tal:content="structure view/data_template | nothing"></div>
 <div tal:content="structure view/extras | nothing"></div>
 
@@ -11,8 +22,8 @@
       <li class="nav-item">
         <a class="nav-link" tal:define="utitle section/title"
            tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
-        href python:'#' + utitle.replace(' ', '_').lower();
-        aria-controls python:utitle.replace(' ', '_').lower()"
+           href python:'#' + utitle.replace(' ', '_').lower();
+           aria-controls python:utitle.replace(' ', '_').lower()"
            data-toggle="tab"
            role="tab"
            aria-selected="true"
@@ -26,24 +37,39 @@
   <!-- Tab panes -->
   <div class="tab-content" id="tabContents" >
     <tal:loop repeat="section view/get_sections">
-      <div class="tab-pane fade"
-        tal:define="utitle section/title"
-        tal:attributes="id python:utitle.replace(' ', '_').lower()"
-        role="tabpanel"
-        tal:content="structure section"
-        >...</div>
+    <div class="tab-pane fade"
+         tal:define="utitle section/title"
+         tal:attributes="id python:utitle.replace(' ', '_').lower()"
+         role="tabpanel"
+         tal:content="structure section"
+         >...</div>
     </tal:loop>
   </div>
 </div>
 
 <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing">
-  <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
-  Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
-  <input type="submit" tal:replace="structure next" tal:condition="next"/>
+
+    <div>
+        <span style="width: 32%; display: inline-block; height: 40px;">
+          <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
+        </span>
+
+        <span style="width: 35%; display: inline-block; height: 40px; text-align: center; position: absolute; ">
+          <span style=" position: relative; height: 40px; top: 25%;" >
+            Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
+          </span>
+        </span>
+
+        <span style="width: 32%; display: inline-block; height: 40px;">
+          <input type="submit" tal:replace="structure next" tal:condition="next"/>
+        </span>
+
+    </div>
+
 </div>
 
 <tal:def define="subform view/subform | nothing">
-  <div class="subform-level-x" tal:condition="subform">
-    <div tal:content="structure subform">subform here</div>
-  </div>
+<div class="subform-level-x" tal:condition="subform">
+  <div tal:content="structure subform">subform here</div>
+</div>
 </tal:def>

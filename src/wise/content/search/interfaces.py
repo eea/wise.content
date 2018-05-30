@@ -44,19 +44,19 @@ class IStartArticles8910(Interface):
     member_states = List(
         title=u"Member state",
         value_type=Choice(vocabulary="wise_search_member_states"),
-        required=True,
+        required=False,
     )
 
     region_subregions = List(
         title=u"Region and Subregions",
         value_type=Choice(vocabulary="wise_search_region_subregions"),
-        required=True,
+        required=False,
     )
 
     area_types = List(
         title=u"Area Type",
         value_type=Choice(vocabulary="wise_search_area_type"),
-        required=True,
+        required=False,
     )
 
 
@@ -64,29 +64,32 @@ class IStartArticles1314(Interface):
     report_type = Choice(
         title=u"Report Type",
         vocabulary="wise_search_a1314_report_types",
-        required=True,
+        required=False,
     )
 
     region = Choice(
         title=u"Region",
         vocabulary="wise_search_a1314_regions",
-        required=True,
+        required=False,
     )
 
 
 class IStartArticle11(Interface):
     monitoring_programme_types = List(
         title=u"Monitoring programme Type",
-        value_type=Choice(vocabulary="wise_search_monitoring_programme_vb_factory"),
-        required=True
+        value_type=Choice(
+            vocabulary="wise_search_monitoring_programme_vb_factory"),
+        required=False
     )
 
 
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
         title=u"MarineUnitIDs",
-        description=u"Select one or more MarineUnitIDs that you're interested",
-        value_type=Choice(vocabulary="wise_search_marine_unit_ids")
+        # description=u"Select one or more MarineUnitIDs that you're
+        # interested",
+        value_type=Choice(vocabulary="wise_search_marine_unit_ids"),
+        required=False
     )
 
 
@@ -100,7 +103,9 @@ class IArticleSelect(Interface):
 class IMarineUnitIDSelect(Interface):
     marine_unit_id = Choice(
         title=u"MarineUnitID",
-        description=u"Select one or more MarineUnitIDs that you're interested",
+        # description=u"Select one or more MarineUnitIDs that you're
+        # interested",
+        required=False,
         vocabulary="wise_search_marine_unit_id"
     )
 
@@ -108,6 +113,8 @@ class IMarineUnitIDSelect(Interface):
 class IA1314UniqueCodes(Interface):
     unique_codes = List(
         title=u"Unique Codes",
-        description=u"Select one or more Unique Codes that you're interested",
+        # description=u"Select one or more Unique Codes that you're
+        # interested",
+        required=False,
         value_type=Choice(vocabulary="wise_search_a1314_unique_codes")
     )
