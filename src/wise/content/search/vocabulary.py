@@ -13,7 +13,7 @@ from .utils import FORMS, LABELS, SUBFORMS
 def populate_labels():
     """ Read XSD files and populates a vocabulary of term->label
 
-    Note: there labels are pretty ad-hoc defined in the xsd file as
+    Note: the labels are pretty ad-hoc defined in the xsd file as
     documentation tags, so this method is imprecise.
     """
     lines = []

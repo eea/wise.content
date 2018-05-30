@@ -114,7 +114,7 @@ class MainForm(Form):
 
     main_forms = (
         ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
-        ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
+        # ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
         ('msfd-c3', 'Article 13 & 14 (2015 reporting exercise)'),
     )
 
@@ -129,6 +129,21 @@ class MainForm(Form):
     @property
     def title(self):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
+
+    def extractData(self):
+        """ Override to be able to provide defaults
+        """
+        data, errors = super(MainForm, self).extractData()
+
+        for k, v in data.items():
+            if not v:
+                default = getattr(self, 'default_' + k, None)
+
+                if default:
+                    data[k] = default()
+                    self.widgets[k].value = data[k]
+
+        return data, errors
 
     def update(self):
         super(MainForm, self).update()

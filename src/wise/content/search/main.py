@@ -6,7 +6,7 @@ from z3c.form.field import Fields
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import EmbededForm, MainForm, MainFormWrapper
-from .utils import get_form, scan
+from .utils import default_value_from_field, get_form, scan
 
 
 class StartArticle8910Form(MainForm):
@@ -21,6 +21,9 @@ class StartArticle8910Form(MainForm):
 
         if self.data['article']:
             return MemberRegionAreaForm(self, self.request)
+
+    def default_article(self):
+        return default_value_from_field(self, self.fields['article'])
 
 
 class MemberRegionAreaForm(EmbededForm):
