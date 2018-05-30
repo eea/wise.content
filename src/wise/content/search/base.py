@@ -110,6 +110,7 @@ class MainForm(Form):
     subform = None
     subform_content = None
     should_download = False     # flag that signals download button is hit
+    # method = 'get'
 
     main_forms = (
         ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),

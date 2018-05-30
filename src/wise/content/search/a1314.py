@@ -71,8 +71,6 @@ class UniqueCodesForm(EmbededForm):
     """ Select the unique codes
     """
 
-    css_class = "left-side-form"
-
     fields = Fields(interfaces.IA1314UniqueCodes)
 
     fields['unique_codes'].widgetFactory = CheckBoxFieldWidget
@@ -85,6 +83,8 @@ class A1314ItemDisplay(ItemDisplayForm):
     """ The implementation for the Article 9 (GES determination) form
     """
     extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
+    css_class = "left-side-form"
 
     mapper_class = sql.MSFD13MeasuresInfo
     order_field = 'ID'
