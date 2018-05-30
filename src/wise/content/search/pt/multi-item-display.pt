@@ -48,9 +48,19 @@
 </div>
 
 <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing">
-  <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
-  Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
-  <input type="submit" tal:replace="structure next" tal:condition="next"/>
+  <span>
+    <div style="height: 40px;position: relative;" >
+      <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
+      <input type="submit" tal:replace="structure next" tal:condition="next"/>
+    </div>
+
+    <div>
+      Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
+    </div>
+
+
+  </span>
+
 </div>
 
 <tal:def define="subform view/subform | nothing">
