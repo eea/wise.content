@@ -1,25 +1,41 @@
+import csv
 from lxml.etree import parse
-from pkg_resources import resource_filename
-from sqlalchemy.sql.schema import Table
 from zope.interface import provider
+from wise.content.search import db, sql
+from sqlalchemy.sql.schema import Table
+from .utils import FORMS, LABELS, SUBFORMS
+from pkg_resources import resource_filename
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from wise.content.search import db, sql
-
-from .utils import FORMS, LABELS, SUBFORMS
-
 
 def populate_labels():
-    """ Read XSD files and populates a vocabulary of term->label
+    csv_labels = {}
+    xsd_labels = {}
+    xsd_only_labels = 0
+    # csv_only_labels = 0
+    LABELS = {}
 
-    Note: there labels are pretty ad-hoc defined in the xsd file as
-    documentation tags, so this method is imprecise.
-    """
+    csv_f = resource_filename('wise.content',
+                              'search/data/MSFDreporting_TermLists.csv')
+
+    with open(csv_f, 'rb') as csvfile:
+        csv_file = csv.reader(csvfile, delimiter=',', quotechar='|')
+
+        for row in csv_file:
+            csv_labels[row[0]] = row[1]
+
+    # """ Read XSD files and populates a vocabulary of term->label
+
+    # Note: there labels are pretty ad-hoc defined in the xsd file as
+    # documentation tags, so this method is imprecise.
+    # """
+
     lines = []
-    f = resource_filename('wise.content',
-                          'search/data/MSFDreporting_TermLists_20180406.csv')
-    e = parse(f)
+    xsd_f = resource_filename('wise.content',
+                              'search/data/MSCommon_1p0.xsd')
+
+    e = parse(xsd_f)
 
     for node in e.xpath('//xs:documentation',
                         namespaces={'xs': "http://www.w3.org/2001/XMLSchema"}):
@@ -27,8 +43,8 @@ def populate_labels():
         lines.extend(text.split('\n'))
 
     for line in lines:
-        line = line.strip()
 
+        line = line.strip()
         for splitter in ['=', '\t']:
             eqpos = line.find(splitter)
 
@@ -43,7 +59,34 @@ def populate_labels():
             if label in LABELS:
                 continue
 
-            LABELS[label] = title
+            xsd_labels[label] = title
+
+    LABELS.update(csv_labels)
+    LABELS.update(xsd_labels)
+
+    # for item in csv_labels.keys():
+    #     if item in xsd_labels.keys():
+    #         common_labels += 1
+    #     else:
+    #         xsd_only_labels += 1
+
+    common_labels = len(list(csv_labels.keys()) +
+                        list(xsd_labels.keys())) - len(LABELS)
+
+    csv_nr = len(list(csv_labels.keys()))
+    xsd_nr = len(list(xsd_labels.keys()))
+
+    # for item in xsd_labels.keys():
+    #     if item in csv_labels.keys():
+    #         pass
+    #     else:
+    #         csv_only_labels += 1x
+
+    print('Labels count')
+    print('Total labels', len(LABELS))
+    print('common_labels', common_labels)
+    print('.csv_nr', csv_nr)
+    print('.xsd_nr', xsd_nr)
 
     return
 
