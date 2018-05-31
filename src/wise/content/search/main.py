@@ -6,7 +6,8 @@ from z3c.form.field import Fields
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import EmbededForm, MainForm, MainFormWrapper
-from .utils import default_value_from_field, get_form, scan
+from .utils import (all_values_from_field, default_value_from_field, get_form,
+                    scan)
 
 
 class StartArticle8910Form(MainForm):
@@ -38,6 +39,15 @@ class MemberRegionAreaForm(EmbededForm):
 
     def get_subform(self):
         return MarineUnitIDsForm(self, self.request)
+
+    def default_member_states(self):
+        return all_values_from_field(self, self.fields['member_states'])
+
+    def default_region_subregions(self):
+        return all_values_from_field(self, self.fields['region_subregions'])
+
+    def default_area_types(self):
+        return all_values_from_field(self, self.fields['area_types'])
 
 
 StartArticle8910View = wrap_form(StartArticle8910Form, MainFormWrapper)

@@ -240,6 +240,31 @@ class EmbededForm(Form, BaseUtil):
             if subform is not None:
                 self.subform = subform
 
+    def extractData(self):
+        """ Override to be able to provide defaults
+
+        Create a function called "default_<name_of_field>" to provide default
+        value
+        """
+        data, errors = super(EmbededForm, self).extractData()
+
+        for k, v in data.items():
+            if not v:
+                default = getattr(self, 'default_' + k, None)
+
+                if default:
+                    value = data[k] = default()
+                    # print("Setting ", k, " with ", len(data[k]), " values.")
+                    widget = self.widgets[k]
+                    widget.value = value
+                    field = widget.field.bind(self.context)
+                    field.default = value
+                    widget.field = field
+                    widget.ignoreRequest = True
+                    widget.update()
+
+        return data, errors
+
     def get_subform(self, klass=None):
         if klass is None:
             klass = self.subform_class
