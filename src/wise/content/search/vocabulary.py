@@ -7,13 +7,12 @@ from .utils import FORMS, LABELS, SUBFORMS
 from pkg_resources import resource_filename
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
+import logging
 
 
 def populate_labels():
     csv_labels = {}
     xsd_labels = {}
-    xsd_only_labels = 0
-    # csv_only_labels = 0
     LABELS = {}
 
     csv_f = resource_filename('wise.content',
@@ -23,6 +22,10 @@ def populate_labels():
         csv_file = csv.reader(csvfile, delimiter=',', quotechar='|')
 
         for row in csv_file:
+            if row[0] in csv_labels.keys():
+                logger = logging.getLogger('tcpserver')
+                logger.warning("Duplicate label in csv file: %s", row[0])
+
             csv_labels[row[0]] = row[1]
 
     # """ Read XSD files and populates a vocabulary of term->label
@@ -57,30 +60,19 @@ def populate_labels():
             label, title = line.split(splitter, 1)
 
             if label in LABELS:
-                continue
+                logger = logging.getLogger('tcpserver')
+                logger.warning("Duplicate label in xsd file: %s", label)
 
             xsd_labels[label] = title
 
     LABELS.update(csv_labels)
     LABELS.update(xsd_labels)
 
-    # for item in csv_labels.keys():
-    #     if item in xsd_labels.keys():
-    #         common_labels += 1
-    #     else:
-    #         xsd_only_labels += 1
-
     common_labels = len(list(csv_labels.keys()) +
                         list(xsd_labels.keys())) - len(LABELS)
 
     csv_nr = len(list(csv_labels.keys()))
     xsd_nr = len(list(xsd_labels.keys()))
-
-    # for item in xsd_labels.keys():
-    #     if item in csv_labels.keys():
-    #         pass
-    #     else:
-    #         csv_only_labels += 1x
 
     print('Labels count')
     print('Total labels', len(LABELS))
