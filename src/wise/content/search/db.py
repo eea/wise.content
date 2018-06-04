@@ -1,3 +1,4 @@
+import os
 import threading
 
 from sqlalchemy import create_engine
@@ -7,7 +8,7 @@ from zope.sqlalchemy import register
 
 from wise.content.search import sql
 
-DB = "mssql+pymssql://SA:bla3311!@msdb/MarineDB"        # MarineDB
+DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
 
 threadlocals = threading.local()
 

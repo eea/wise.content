@@ -14,7 +14,8 @@ from z3c.form.form import Form
 
 from .db import get_available_marine_unit_ids, get_item_by_conditions
 from .interfaces import IMainForm
-from .utils import get_obj_fields, get_registered_form_sections, print_value
+from .utils import (default_value_from_field, get_obj_fields,
+                    get_registered_form_sections, print_value)
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -291,6 +292,10 @@ class MarineUnitIDSelectForm(EmbededForm):
     mapper_class = None         # what type of objects are we focused on?
 
     css_class = "left-side-form"
+
+    def default_marine_unit_id(self):
+        return default_value_from_field(self.context,
+                                        self.fields['marine_unit_id'])
 
     def update(self):
         # Override the default to be able to have a default marine unit id

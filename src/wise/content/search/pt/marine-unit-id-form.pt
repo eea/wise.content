@@ -3,14 +3,14 @@
   tal:attributes="class string:subform ${css_class}; id view/form_name">
 
   <div style="margin-top: 10px;margin-bottom: 16px; position: relative;" id="marine-widget-top">
-    <span id="form-buttons-prev-top" ></span>
+    <span id="form-buttons-prev-top" style=" width: 30%;height: 40px; position: relative;display: inline-block;float: left;" ></span>
 
     <tal:widgets repeat="widget view/widgets/values">
       <div
               tal:define="hidden python:widget.mode == 'hidden'"
               tal:omit-tag="hidden" style="display: inline-block;">
 
-        <div class="field" style="border: none; margin: 0 auto;"
+        <div class="field" style="border: none; margin: 0 auto; "
              tal:define="error widget/error;
          hidden python:widget.mode == 'hidden';"
              tal:attributes="class python:'field' + (error and ' error' or '');">
@@ -19,7 +19,7 @@
             Error
           </div>
 
-          <div class="widget" style="margin: 0; display: inline;">
+          <div class="widget" style="margin: 0; display: inline-block;margin-left: 20px; ">
             <input type="text" tal:replace="structure widget/render" />
           </div>
         </div>

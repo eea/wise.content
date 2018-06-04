@@ -57,7 +57,6 @@ class MarineUnitIDsForm(EmbededForm):
     """ Select the MarineUnitID based on MemberState, Region and Area
     """
 
-    # TODO: properly show only available marine unit ids
     fields = Fields(interfaces.IMarineUnitIDsSelect)
     fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
@@ -66,6 +65,10 @@ class MarineUnitIDsForm(EmbededForm):
         klass = get_form(data['article'])
 
         return super(MarineUnitIDsForm, self).get_subform(klass)
+
+    def default_marine_unit_ids(self):
+        return all_values_from_field(self.context,
+                                     self.fields['marine_unit_ids'])
 
 
 StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
