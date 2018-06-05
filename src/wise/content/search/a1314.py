@@ -57,6 +57,7 @@ class MarineUnitIDsForm(EmbededForm):
         self.data['report_ids'] = [x[0] for x in res]
 
         mc = sql.MSFD13Measure
+
         count, res = db.get_all_records(
             mc,
             mc.ReportID.in_(self.data['report_ids'])
