@@ -49,7 +49,14 @@ def get_unique_from_table(table, column):
     sess = session()
     res = sess.query(col).distinct().order_by(col)
 
-    return [x[0] for x in res]
+    unique_values = []
+
+    for x in res:
+        unique_values.append(x[0])
+
+    unique_values.sort()
+
+    return [x for x in unique_values]
 
 
 def get_unique_from_mapper(mapper_class, column, *conditions):
@@ -76,7 +83,14 @@ def get_marine_unit_ids(**data):
         table.c.AreaType.in_(data['area_types']),
     )
 
-    l = [x[0] for x in query]
+    unique_values = []
+
+    for x in query:
+        unique_values.append(x[0])
+
+    unique_values.sort()
+
+    l = [x for x in unique_values]
 
     return (query.count(), l)
 
