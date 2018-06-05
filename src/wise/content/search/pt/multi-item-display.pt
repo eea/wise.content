@@ -23,11 +23,12 @@
         <a class="nav-link" tal:define="utitle section/title"
            tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
            href python:'#' + utitle.replace(' ', '_').lower();
-           aria-controls python:utitle.replace(' ', '_').lower()"
+           aria-controls python:utitle.replace(' ', '_').lower();
+           title  section/title"
            data-toggle="tab"
            role="tab"
            aria-selected="true"
-           tal:content="section/title">Section title here</a>
+           tal:content="python: section.title[:30] + '...'">Section title here</a>
 
       </li>
     </tal:block>
