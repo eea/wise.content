@@ -9,6 +9,7 @@ from zope.sqlalchemy import register
 from wise.content.search import sql
 
 DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
+# DB = os.environ.get('MSFDURI', "mssql+pyodbc://SA:bla3311!@msdb/MarineDB")
 
 threadlocals = threading.local()
 

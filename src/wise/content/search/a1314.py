@@ -8,7 +8,7 @@ from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm, MainForm
 from .db import get_all_records
-from .utils import data_to_xls
+from .utils import data_to_xls, default_value_from_field
 
 
 class StartArticle1314Form(MainForm):
@@ -38,11 +38,11 @@ class StartArticle1314Form(MainForm):
 
         return (len(res), res)
 
-    # def default_report_type(self):
-    #     pass
-    #
-    # def default_region(self):
-    #     pass
+    def default_report_type(self):
+        return default_value_from_field(self, self.fields['report_type'])
+
+    def default_region(self):
+        return default_value_from_field(self, self.fields['region'])
 
 
 class MarineUnitIDsForm(EmbededForm):
