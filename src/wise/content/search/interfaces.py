@@ -82,6 +82,12 @@ class IStartArticle11(Interface):
         required=False
     )
 
+    monitoring_programme_info_types = Choice(
+        title=u"Information Type",
+        vocabulary="wise_search_monitoring_programme_info_types",
+        required=False
+    )
+
 
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(

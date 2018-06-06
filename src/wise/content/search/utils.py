@@ -9,6 +9,7 @@ from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
 
+FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
@@ -22,6 +23,16 @@ def class_id(obj):
         klass = obj.__class__
 
     return klass.__name__.lower()
+
+
+def register_form_art11(klass):
+    """ Registers a 'secondary' form class for article 11
+
+    """
+
+    FORMS_ART11[class_id(klass)] = klass
+
+    return klass
 
 
 def register_form(klass):
