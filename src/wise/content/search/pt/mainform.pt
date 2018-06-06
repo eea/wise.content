@@ -9,7 +9,7 @@
           >
           <a href=""
             tal:attributes="href string:./@@${name}"
-            tal:content="title"></a>
+            tal:content="structure title"></a>
         </li>
       </tal:rep>
     </ul>

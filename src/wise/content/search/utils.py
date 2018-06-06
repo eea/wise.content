@@ -172,8 +172,12 @@ def pivot_data(data, pivot):
 def default_value_from_field(context, field):
     """ Get the defaulf value for a choice field
     """
-    name = field.field.vocabularyName
-    vocab = getUtility(IVocabularyFactory, name=name)(context)
+    vocab = field.field.vocabulary
+
+    if not vocab:
+        name = field.field.vocabularyName
+        vocab = getUtility(IVocabularyFactory, name=name)(context)
+
     term = vocab._terms[0]
 
     return term.token

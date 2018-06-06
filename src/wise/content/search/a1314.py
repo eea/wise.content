@@ -38,6 +38,12 @@ class StartArticle1314Form(MainForm):
 
         return (len(res), res)
 
+    # def default_report_type(self):
+    #     pass
+    #
+    # def default_region(self):
+    #     pass
+
 
 class MarineUnitIDsForm(EmbededForm):
     """ Select the MarineUnitID based on MemberState, Region and Area

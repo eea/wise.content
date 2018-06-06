@@ -5,8 +5,8 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
-from .utils import (data_to_xls, register_form, register_form_section,
-                    register_subform)
+from .utils import (data_to_xls, default_value_from_field, register_form,
+                    register_form_section, register_subform)
 from .vocabulary import SubFormsVocabulary
 
 
@@ -22,14 +22,23 @@ class A81bForm(EmbededForm):
     @property
     def fields(self):
         # TODO: could this be reimplemented with simple vocab?
+        vocab = SubFormsVocabulary(self.__class__)
         theme = Choice(
             __name__='theme',
             title=u"Select theme",
             required=False,
-            vocabulary=SubFormsVocabulary(self.__class__)
+            vocabulary=vocab,
         )
 
         return Fields(theme)
+
+    def default_theme(self):
+
+        field = self.fields['theme']
+        vocab = field.field.vocabulary
+        value = vocab._terms[0].value
+
+        return value
 
     def get_subform(self):
         klass = self.data.get('theme')

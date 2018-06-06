@@ -114,9 +114,12 @@ class MainForm(Form):
     # method = 'get'
 
     main_forms = (
-        ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
-        # ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
-        ('msfd-c3', 'Article 13 & 14 (2015 reporting exercise)'),
+        ('msfd-c1',
+         '<strong>Article 8, 9 & 10</strong> <br/>(2012 reporting exercise)'),
+        # ('msfd-c2',
+        # '<strong>Article 11 </strong><br/>(2014 reporting exercise)'),
+        ('msfd-c3',
+         '<strong>Article 13 & 14 </strong><br/>(2015 reporting exercise)'),
     )
 
     @buttonAndHandler(u'Apply filters', name='continue')

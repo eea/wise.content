@@ -31,6 +31,14 @@ class A81aForm(EmbededForm):
 
         return Fields(theme)
 
+    def default_theme(self):
+
+        field = self.fields['theme']
+        vocab = field.field.vocabulary
+        value = vocab._terms[0].value
+
+        return value
+
     def get_subform(self):
         klass = self.data.get('theme')
 
