@@ -60,8 +60,22 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     sess = session()
     res = sess.query(col).filter(*conditions).distinct().order_by(col)
 
+    # import pdb; pdb.set_trace()
     return [x[0] for x in res]
 
+
+def get_all_columns_from_mapper(mapper_class, column, *conditions):
+    """ Retrieves all columns for a mapper class
+    """
+    col = getattr(mapper_class, column)
+
+    sess = session()
+    res = sess.query(mapper_class).filter(*conditions).order_by(col)
+    return_value = [x for x in res]
+
+    # import pdb; pdb.set_trace()
+
+    return return_value
 
 def get_marine_unit_ids(**data):
     """ Return a list of available MarineUnitIDs for the query
@@ -87,6 +101,26 @@ def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
     sess = session()
     order_field = getattr(mapper_class, order_field)
     q = sess.query(mapper_class).filter(
+        *conditions
+    ).order_by(order_field)
+
+    total = q.count()
+    item = q.offset(page).limit(1).first()
+
+    return [total, item]
+
+
+def get_item_by_conditions_joined(
+        mapper_class,
+        klass_join,
+        order_field,
+        *conditions,
+        **kwargs):
+    # Paged retrieval of items based on conditions with joining two tables
+    page = kwargs.get('page', 0)
+    sess = session()
+    order_field = getattr(mapper_class, order_field)
+    q = sess.query(mapper_class).join(klass_join).filter(
         *conditions
     ).order_by(order_field)
 

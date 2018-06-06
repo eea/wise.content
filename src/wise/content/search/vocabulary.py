@@ -3,7 +3,7 @@ from lxml.etree import parse
 from zope.interface import provider
 from wise.content.search import db, sql
 from sqlalchemy.sql.schema import Table
-from .utils import FORMS, LABELS, SUBFORMS
+from .utils import FORMS, LABELS, SUBFORMS, FORMS_ART11
 from pkg_resources import resource_filename
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -135,15 +135,16 @@ def db_vocab(table, column):
 
     if isinstance(table, Table):
         res = db.get_unique_from_table(table, column)
+    elif table.__tablename__ == 'MSFD11_MPTypes':
+        res = db.get_all_columns_from_mapper(table, column)
+        terms = [SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description)) for x in res]
+        vocab = SimpleVocabulary(terms)
+        return vocab
     else:
         res = db.get_unique_from_mapper(table, column)
     res = [x.strip() for x in res]
-    # res_strip = []
-    # for x in res:
-    #     try:
-    #         res_strip.append(x.strip().encode('utf8'))
-    #     except:
-    #         res_strip.append(x.strip())
+
+    # import pdb; pdb.set_trace()
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -176,7 +177,15 @@ def articles_vocabulary_factory(context):
 
 @provider(IVocabularyFactory)
 def monitoring_programme_vb_factory(context):
-    return db_vocab(sql.MSFD11MPType, 'Description')
+    return db_vocab(sql.MSFD11MPType, 'ID')
+
+
+@provider(IVocabularyFactory)
+def monitoring_programme_info_types(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    vocab = SimpleVocabulary(terms)
+    # import pdb;pdb.set_trace()
+    return vocab
 
 
 @provider(IVocabularyFactory)

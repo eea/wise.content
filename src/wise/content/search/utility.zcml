@@ -55,5 +55,10 @@
     name="wise_search_monitoring_programme_vb_factory"
     />
 
+  <utility
+    component=".vocabulary.monitoring_programme_info_types"
+    name="wise_search_monitoring_programme_info_types"
+    />
+
 
 </configure>
