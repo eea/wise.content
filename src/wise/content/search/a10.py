@@ -34,8 +34,8 @@ class A10ItemDisplay(ItemDisplayForm):
     mapper_class = sql.MSFD10Target
     order_field = 'MSFD10_Target_ID'
 
-#     # TODO: the MSFD10_DESCrit is not ORM mapped yet
-#     # this query is not finished!!!!
+    # TODO: the MSFD10_DESCrit is not ORM mapped yet
+    # this query is not finished!!!!
 
     def get_extra_data(self):
         if not self.item:

@@ -75,6 +75,7 @@ StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
 StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 
 # discover and register associated views
+
 scan('a8ac')
 scan('a8b')
 scan('a9')

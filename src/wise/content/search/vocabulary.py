@@ -73,13 +73,9 @@ def populate_labels():
 
     csv_nr = len(list(csv_labels.keys()))
     xsd_nr = len(list(xsd_labels.keys()))
-
-    print('Labels count')
-    print('Total labels', len(LABELS))
-    print('common_labels', common_labels)
-    print('.csv_nr', csv_nr)
-    print('.xsd_nr', xsd_nr)
-
+    
+    print("Labels count\n Total labels %s\n Common_labels %s\n .csv_nr %s \n.xsd_nr %s" % (
+        len(LABELS), common_labels, csv_nr, xsd_nr))
     return
 
 
@@ -137,7 +133,9 @@ def db_vocab(table, column):
         res = db.get_unique_from_table(table, column)
     else:
         res = db.get_unique_from_mapper(table, column)
+
     res = [x.strip() for x in res]
+
     # res_strip = []
     # for x in res:
     #     try:
@@ -168,7 +166,8 @@ def get_area_type_vb_factory(context):
 @provider(IVocabularyFactory)
 def articles_vocabulary_factory(context):
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
-    terms.sort(key=lambda t: t.token)
+    # terms.sort(key=lambda t: t.token)
+    terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
     return vocab
