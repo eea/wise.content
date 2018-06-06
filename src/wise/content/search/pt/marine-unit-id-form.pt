@@ -5,10 +5,14 @@
   <div id="marine-widget-top">
     <span id="form-buttons-prev-top"></span>
 
+
+
+    <span id="form-buttons-next-top"></span>
+
     <tal:widgets repeat="widget view/widgets/values">
       <div class="select-article"
-              tal:define="hidden python:widget.mode == 'hidden'"
-              tal:omit-tag="hidden" >
+           tal:define="hidden python:widget.mode == 'hidden'"
+           tal:omit-tag="hidden" >
 
         <div class="field"
              tal:define="error widget/error;
@@ -26,8 +30,6 @@
 
       </div>
     </tal:widgets>
-
-    <span id="form-buttons-next-top"></span>
   </div>
 
 

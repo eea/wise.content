@@ -28,7 +28,7 @@
            data-toggle="tab"
            role="tab"
            aria-selected="true"
-           tal:content="python: section.title[:30] + '...'">Section title here</a>
+           tal:content="section/title">Section title here</a>
 
       </li>
     </tal:block>
@@ -52,7 +52,16 @@
 
     <div>
         <span style="width: 32%; display: inline-block; height: 40px;">
-          <input type="submit" tal:replace="structure prev" tal:condition="prev"/>
+          <!--<input type="submit" tal:replace="structure prev" tal:condition="prev" />-->
+
+            <div tal:condition="prev" id="form-buttons-prev-row" class="row">
+                <div class="widget">
+                    <button type="submit" id="form-buttons-prev" name="form.buttons.prev" class="submit-widget button-field btn btn-default pagination-prev fa fa-angle-left" value=""
+                    >
+                    </button>
+                </div>
+            </div>
+
         </span>
 
         <span style="width: 35%; display: inline-block; height: 40px; text-align: center; position: absolute; ">
@@ -62,7 +71,17 @@
         </span>
 
         <span style="width: 32%; display: inline-block; height: 40px;">
-          <input type="submit" tal:replace="structure next" tal:condition="next"/>
+          <!--<input type="submit" tal:replace="structure next" tal:condition="next"/>-->
+            <div tal:condition="next" id="form-buttons-next-row" class="row">
+                <div class="widget">
+                    <button type="submit" id="form-buttons-next" name="form.buttons.next" class="submit-widget button-field btn btn-default fa fa-angle-right" value="">
+                    </button>
+
+                </div>
+
+            </div>
+
+
         </span>
 
     </div>
