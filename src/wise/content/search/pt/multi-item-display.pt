@@ -82,16 +82,15 @@
         <!--<input type="submit" tal:replace="structure next" tal:condition="next"/>-->
         <div tal:condition="next" id="form-buttons-next-row" class="row">
           <div class="widget">
-            <button type="submit" id="form-buttons-next" name="form.buttons.next" class="submit-widget button-field btn btn-default fa fa-angle-right" value="">
+            <button type="submit"
+              id="form-buttons-next"
+              name="form.buttons.next"
+              class="submit-widget button-field btn btn-default fa fa-angle-right"
+              value="">
             </button>
-
           </div>
-
         </div>
-
-
       </span>
-
     </div>
 
   </div>
