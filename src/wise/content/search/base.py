@@ -353,10 +353,10 @@ class ItemDisplayForm(EmbededForm):
 
         self.count, self.item = self.get_db_results()
 
-        if self.count == self.data['page']:
+        if self.count == int(self.data['page']):
             del self.actions['next']
 
-        if self.data['page'] == 0:
+        if int(self.data['page']) == 0:
             del self.actions['prev']
 
     def updateWidgets(self, prefix=None):

@@ -9,7 +9,6 @@ from zope.sqlalchemy import register
 from wise.content.search import sql
 
 DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
-# DB = os.environ.get('MSFDURI', "mssql+pyodbc://SA:bla3311!@msdb/MarineDB")
 
 threadlocals = threading.local()
 
@@ -62,6 +61,7 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     res = sess.query(col).filter(*conditions).distinct().order_by(col)
 
     # import pdb; pdb.set_trace()
+
     return [x[0] for x in res]
 
 
@@ -72,6 +72,7 @@ def get_all_columns_from_mapper(mapper_class, column, *conditions):
 
     sess = session()
     res = sess.query(mapper_class).filter(*conditions).order_by(col)
+
     return_value = [x for x in res]
 
     # import pdb; pdb.set_trace()
