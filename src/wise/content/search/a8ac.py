@@ -31,6 +31,14 @@ class A81aForm(EmbededForm):
 
         return Fields(theme)
 
+    def default_theme(self):
+
+        field = self.fields['theme']
+        vocab = field.field.vocabulary
+        value = vocab._terms[0].value
+
+        return value
+
     def get_subform(self):
         klass = self.data.get('theme')
 
@@ -369,6 +377,7 @@ class A81aOtherAsessment(ItemDisplay):
             )
 
     def get_extra_data(self):
+
         if not self.item:
             return {}
 
@@ -379,9 +388,12 @@ class A81aOtherAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        if count:
+            return [
+                ('Status Indicator', {'Feature': item}),
+            ]
+
+        return {}
 
 # endregion Other(s)
 

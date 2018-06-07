@@ -114,9 +114,9 @@ class MainForm(Form):
     # method = 'get'
 
     main_forms = (
-        ('msfd-c1', 'Article 8, 9 & 10 (2012 reporting exercise)'),
-        # ('msfd-c2', 'Article 11 (2014 reporting exercise)'),
-        ('msfd-c3', 'Article 13 & 14 (2015 reporting exercise)'),
+        ('msfd-c1', ('Article 8, 9 & 10', '2012 reporting exercise')),
+        ('msfd-c2', ('Article 11', '2014 reporting exercise')),
+        ('msfd-c3', ('Article 13 & 14', '2015 reporting exercise')),
     )
 
     @buttonAndHandler(u'Apply filters', name='continue')
@@ -345,6 +345,8 @@ class ItemDisplayForm(EmbededForm):
     def update(self):
         super(ItemDisplayForm, self).update()
 
+        # import pdb; pdb.set_trace()
+
         if not self.get_main_form().reset_page:
             self.data['page'] = self.widgets['page'].value
         else:
@@ -353,10 +355,10 @@ class ItemDisplayForm(EmbededForm):
 
         self.count, self.item = self.get_db_results()
 
-        if self.count == self.data['page']:
+        if self.count == (int(self.data['page']) + 1):
             del self.actions['next']
 
-        if self.data['page'] == 0:
+        if int(self.data['page']) == 0:
             del self.actions['prev']
 
     def updateWidgets(self, prefix=None):
@@ -411,6 +413,7 @@ class MultiItemDisplayForm(ItemDisplayForm):
     fields = Fields(interfaces.IRecordSelect)
 
     def get_sections(self):
+
         klasses = get_registered_form_sections(self)
         views = [k(self, self.request) for k in klasses]
 
@@ -431,14 +434,19 @@ class ItemDisplay(BrowserView, BaseUtil):
     def __init__(self, context, request):
         self.__parent__ = self.context = context
         self.request = request
+
         self.count = 0
         self.item = None
 
-    def __call__(self):
         res = self.get_db_results()
 
         if res:
             self.count, self.item = res
+
+    def __call__(self):
+
+        if not self.item:
+            return ''
 
         return self.index()
 
