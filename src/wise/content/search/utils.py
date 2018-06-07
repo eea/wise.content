@@ -189,6 +189,9 @@ def default_value_from_field(context, field):
         name = field.field.vocabularyName
         vocab = getUtility(IVocabularyFactory, name=name)(context)
 
+    if not vocab._terms:
+        return
+
     term = vocab._terms[0]
 
     return term.token

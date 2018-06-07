@@ -345,6 +345,8 @@ class ItemDisplayForm(EmbededForm):
     def update(self):
         super(ItemDisplayForm, self).update()
 
+        # import pdb; pdb.set_trace()
+
         if not self.get_main_form().reset_page:
             self.data['page'] = self.widgets['page'].value
         else:
@@ -353,7 +355,7 @@ class ItemDisplayForm(EmbededForm):
 
         self.count, self.item = self.get_db_results()
 
-        if self.count == int(self.data['page']):
+        if self.count == (int(self.data['page']) + 1):
             del self.actions['next']
 
         if int(self.data['page']) == 0:
