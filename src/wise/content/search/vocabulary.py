@@ -184,6 +184,22 @@ def monitoring_programme_vb_factory(context):
 def monitoring_programme_info_types(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
     vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def monitoring_programme_info_types(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    vocab = SimpleVocabulary(terms)
+    # import pdb;pdb.set_trace()
+    return vocab
+
+# TODO not used, delete this later
+@provider(IVocabularyFactory)
+def monitoring_subprogramme_names(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    vocab = SimpleVocabulary(terms)
     # import pdb;pdb.set_trace()
     return vocab
 

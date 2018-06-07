@@ -60,5 +60,11 @@
     name="wise_search_monitoring_programme_info_types"
     />
 
+<!-- TODO not used, delete this later -->
+  <utility
+    component=".vocabulary.monitoring_subprogramme_names"
+    name="wise_search_monitoring_subprogramme_names"
+    />
+
 
 </configure>

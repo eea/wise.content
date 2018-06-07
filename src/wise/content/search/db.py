@@ -65,6 +65,30 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     return [x[0] for x in res]
 
 
+def get_unique_from_mapper_join(
+        mapper_class,
+        column,
+        klass_join,
+        order_field,
+        *conditions,
+        **kwargs):
+    """ Retrieves unique values for a mapper class
+    """
+    page = kwargs.get('page', 0)
+    col = getattr(mapper_class, column)
+
+    sess = session()
+    q = sess.query(col).join(klass_join).filter(
+        *conditions
+    ).order_by(order_field)
+
+    # import pdb; pdb.set_trace()
+    total = q.count()
+    item = q.offset(page).limit(1).first()
+
+    return [total, item]
+
+
 def get_all_columns_from_mapper(mapper_class, column, *conditions):
     """ Retrieves all columns for a mapper class
     """
@@ -190,6 +214,7 @@ def get_related_record(klass, column, rel_id):
     )
     item = q.first()
 
+    # import pdb; pdb.set_trace()
     return [q.count(), item]
 
 
