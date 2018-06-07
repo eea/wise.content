@@ -377,6 +377,7 @@ class A81aOtherAsessment(ItemDisplay):
             )
 
     def get_extra_data(self):
+
         if not self.item:
             return {}
 
@@ -387,9 +388,12 @@ class A81aOtherAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        if count:
+            return [
+                ('Status Indicator', {'Feature': item}),
+            ]
+
+        return {}
 
 # endregion Other(s)
 

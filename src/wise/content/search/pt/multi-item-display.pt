@@ -19,12 +19,13 @@
   <div tal:content="structure view/data_template | nothing"></div>
   <div tal:content="structure view/extras | nothing"></div>
 
-  <div id="tabs-wrapper">
+  <div id="tabs-wrapper" tal:define="sections view/get_sections">
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="tabs" role="tablist"  >
-      <tal:block tal:repeat="section view/get_sections">
 
-      <li class="nav-item">
+      <tal:block tal:repeat="section sections">
+
+      <li class="nav-item" tal:condition="section/item">
         <a class="nav-link" tal:define="utitle section/title"
            tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
            href python:'#' + utitle.replace(' ', '_').lower();
@@ -34,7 +35,6 @@
            role="tab"
            aria-selected="true"
            tal:content="section/title">Section title here</a>
-
       </li>
       </tal:block>
 
@@ -42,8 +42,9 @@
 
     <!-- Tab panes -->
     <div class="tab-content" id="tabContents" >
-      <tal:loop repeat="section view/get_sections">
+      <tal:loop repeat="section sections">
       <div class="tab-pane fade"
+           tal:condition="section/item"
            tal:define="utitle section/title"
            tal:attributes="id python:utitle.replace(' ', '_').lower()"
            role="tabpanel"

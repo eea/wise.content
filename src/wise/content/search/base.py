@@ -413,6 +413,7 @@ class MultiItemDisplayForm(ItemDisplayForm):
     fields = Fields(interfaces.IRecordSelect)
 
     def get_sections(self):
+
         klasses = get_registered_form_sections(self)
         views = [k(self, self.request) for k in klasses]
 
@@ -433,14 +434,19 @@ class ItemDisplay(BrowserView, BaseUtil):
     def __init__(self, context, request):
         self.__parent__ = self.context = context
         self.request = request
+
         self.count = 0
         self.item = None
 
-    def __call__(self):
         res = self.get_db_results()
 
         if res:
             self.count, self.item = res
+
+    def __call__(self):
+
+        if not self.item:
+            return ''
 
         return self.index()
 
