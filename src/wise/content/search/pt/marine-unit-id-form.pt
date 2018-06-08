@@ -3,11 +3,9 @@
   tal:attributes="class string:subform ${css_class}; id view/form_name">
 
   <div id="marine-widget-top">
-    <span id="form-buttons-prev-top"></span>
 
 
 
-    <span id="form-buttons-next-top"></span>
 
     <tal:widgets repeat="widget view/widgets/values">
       <div class="select-article"
@@ -30,6 +28,12 @@
 
       </div>
     </tal:widgets>
+
+    <div style="margin-top: 2rem; margin-bottom:2rem; height: 3rem;">
+      <span id="form-buttons-prev-top"></span>
+      <span id="form-buttons-next-top"></span>
+    </div>
+
   </div>
 
 

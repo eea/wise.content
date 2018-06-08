@@ -19,40 +19,44 @@
   <div tal:content="structure view/data_template | nothing"></div>
   <div tal:content="structure view/extras | nothing"></div>
 
-  <div id="tabs-wrapper" tal:define="sections view/get_sections">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+  <tal:block tal:define="sections view/get_sections | nothing">
 
-      <tal:block tal:repeat="section sections">
+    <div id="tabs-wrapper" tal:condition="sections">
+      <!-- Nav tabs -->
 
-      <li class="nav-item" tal:condition="section/item">
-        <a class="nav-link" tal:define="utitle section/title"
-           tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
+      <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+
+        <tal:block tal:repeat="section sections">
+
+          <li class="nav-item" tal:condition="section/item">
+            <a class="nav-link" tal:define="utitle section/title"
+               tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
            href python:'#' + utitle.replace(' ', '_').lower();
            aria-controls python:utitle.replace(' ', '_').lower();
            title  section/title"
-           data-toggle="tab"
-           role="tab"
-           aria-selected="true"
-           tal:content="section/title">Section title here</a>
-      </li>
-      </tal:block>
+               data-toggle="tab"
+               role="tab"
+               aria-selected="true"
+               tal:content="section/title">Section title here</a>
+          </li>
+        </tal:block>
 
-    </ul>
-
-    <!-- Tab panes -->
-    <div class="tab-content" id="tabContents" >
-      <tal:loop repeat="section sections">
-      <div class="tab-pane fade"
-           tal:condition="section/item"
-           tal:define="utitle section/title"
-           tal:attributes="id python:utitle.replace(' ', '_').lower()"
-           role="tabpanel"
-           tal:content="structure section"
-           >...</div>
-      </tal:loop>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content" id="tabContents" >
+        <tal:loop repeat="section sections">
+          <div class="tab-pane fade"
+               tal:condition="section/item"
+               tal:define="utitle section/title"
+               tal:attributes="id python:utitle.replace(' ', '_').lower()"
+               role="tabpanel"
+               tal:content="structure section"
+          >...</div>
+        </tal:loop>
+      </div>
     </div>
-  </div>
+  </tal:block>
+
 
   <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing">
 
