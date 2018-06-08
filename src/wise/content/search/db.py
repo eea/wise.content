@@ -49,7 +49,7 @@ def get_unique_from_table(table, column):
     sess = session()
     res = sess.query(col).distinct().order_by(col)
 
-    return [x[0] for x in res]
+    return sorted([x[0] for x in res])
 
 
 def get_unique_from_mapper(mapper_class, column, *conditions):
@@ -60,9 +60,7 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     sess = session()
     res = sess.query(col).filter(*conditions).distinct().order_by(col)
 
-    # import pdb; pdb.set_trace()
-
-    return [x[0] for x in res]
+    return sorted([x[0] for x in res])
 
 
 def get_unique_from_mapper_join(
@@ -115,13 +113,15 @@ def get_marine_unit_ids(**data):
         table.c.AreaType.in_(data['area_types']),
     )
 
-    l = [x[0] for x in query]
+    l = sorted([x[0] for x in query])
 
     return (query.count(), l)
 
 
 def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
-    # Paged retrieval of items based on conditions
+    """Paged retrieval of items based on conditions
+    """
+
     page = kwargs.get('page', 0)
     sess = session()
     order_field = getattr(mapper_class, order_field)
@@ -166,7 +166,10 @@ WHERE MSFD9_Descriptor = :descriptor_id
 ;
 """), descriptor_id=msfd9_descriptor_id)
 
-    return res
+    items = []
+    for item in res:
+        items.append(item)
+    return sorted(items)
 
 
 def get_available_marine_unit_ids(marine_unit_ids, klass):
@@ -208,7 +211,10 @@ FROM MarineDB.dbo.MSFD10_FeaturesPressures
 WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
-    return res
+    items = []
+    for item in res:
+        items.append(item)
+    return sorted(items)
 
 
 def get_a10_criteria_indicators(target_id):
@@ -219,7 +225,10 @@ FROM MarineDB.dbo.MSFD10_DESCrit
 WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
-    return res
+    items = []
+    for item in res:
+        items.append(item)
+    return sorted(items)
 
 
 def get_related_record(klass, column, rel_id):

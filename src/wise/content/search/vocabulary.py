@@ -16,6 +16,7 @@ from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
 def populate_labels():
     csv_labels = {}
     xsd_labels = {}
+
     csv_f = resource_filename('wise.content',
                               'search/data/MSFDreporting_TermLists.csv')
 
@@ -76,12 +77,8 @@ def populate_labels():
     csv_nr = len(list(csv_labels.keys()))
     xsd_nr = len(list(xsd_labels.keys()))
 
-    print('Labels count')
-    print('Total labels', len(LABELS))
-    print('common_labels', common_labels)
-    print('.csv_nr', csv_nr)
-    print('.xsd_nr', xsd_nr)
-
+    print("Labels count\n Total labels %s\n Common_labels %s\n .csv_nr %s \n.xsd_nr %s" % (
+        len(LABELS), common_labels, csv_nr, xsd_nr))
     return
 
 
@@ -110,6 +107,7 @@ class SubFormsVocabulary(SimpleVocabulary):
         for k in forms:
             terms.append(SimpleTerm(k, k.title, k.title))
 
+        terms.sort(key=lambda t: t.title)
         return terms
 
     @property
@@ -139,20 +137,29 @@ def db_vocab(table, column):
         res = db.get_unique_from_table(table, column)
     elif table.__tablename__ == 'MSFD11_MPTypes':
         res = db.get_all_columns_from_mapper(table, column)
-        terms = [
-            SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description))
-
-            for x in res
-        ]
+        terms = [SimpleTerm(x.ID, x.ID, LABELS.get(
+            x.Description, x.Description)) for x in res]
         vocab = SimpleVocabulary(terms)
 
         return vocab
     else:
         res = db.get_unique_from_mapper(table, column)
+
     res = [x.strip() for x in res]
 
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
+# TODO not used, delete this later
+@provider(IVocabularyFactory)
+def monitoring_subprogramme_names(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    vocab = SimpleVocabulary(terms)
+
+    vocab = SimpleVocabulary(sorted(terms))
 
     return vocab
 
@@ -175,7 +182,7 @@ def get_area_type_vb_factory(context):
 @provider(IVocabularyFactory)
 def articles_vocabulary_factory(context):
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
-    terms.sort(key=lambda t: t.token)
+    terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
     return vocab
@@ -189,17 +196,7 @@ def monitoring_programme_vb_factory(context):
 @provider(IVocabularyFactory)
 def monitoring_programme_info_types(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    vocab = SimpleVocabulary(terms)
-
-    return vocab
-
-
-# TODO not used, delete this later
-@provider(IVocabularyFactory)
-def monitoring_subprogramme_names(context):
-    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    vocab = SimpleVocabulary(terms)
-
+    vocab = SimpleVocabulary(sorted(terms))
     return vocab
 
 

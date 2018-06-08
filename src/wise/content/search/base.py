@@ -32,10 +32,10 @@ class BaseUtil(object):
         """
         text = text.replace('_', ' ')
 
-        for l in range(len(text)-1):
+        for l in range(len(text) - 1):
             if text[l].islower() and text[l + 1].isupper():
-                text = text[:(l+1)] + ' ' + \
-                    text[(l+1):]
+                text = text[:(l + 1)] + ' ' + \
+                    text[(l + 1):]
 
         return text
 

@@ -22,6 +22,7 @@ class A81aForm(EmbededForm):
     @property
     def fields(self):
         # TODO: could this be reimplemented with simple vocab?
+
         theme = Choice(
             __name__='theme',
             title=u"Select theme",
