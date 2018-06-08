@@ -101,6 +101,7 @@ def get_all_columns_from_mapper(mapper_class, column, *conditions):
 
     return return_value
 
+
 def get_marine_unit_ids(**data):
     """ Return a list of available MarineUnitIDs for the query
     """
@@ -181,6 +182,22 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
     return [total, q]
 
 
+def get_marine_unit_id_names(marine_unit_ids):
+    """ Returns tuples of (id, label) based on the marine_unit_ids
+    """
+    sess = session()
+    t = sql.t_MSFD4_GegraphicalAreasID
+
+    q = sess.query(t.c.MarineUnitID, t.c.MarineUnits_ReportingAreas)\
+        .filter(t.c.MarineUnitID.in_(marine_unit_ids))\
+        .order_by(t.c.MarineUnits_ReportingAreas)\
+        .distinct()
+
+    total = q.count()
+
+    return [total, q]
+
+
 def get_a10_feature_targets(target_id):
     """ Used in extra_data for A10
     """
@@ -213,6 +230,7 @@ def get_related_record(klass, column, rel_id):
     item = q.first()
 
     # import pdb; pdb.set_trace()
+
     return [q.count(), item]
 
 

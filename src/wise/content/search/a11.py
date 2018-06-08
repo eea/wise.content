@@ -3,8 +3,9 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
-from .utils import register_form_art11, register_form_section, pivot_data
+from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
+                   MultiItemDisplayForm)
+from .utils import pivot_data, register_form_art11, register_form_section
 
 
 class StartArticle11Form(MainForm):
@@ -130,6 +131,7 @@ class A11MonitorSubprogrammeForm(ItemDisplayForm):
             #     klass_join.MPType.in_(needed_ids),
             #     page=page
             # )
+
             return db.get_item_by_conditions_joined(
                 self.mapper_class,
                 klass_join,
@@ -148,6 +150,7 @@ class A11MonitorSubprogrammeForm(ItemDisplayForm):
         mc = sql.MSFD11SubProgramme
 
         count, item = db.get_related_record(mc, 'Q4g_SubProgrammeID', subprogramme_id)
+
         if item:
             self.subprogramme = getattr(item, 'ID')
         else:
@@ -171,6 +174,7 @@ class A11MPElements(ItemDisplay):
             'Q9a_ElementMonitored',
             self.mapper_class.SubProgramme == self.context.subprogramme
         )
+
         return [
             ('Element(s) monitored', {
                 '':
@@ -192,4 +196,5 @@ class A11MPParameters(ItemDisplay):
             'ID',
             self.mapper_class.SubProgramme == self.context.subprogramme
         )
+
         return 0, []

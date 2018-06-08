@@ -1,13 +1,16 @@
 import csv
+import logging
+
 from lxml.etree import parse
-from zope.interface import provider
-from wise.content.search import db, sql
-from sqlalchemy.sql.schema import Table
-from .utils import FORMS, LABELS, SUBFORMS, FORMS_ART11
 from pkg_resources import resource_filename
+from sqlalchemy.sql.schema import Table
+from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
-import logging
+
+from wise.content.search import db, sql
+
+from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
 
 
 def populate_labels():
@@ -48,6 +51,7 @@ def populate_labels():
     for line in lines:
 
         line = line.strip()
+
         for splitter in ['=', '\t']:
             eqpos = line.find(splitter)
 
@@ -139,6 +143,7 @@ def db_vocab(table, column):
         res = db.get_all_columns_from_mapper(table, column)
         terms = [SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description)) for x in res]
         vocab = SimpleVocabulary(terms)
+
         return vocab
     else:
         res = db.get_unique_from_mapper(table, column)
@@ -188,12 +193,12 @@ def monitoring_programme_info_types(context):
     return vocab
 
 
-@provider(IVocabularyFactory)
-def monitoring_programme_info_types(context):
-    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    vocab = SimpleVocabulary(terms)
-    # import pdb;pdb.set_trace()
-    return vocab
+# @provider(IVocabularyFactory)
+# def monitoring_programme_info_types(context):
+#     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+#     vocab = SimpleVocabulary(terms)
+#     # import pdb;pdb.set_trace()
+#     return vocab
 
 # TODO not used, delete this later
 @provider(IVocabularyFactory)
@@ -201,7 +206,23 @@ def monitoring_subprogramme_names(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
     vocab = SimpleVocabulary(terms)
     # import pdb;pdb.set_trace()
+
     return vocab
+
+
+def marine_unit_id_vocab(ids):
+    count, res = db.get_marine_unit_id_names(ids)
+
+    terms = []
+
+    for id, label in res:
+        if label:
+            label = u'%s - %s' % (label, id)
+        else:
+            label = id
+        terms.append(SimpleTerm(id, id, label))
+
+    return SimpleVocabulary(terms)
 
 
 @provider(IVocabularyFactory)
@@ -216,9 +237,7 @@ def marine_unit_ids_vocab_factory(context):
         data = context.data
         count, ids = db.get_marine_unit_ids(**data)
 
-    terms = [SimpleTerm(x, x, x) for x in ids]
-
-    return SimpleVocabulary(terms)
+    return marine_unit_id_vocab(ids)
 
 
 @provider(IVocabularyFactory)
@@ -226,9 +245,8 @@ def marine_unit_id_vocab_factory(context):
     """ A list of MarineUnitIds taken from parent form selection
     """
     ids = context.subform.get_available_marine_unit_ids()
-    terms = [SimpleTerm(x, x, x) for x in ids]
 
-    return SimpleVocabulary(terms)
+    return marine_unit_id_vocab(ids)
 
 
 @provider(IVocabularyFactory)
