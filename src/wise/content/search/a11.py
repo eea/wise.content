@@ -5,7 +5,7 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
                    MultiItemDisplayForm)
-from .utils import pivot_data, register_form_art11, register_form_section
+from .utils import db_objects_to_dict, pivot_data, register_form_art11, register_form_section
 
 
 class StartArticle11Form(MainForm):
@@ -75,21 +75,23 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
             getattr(mapper_class_mp_marine, column) == monitoring_programme_id
         )
 
-        # element_names = pivot_data(result_programme_list, 'ElementName')
-
-
-        # import pdb;pdb.set_trace()
+        element_names = db_objects_to_dict(result_programme_list)
+        element_names = pivot_data(element_names, 'ElementName')
 
         return [
             # ('Element Names TEST', {
             #     'Name1': [{'Other Data Here': x} for x in marine_units],
             #     'Name2': [{'Other Data Here': x} for x in marine_units],
-            #     'Name3': [{'Other Data Here1': '1234'}, {'Other Data Here2': '123'}]
+            #     'Name3': [{'Other Data Here1': '1234', 'Other Data Here2': '123'},
+            #               {'Other Data Here1': 'qwe', 'Other Data Here2': 'asd'},
+            #               {'Other Data Here1': 'qwe', 'Other Data Here2': 'asd'}
+            #               ]
             # }),
-            ('Element Names', {
-                "_".join((str(x.ID), x.ElementName)):
-                    [{'subgroup': x.subgroup}] for x in result_programme_list
-            }),
+            # ('Element Names', {
+            #     x.ElementName:
+            #         [{'subgroup': x.subgroup}, {'subgroup': x.subgroup}] for x in result_programme_list
+            # }),
+            ('Element Names', element_names),
             ('Marine Unit(s)', {
                 '': [{'MarineUnitIDs': x} for x in marine_units]
             }),
@@ -98,7 +100,6 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
             }),
         ]
 
-
     def get_mp_type_ids(self):
         return self.context.data.get('monitoring_programme_types', [])
 
@@ -106,16 +107,17 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
 
 
 @register_form_art11
-class A11MonitorSubprogrammeForm(ItemDisplayForm):
+class A11MonitorSubprogrammeForm(MultiItemDisplayForm):
 
     title = "Monitoring Subprogrammes"
 
     # fields = Fields(interfaces.I11Subprogrammes)
 
-    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
     mapper_class = sql.MSFD11ReferenceSubProgramme
     order_field = "ID"
     css_class = 'left-side-form'
+
+    # extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
 
     def get_db_results(self):
         page = self.get_page()
@@ -140,13 +142,39 @@ class A11MonitorSubprogrammeForm(ItemDisplayForm):
                 page=page
             )
 
+
+    # def get_extra_data(self):
+    #     if not self.item:
+    #         return {}
+    #
+    #     subprogramme_id = self.item.SubMonitoringProgrammeID
+    #     mc = sql.MSFD11SubProgramme
+    #
+    #     count, item = db.get_related_record(mc, 'Q4g_SubProgrammeID', subprogramme_id)
+    #     if item:
+    #         self.subprogramme = getattr(item, 'ID')
+    #     else:
+    #         self.subprogramme = 0
+    #
+    #     return 'Subprogramme info', item
+    #     # return [('Subprogramme info', item)]
+
+
+@register_form_section(A11MonitorSubprogrammeForm)
+class A11MPExtraInfo(ItemDisplay):
+    title = "SubProgramme Info"
+
+    # data_template = ViewPageTemplateFile('pt/extra-data.pt')
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    # data_template = ViewPageTemplateFile('pt/item-display.pt')
+
     # TODO data from columns SubMonitoringProgrammeID and Q4g_SubProgrammeID
     # do not match, SubMonitoringProgrammeID contains spaces
-    def get_extra_data(self):
-        if not self.item:
+    def get_db_results(self):
+        if not self.context.item:
             return {}
 
-        subprogramme_id = self.item.SubMonitoringProgrammeID
+        subprogramme_id = self.context.item.SubMonitoringProgrammeID
         mc = sql.MSFD11SubProgramme
 
         count, item = db.get_related_record(mc, 'Q4g_SubProgrammeID', subprogramme_id)
@@ -156,45 +184,31 @@ class A11MonitorSubprogrammeForm(ItemDisplayForm):
         else:
             self.subprogramme = 0
 
-        return 'Subprogramme info', item
+        page = self.get_page()
 
+        return page, item
 
-@register_form_section(A11MonitorSubprogrammeForm)
-class A11MPElements(ItemDisplay):
-    title = "Element(s) monitored"
-
-    mapper_class = sql.MSFD11Q9aElementMonitored
-
-    data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
-
-    # TODO not finished, implement to return a list with values
-    def get_db_results(self):
-        result = db.get_unique_from_mapper(
-            self.mapper_class,
+    def get_extra_data(self):
+        mapper_class_element = sql.MSFD11Q9aElementMonitored
+        elements_monitored = db.get_all_columns_from_mapper(
+            mapper_class_element,
             'Q9a_ElementMonitored',
-            self.mapper_class.SubProgramme == self.context.subprogramme
+            mapper_class_element.SubProgramme == self.subprogramme
         )
+
+        mapper_class_measure = sql.MSFD11Q9bMeasurementParameter
+        parameters_measured = db.get_all_columns_from_mapper(
+            mapper_class_measure,
+            'ID',
+            mapper_class_measure.SubProgramme == self.subprogramme
+        )
+        parameters_measured = db_objects_to_dict(parameters_measured)
+        parameters_measured = pivot_data(parameters_measured, 'mpgroup')
 
         return [
-            ('Element(s) monitored', {
-                '':
-                    [{'Q9a_ElementMonitored': x} for x in result]
+            ('Elements monitored', {
+                '': [{'ElementMonitored': x.Q9a_ElementMonitored} for x in elements_monitored
+                    ]
             }),
+            ('Paramenters measured', parameters_measured),
         ]
-
-
-@register_form_section(A11MonitorSubprogrammeForm)
-class A11MPParameters(ItemDisplay):
-    title = "Parameter(s) monitored"
-
-    mapper_class = sql.MSFD11Q9bMeasurementParameter
-
-    # TODO not finished, implement return part
-    def get_db_results(self):
-        result = db.get_all_columns_from_mapper(
-            self.mapper_class,
-            'ID',
-            self.mapper_class.SubProgramme == self.context.subprogramme
-        )
-
-        return 0, []
