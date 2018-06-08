@@ -16,7 +16,6 @@ from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
 def populate_labels():
     csv_labels = {}
     xsd_labels = {}
-    all_labels = {}
 
     csv_f = resource_filename('wise.content',
                               'search/data/MSFDreporting_TermLists.csv')
@@ -69,8 +68,8 @@ def populate_labels():
 
             xsd_labels[label] = title
 
-    all_labels.update(csv_labels)
-    all_labels.update(xsd_labels)
+    LABELS.update(csv_labels)
+    LABELS.update(xsd_labels)
 
     common_labels = len(list(csv_labels.keys()) +
                         list(xsd_labels.keys())) - len(LABELS)
@@ -79,7 +78,7 @@ def populate_labels():
     xsd_nr = len(list(xsd_labels.keys()))
 
     print("Labels count\n Total labels %s\n Common_labels %s\n .csv_nr %s \n.xsd_nr %s" % (
-        len(all_labels), common_labels, csv_nr, xsd_nr))
+        len(LABELS), common_labels, csv_nr, xsd_nr))
     return
 
 
