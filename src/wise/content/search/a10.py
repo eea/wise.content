@@ -22,7 +22,11 @@ class A10Form(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        xlsdata = [
+            ('MSFD10Target', data),      # worksheet title, row data
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A10ItemDisplay(ItemDisplayForm):
@@ -34,8 +38,8 @@ class A10ItemDisplay(ItemDisplayForm):
     mapper_class = sql.MSFD10Target
     order_field = 'MSFD10_Target_ID'
 
-#     # TODO: the MSFD10_DESCrit is not ORM mapped yet
-#     # this query is not finished!!!!
+    # TODO: the MSFD10_DESCrit is not ORM mapped yet
+    # this query is not finished!!!!
 
     def get_extra_data(self):
         if not self.item:
@@ -45,7 +49,7 @@ class A10ItemDisplay(ItemDisplayForm):
 
         res = db.get_a10_feature_targets(target_id)
         ft = pivot_data(res, 'FeatureType')
-        # import pdb; pdb.set_trace()
+
         res = db.get_a10_criteria_indicators(target_id)
         res = {
             '':
