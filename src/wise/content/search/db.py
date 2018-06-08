@@ -238,8 +238,6 @@ def get_related_record(klass, column, rel_id):
     )
     item = q.first()
 
-    # import pdb; pdb.set_trace()
-
     return [q.count(), item]
 
 

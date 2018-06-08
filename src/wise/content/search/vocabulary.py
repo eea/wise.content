@@ -196,7 +196,7 @@ def marine_unit_id_vocab(ids):
 
     for id, label in res:
         if label:
-            label = u'%s - %s' % (label, id)
+            label = u'%s (%s)' % (label, id)
         else:
             label = id
         terms.append(SimpleTerm(id, id, label))

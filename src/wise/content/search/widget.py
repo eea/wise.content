@@ -10,6 +10,7 @@ class MarineUnitIDSelectWidget(SelectWidget):
     """ Special marine widget that, if there's no selection already made,
     always returns at least one value from its possible choices.
     """
+    prompt = True
 
     def isSelected(self, term):
         return term.token in self.value

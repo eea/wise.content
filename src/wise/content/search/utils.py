@@ -134,28 +134,33 @@ def print_value(value):
 
 
 def data_to_xls(data):
+    """ Convert python export data to XLS stream of data
+    """
 
     # Create a workbook and add a worksheet.
     out = BytesIO()
     workbook = xlsxwriter.Workbook(out, {'in_memory': True})
-    worksheet = workbook.add_worksheet()
 
-    row0 = data[0]
-    fields = sorted(get_obj_fields(row0))
+    for wtitle, wdata in data:
+        worksheet = workbook.add_worksheet(wtitle)
 
-    # write titles
+        row0 = wdata[0]
+        fields = sorted(get_obj_fields(row0))
 
-    for i, f in enumerate(fields):
-        worksheet.write(0, i, f)
+        # write titles
 
-    for j, row in enumerate(data):
         for i, f in enumerate(fields):
-            value = getattr(row, f)
+            worksheet.write(0, i, f)
 
-            if not isinstance(value, string_types + (float, int, type(None))):
-                value = 'not exported'
+        for j, row in enumerate(wdata):
+            for i, f in enumerate(fields):
+                value = getattr(row, f)
 
-            worksheet.write(j + 1, i, value)
+                if not isinstance(value,
+                                  string_types + (float, int, type(None))):
+                    value = 'not exported'
+
+                worksheet.write(j + 1, i, value)
 
     workbook.close()
     out.seek(0)
