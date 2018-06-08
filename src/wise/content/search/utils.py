@@ -166,7 +166,41 @@ def data_to_xls(data):
 def get_obj_fields(obj):
     mapper = inspect(obj)
 
-    return sorted([c.key for c in mapper.attrs])
+    res = []
+    keys = sorted([c.key for c in mapper.attrs])
+
+    BLACKLIST = ['ID', 'Import']
+
+    for key in keys:
+        flag = False
+
+        for bit in BLACKLIST:
+            if bit in key:
+                flag = True
+
+        if not flag:
+            res.append(key)
+
+    return res
+
+
+def db_objects_to_dict(data):
+    """
+    Transform a list of sqlalchemy DB objects into
+    a list of dictionaries, needed for pivot_data()
+
+    :param data: list of sqlalchemy DB objects
+    :return: list of dictionaries
+    """
+    out = []
+    for row in data:
+        columns = row.__table__.columns.keys()
+        d = dict()
+        for col in columns:
+            d.update({col: getattr(row, col)})
+        out.append(d)
+
+    return out
 
 
 def pivot_data(data, pivot):

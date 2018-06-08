@@ -255,7 +255,9 @@ class EmbededForm(Form, BaseUtil):
 
                 if default:
                     value = data[k] = default()
-                    # print("Setting ", k, " with ", len(data[k]), " values.")
+
+                    if not value:
+                        continue
                     widget = self.widgets[k]
                     widget.value = value
                     field = widget.field.bind(self.context)

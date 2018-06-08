@@ -88,6 +88,16 @@ class IStartArticle11(Interface):
         required=False
     )
 
+# TODO nod used, delete this later
+class I11Subprogrammes(Interface):
+    monitoring_subprogramme_names = List(
+        title=u"Monitoring subprogramme names",
+        value_type=Choice(
+            vocabulary="wise_search_monitoring_subprogramme_names"),
+        required=False
+    )
+
+
 
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(

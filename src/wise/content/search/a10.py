@@ -45,7 +45,7 @@ class A10ItemDisplay(ItemDisplayForm):
 
         res = db.get_a10_feature_targets(target_id)
         ft = pivot_data(res, 'FeatureType')
-
+        # import pdb; pdb.set_trace()
         res = db.get_a10_criteria_indicators(target_id)
         res = {
             '':

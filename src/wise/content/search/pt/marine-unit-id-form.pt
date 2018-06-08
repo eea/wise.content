@@ -3,23 +3,18 @@
   tal:attributes="class string:subform ${css_class}; id view/form_name">
 
   <div id="marine-widget-top">
-    <span id="form-buttons-prev-top"></span>
-
-
-
-    <span id="form-buttons-next-top"></span>
 
     <tal:widgets repeat="widget view/widgets/values">
       <div class="select-article"
-           tal:define="hidden python:widget.mode == 'hidden'"
-           tal:omit-tag="hidden" >
+        tal:define="hidden python:widget.mode == 'hidden'"
+        tal:omit-tag="hidden" >
 
         <div class="field"
-             tal:define="error widget/error;
-         hidden python:widget.mode == 'hidden';"
-             tal:attributes="class python:'field' + (error and ' error' or '');">
+          tal:define="error widget/error;
+          hidden python:widget.mode == 'hidden';"
+          tal:attributes="class python:'field' + (error and ' error' or '');">
           <div tal:condition="error"
-               tal:content="structure error/render">
+            tal:content="structure error/render">
             Error
           </div>
 
@@ -30,16 +25,19 @@
 
       </div>
     </tal:widgets>
+
+    <div style="margin-top: 2rem; margin-bottom:2rem; height: 3rem;">
+      <span id="form-buttons-prev-top"></span>
+      <span id="form-buttons-next-top"></span>
+    </div>
+
   </div>
-
-
-
 
   <metal:block use-macro="context/@@ploneform-macros/actions" />
 
   <tal:def define="subform view/subform | nothing">
-  <div tal:condition="subform">
-    <div tal:content="structure subform">subform here</div>
-  </div>
+    <div tal:condition="subform">
+      <div tal:content="structure subform">subform here</div>
+    </div>
   </tal:def>
 </div>

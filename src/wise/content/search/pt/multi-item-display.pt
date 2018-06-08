@@ -8,10 +8,10 @@
   <tal:block tal:condition="python: view.item ">
   <tal:block tal:condition="python: view.item_title(view.item)">
   <h3 tal:define="info python: view.item_title(view.item)">
-    Record:
+    <!-- Record: -->
     <span tal:replace="python: info[0]">Class</span>
-    #
-    <span tal:replace="python: info[1]">10</span>
+    <!-- # -->
+    <!-- <span tal:replace="python: info[1]">10</span> -->
   </h3>
   </tal:block>
   </tal:block>
@@ -19,44 +19,46 @@
   <div tal:content="structure view/data_template | nothing"></div>
   <div tal:content="structure view/extras | nothing"></div>
 
-  <div id="tabs-wrapper" tal:define="sections view/get_sections">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+  <tal:block tal:define="sections view/get_sections | nothing">
 
-      <tal:block tal:repeat="section sections">
+    <div id="tabs-wrapper" tal:condition="sections">
+      <!-- Nav tabs -->
 
-      <li class="nav-item" tal:condition="section/item">
-        <a class="nav-link" tal:define="utitle section/title"
-           tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
+      <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+
+        <tal:block tal:repeat="section sections">
+
+          <li class="nav-item" tal:condition="section/item">
+            <a class="nav-link" tal:define="utitle section/title"
+               tal:attributes="id python:utitle.replace(' ', '_').lower() + '-tab';
            href python:'#' + utitle.replace(' ', '_').lower();
            aria-controls python:utitle.replace(' ', '_').lower();
            title  section/title"
-           data-toggle="tab"
-           role="tab"
-           aria-selected="true"
-           tal:content="section/title">Section title here</a>
-      </li>
-      </tal:block>
+               data-toggle="tab"
+               role="tab"
+               aria-selected="true"
+               tal:content="section/title">Section title here</a>
+          </li>
+        </tal:block>
 
-    </ul>
-
-    <!-- Tab panes -->
-    <div class="tab-content" id="tabContents" >
-      <tal:loop repeat="section sections">
-      <div class="tab-pane fade"
-           tal:condition="section/item"
-           tal:define="utitle section/title"
-           tal:attributes="id python:utitle.replace(' ', '_').lower()"
-           role="tabpanel"
-           tal:content="structure section"
-           >...</div>
-      </tal:loop>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content" id="tabContents" >
+        <tal:loop repeat="section sections">
+          <div class="tab-pane fade"
+               tal:condition="section/item"
+               tal:define="utitle section/title"
+               tal:attributes="id python:utitle.replace(' ', '_').lower()"
+               role="tabpanel"
+               tal:content="structure section"
+          >...</div>
+        </tal:loop>
+      </div>
     </div>
-  </div>
+  </tal:block>
+
 
   <div id="prev-next-row" tal:define="actions view/actions; next actions/next | nothing; prev actions/prev | nothing">
-
-
 
     <div>
       <span style="width: 32%; display: inline-block; height: 40px;">
@@ -82,16 +84,15 @@
         <!--<input type="submit" tal:replace="structure next" tal:condition="next"/>-->
         <div tal:condition="next" id="form-buttons-next-row" class="row">
           <div class="widget">
-            <button type="submit" id="form-buttons-next" name="form.buttons.next" class="submit-widget button-field btn btn-default fa fa-angle-right" value="">
+            <button type="submit"
+              id="form-buttons-next"
+              name="form.buttons.next"
+              class="submit-widget button-field btn btn-default fa fa-angle-right"
+              value="">
             </button>
-
           </div>
-
         </div>
-
-
       </span>
-
     </div>
 
   </div>
