@@ -50,39 +50,51 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
 
         monitoring_programme_id = self.item.ID
 
-        mapper_class = sql.MSFD11MonitoringProgrammeList
+        mapper_class_mp_list = sql.MSFD11MonitoringProgrammeList
         column = 'MonitoringProgramme'
         result_programme_list = db.get_all_columns_from_mapper(
-            mapper_class,
+            mapper_class_mp_list,
             column,
-            getattr(mapper_class, column) == monitoring_programme_id
+            getattr(mapper_class_mp_list, column) == monitoring_programme_id
         )
 
-        marine_units = db.get_unique_from_mapper(
-            sql.MSFD11Q6aRelevantTarget,
+        mapper_class_target = sql.MSFD11Q6aRelevantTarget
+        targets = db.get_unique_from_mapper(
+            mapper_class_target,
             'RelevantTarget',
-            sql.MSFD11Q6aRelevantTarget.MonitoringProgramme == monitoring_programme_id
+            getattr(mapper_class_target, column) == monitoring_programme_id
         )
 
-        targets = db.get_unique_from_mapper_join(
+        mapper_class_mp_marine = sql.MSFD11MonitoringProgrammeMarineUnitID
+        total, marine_units = db.get_unique_from_mapper_join(
             sql.MSFD11MarineUnitID,
             'MarineUnitID',
-            sql.MSFD11MonitoringProgrammeMarineUnitID,
+            mapper_class_mp_marine,
             'ID',
-            sql.MSFD11MonitoringProgrammeMarineUnitID.MonitoringProgramme == monitoring_programme_id
+            getattr(mapper_class_mp_marine, column) == monitoring_programme_id
         )
 
         # element_names = pivot_data(result_programme_list, 'ElementName')
 
-        res = []
-        tars = {
-            '':
-            [{'GESDescriptorsCriteriaIndicators': x[0]} for x in res]
-        }
+
+        # import pdb;pdb.set_trace()
 
         return [
-            ('Marine Unit(s)', res),
-            ('Target(s)', res),
+            # ('Element Names TEST', {
+            #     'Name1': [{'Other Data Here': x} for x in marine_units],
+            #     'Name2': [{'Other Data Here': x} for x in marine_units],
+            #     'Name3': [{'Other Data Here1': '1234'}, {'Other Data Here2': '123'}]
+            # }),
+            ('Element Names', {
+                "_".join((str(x.ID), x.ElementName)):
+                    [{'subgroup': x.subgroup}] for x in result_programme_list
+            }),
+            ('Marine Unit(s)', {
+                '': [{'MarineUnitIDs': x} for x in marine_units]
+            }),
+            ('Target(s)', {
+                '': [{'Relevant Targets': x} for x in targets]
+            }),
         ]
 
 
@@ -143,16 +155,14 @@ class A11MonitorSubprogrammeForm(ItemDisplayForm):
 
         return 'Subprogramme info', item
 
-        # return [
-        #     ('Subprogramme info', {'test': item}),
-        # ]
-
 
 @register_form_section(A11MonitorSubprogrammeForm)
 class A11MPElements(ItemDisplay):
     title = "Element(s) monitored"
 
     mapper_class = sql.MSFD11Q9aElementMonitored
+
+    data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     # TODO not finished, implement to return a list with values
     def get_db_results(self):
@@ -161,7 +171,12 @@ class A11MPElements(ItemDisplay):
             'Q9a_ElementMonitored',
             self.mapper_class.SubProgramme == self.context.subprogramme
         )
-        return 0, []
+        return [
+            ('Element(s) monitored', {
+                '':
+                    [{'Q9a_ElementMonitored': x} for x in result]
+            }),
+        ]
 
 
 @register_form_section(A11MonitorSubprogrammeForm)
