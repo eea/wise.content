@@ -16,8 +16,6 @@ from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
 def populate_labels():
     csv_labels = {}
     xsd_labels = {}
-    LABELS = {}
-
     csv_f = resource_filename('wise.content',
                               'search/data/MSFDreporting_TermLists.csv')
 
@@ -141,7 +139,11 @@ def db_vocab(table, column):
         res = db.get_unique_from_table(table, column)
     elif table.__tablename__ == 'MSFD11_MPTypes':
         res = db.get_all_columns_from_mapper(table, column)
-        terms = [SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description)) for x in res]
+        terms = [
+            SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description))
+
+            for x in res
+        ]
         vocab = SimpleVocabulary(terms)
 
         return vocab
@@ -149,7 +151,6 @@ def db_vocab(table, column):
         res = db.get_unique_from_mapper(table, column)
     res = [x.strip() for x in res]
 
-    # import pdb; pdb.set_trace()
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
     vocab = SimpleVocabulary(terms)
 
@@ -193,19 +194,11 @@ def monitoring_programme_info_types(context):
     return vocab
 
 
-# @provider(IVocabularyFactory)
-# def monitoring_programme_info_types(context):
-#     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-#     vocab = SimpleVocabulary(terms)
-#     # import pdb;pdb.set_trace()
-#     return vocab
-
 # TODO not used, delete this later
 @provider(IVocabularyFactory)
 def monitoring_subprogramme_names(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
     vocab = SimpleVocabulary(terms)
-    # import pdb;pdb.set_trace()
 
     return vocab
 
