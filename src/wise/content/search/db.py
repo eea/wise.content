@@ -73,8 +73,6 @@ def get_all_columns_from_mapper(mapper_class, column, *conditions):
 
     return_value = [x for x in res]
 
-    # import pdb; pdb.set_trace()
-
     return return_value
 
 

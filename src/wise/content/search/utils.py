@@ -11,7 +11,7 @@ import xlsxwriter
 
 FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
-SUBFORMS = defaultdict(set)        # store subform references
+SUBFORMS = defaultdict(list)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
 LABELS = {}                        # vocabulary of labels
 
@@ -60,7 +60,7 @@ def register_subform(mainform):
     """
 
     def wrapper(klass):
-        SUBFORMS[mainform].add(klass)
+        SUBFORMS[mainform].append(klass)
 
         return klass
 
