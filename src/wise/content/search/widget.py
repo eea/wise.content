@@ -15,9 +15,11 @@ class MarineUnitIDSelectWidget(SelectWidget):
         return term.token in self.value
 
     def extract(self, default=None):
+        self.value = []
         value = super(MarineUnitIDSelectWidget, self).extract()
 
         if value is NO_VALUE:
+            # import pdb; pdb.set_trace()
             available = [x['value'] for x in self.items()]
 
             if available:

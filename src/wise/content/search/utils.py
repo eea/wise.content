@@ -166,7 +166,22 @@ def data_to_xls(data):
 def get_obj_fields(obj):
     mapper = inspect(obj)
 
-    return sorted([c.key for c in mapper.attrs])
+    res = []
+    keys = sorted([c.key for c in mapper.attrs])
+
+    BLACKLIST = ['ID', 'Import']
+
+    for key in keys:
+        flag = False
+
+        for bit in BLACKLIST:
+            if bit in key:
+                flag = True
+
+        if not flag:
+            res.append(key)
+
+    return res
 
 
 def pivot_data(data, pivot):

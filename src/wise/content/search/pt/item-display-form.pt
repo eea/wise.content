@@ -8,10 +8,10 @@
   <tal:block tal:condition="python: view.item ">
     <tal:block tal:condition="python: view.item_title(view.item)">
       <h3 tal:define="info python: view.item_title(view.item)">
-        Record:
+        <!-- Record: -->
          <span tal:replace="python: info[0]">Class</span>
-         #
-         <span tal:replace="python: info[1]">10</span>
+         <!-- # -->
+         <!-- <span tal:replace="python: info[1]">10</span> -->
       </h3>
     </tal:block>
   </tal:block>
