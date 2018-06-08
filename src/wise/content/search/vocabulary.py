@@ -148,6 +148,17 @@ def db_vocab(table, column):
     res = [x.strip() for x in res]
 
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
+# TODO not used, delete this later
+@provider(IVocabularyFactory)
+def monitoring_subprogramme_names(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    vocab = SimpleVocabulary(terms)
+
     vocab = SimpleVocabulary(sorted(terms))
 
     return vocab
