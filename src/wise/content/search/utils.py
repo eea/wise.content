@@ -190,7 +190,7 @@ def get_obj_fields(obj):
     return res
 
 
-def db_objects_to_dict(data):
+def db_objects_to_dict(data, excluded_columns):
     """
     Transform a list of sqlalchemy DB objects into
     a list of dictionaries, needed for pivot_data()
@@ -205,7 +205,8 @@ def db_objects_to_dict(data):
         d = dict()
 
         for col in columns:
-            d.update({col: getattr(row, col)})
+            if col not in excluded_columns:
+                d.update({col: getattr(row, col)})
         out.append(d)
 
     return out
@@ -260,5 +261,4 @@ def all_values_from_field(context, field):
     name = field.field.value_type.vocabularyName
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 
-    # import pdb;pdb.set_trace()
     return [term.token for term in vocab._terms]

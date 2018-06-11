@@ -22,6 +22,9 @@ class StartArticle11Form(MainForm):
 
         return klass(self, self.request)
 
+    def download_results(self):
+        return None
+
     def extractData(self):
         """ Override to be able to provide defaults
         """
@@ -84,6 +87,7 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
 
         monitoring_programme_id = self.item.ID
 
+        excluded_columns = ('MonitoringProgramme', 'ID')
         mapper_class_mp_list = sql.MSFD11MonitoringProgrammeList
         column = 'MonitoringProgramme'
         result_programme_list = db.get_all_columns_from_mapper(
@@ -108,7 +112,7 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
             getattr(mapper_class_mp_marine, column) == monitoring_programme_id
         )
 
-        element_names = db_objects_to_dict(result_programme_list)
+        element_names = db_objects_to_dict(result_programme_list, excluded_columns)
         element_names = pivot_data(element_names, 'ElementName')
 
         return [
@@ -235,7 +239,8 @@ class A11MPExtraInfo(ItemDisplay):
             'ID',
             mapper_class_measure.SubProgramme == self.subprogramme
         )
-        parameters_measured = db_objects_to_dict(parameters_measured)
+        excluded_columns = ('ID', 'SubProgramme')
+        parameters_measured = db_objects_to_dict(parameters_measured, excluded_columns)
         # parameters_measured = pivot_data(parameters_measured, 'SubProgramme')
 
         return [
