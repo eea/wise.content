@@ -1,7 +1,7 @@
 import os
 import threading
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import text
 from zope.sqlalchemy import register
@@ -58,9 +58,12 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     col = getattr(mapper_class, column)
 
     sess = session()
-    res = sess.query(col).filter(*conditions).distinct().order_by(col)
+    res = sess.query(func.trim(col))\
+        .filter(*conditions)\
+        .distinct()\
+        .order_by(col)
 
-    return sorted([x[0] for x in res])
+    return [x[0] for x in res]
 
 
 def get_unique_from_mapper_join(
@@ -80,7 +83,6 @@ def get_unique_from_mapper_join(
         *conditions
     ).order_by(order_field)
 
-    # import pdb; pdb.set_trace()
     total = q.count()
     item = q.offset(page).limit(1).first()
 
