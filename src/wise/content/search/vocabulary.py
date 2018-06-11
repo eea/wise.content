@@ -77,8 +77,12 @@ def populate_labels():
     csv_nr = len(list(csv_labels.keys()))
     xsd_nr = len(list(xsd_labels.keys()))
 
-    print("Labels count\n Total labels %s\n Common_labels %s\n .csv_nr %s \n.xsd_nr %s" % (
-        len(LABELS), common_labels, csv_nr, xsd_nr))
+    print("""Labels count:
+    Total labels: %s
+    Common_labels: %s
+    .csv_nr: %s
+    .xsd_nr: %s""" % (len(LABELS), common_labels, csv_nr, xsd_nr))
+
     return
 
 
@@ -108,6 +112,7 @@ class SubFormsVocabulary(SimpleVocabulary):
             terms.append(SimpleTerm(k, k.title, k.title))
 
         terms.sort(key=lambda t: t.title)
+
         return terms
 
     @property
@@ -137,8 +142,12 @@ def db_vocab(table, column):
         res = db.get_unique_from_table(table, column)
     elif table.__tablename__ == 'MSFD11_MPTypes':
         res = db.get_all_columns_from_mapper(table, column)
-        terms = [SimpleTerm(x.ID, x.ID, LABELS.get(
-            x.Description, x.Description)) for x in res]
+        terms = [
+            SimpleTerm(x.ID, x.ID, LABELS.get(x.Description, x.Description))
+
+            for x in res
+        ]
+        terms.sort(key=lambda t: t.title)
         vocab = SimpleVocabulary(terms)
 
         return vocab
@@ -148,6 +157,7 @@ def db_vocab(table, column):
     res = [x.strip() for x in res]
 
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
     return vocab
@@ -157,9 +167,8 @@ def db_vocab(table, column):
 @provider(IVocabularyFactory)
 def monitoring_subprogramme_names(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
-
-    vocab = SimpleVocabulary(sorted(terms))
 
     return vocab
 
@@ -196,7 +205,9 @@ def monitoring_programme_vb_factory(context):
 @provider(IVocabularyFactory)
 def monitoring_programme_info_types(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    vocab = SimpleVocabulary(sorted(terms))
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
     return vocab
 
 
@@ -211,6 +222,7 @@ def marine_unit_id_vocab(ids):
         else:
             label = id
         terms.append(SimpleTerm(id, id, label))
+        terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)
 
@@ -227,7 +239,7 @@ def marine_unit_ids_vocab_factory(context):
         data = context.data
         count, ids = db.get_marine_unit_ids(**data)
 
-    return marine_unit_id_vocab(ids)
+    return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)
@@ -236,7 +248,7 @@ def marine_unit_id_vocab_factory(context):
     """
     ids = context.subform.get_available_marine_unit_ids()
 
-    return marine_unit_id_vocab(ids)
+    return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)
@@ -257,5 +269,6 @@ def a1314_unique_codes(context):
 
         for code, name in codes
     ]
+    terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)

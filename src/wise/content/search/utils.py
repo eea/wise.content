@@ -8,6 +8,7 @@ from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
+from inspect import isclass
 
 FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
@@ -198,9 +199,11 @@ def db_objects_to_dict(data):
     :return: list of dictionaries
     """
     out = []
+
     for row in data:
         columns = row.__table__.columns.keys()
         d = dict()
+
         for col in columns:
             d.update({col: getattr(row, col)})
         out.append(d)
@@ -219,6 +222,19 @@ def pivot_data(data, pivot):
     return out
 
 
+def pivot_query(query, pivot):
+    """ Pivot results from a query over a table
+    """
+
+    cols = [x['name'] for x in query.column_descriptions]
+    res = [dict(zip(cols, row)) for row in query]
+
+    if len(cols) == 1:
+        return {pivot: res}
+
+    return pivot_data(res, pivot)
+
+
 def default_value_from_field(context, field):
     """ Get the defaulf value for a choice field
     """
@@ -233,6 +249,10 @@ def default_value_from_field(context, field):
 
     term = vocab._terms[0]
 
+    # import pdb;pdb.set_trace()
+
+    if isclass(term.value):
+        return term.value, term.token
     return term.token
 
 
@@ -240,4 +260,5 @@ def all_values_from_field(context, field):
     name = field.field.value_type.vocabularyName
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 
+    # import pdb;pdb.set_trace()
     return [term.token for term in vocab._terms]

@@ -5,7 +5,9 @@ from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
                    MultiItemDisplayForm)
-from .utils import db_objects_to_dict, pivot_data, register_form_art11, register_form_section
+from .utils import (all_values_from_field, db_objects_to_dict,
+                    default_value_from_field,
+                    pivot_data, register_form_art11, register_form_section)
 
 
 class StartArticle11Form(MainForm):
@@ -19,6 +21,37 @@ class StartArticle11Form(MainForm):
         klass = self.data.get('monitoring_programme_info_types')
 
         return klass(self, self.request)
+
+    def extractData(self):
+        """ Override to be able to provide defaults
+        """
+        data, errors = super(MainForm, self).extractData()
+
+        for k, v in data.items():
+            if not v:
+                default = getattr(self, 'default_' + k, None)
+                if default:
+                    values = default()
+                    if isinstance(values, tuple):
+                        value, token = values
+                    else:
+                        value = token = values
+                    data[k] = value
+                    widget = self.widgets[k]
+                    widget.value = token
+                    # field = widget.field.bind(self)
+                    # field.default = token
+                    # widget.field = field
+                    # widget.ignoreRequest = True
+                    widget.update()
+
+        return data, errors
+
+    def default_monitoring_programme_types(self):
+        return all_values_from_field(self, self.fields['monitoring_programme_types'])
+
+    def default_monitoring_programme_info_types(self):
+        return default_value_from_field(self, self.fields['monitoring_programme_info_types'])
 
 
 @register_form_art11
@@ -203,12 +236,12 @@ class A11MPExtraInfo(ItemDisplay):
             mapper_class_measure.SubProgramme == self.subprogramme
         )
         parameters_measured = db_objects_to_dict(parameters_measured)
-        parameters_measured = pivot_data(parameters_measured, 'mpgroup')
+        # parameters_measured = pivot_data(parameters_measured, 'SubProgramme')
 
         return [
             ('Elements monitored', {
                 '': [{'ElementMonitored': x.Q9a_ElementMonitored} for x in elements_monitored
                     ]
             }),
-            ('Paramenters measured', parameters_measured),
+            ('Paramenters measured', {'': parameters_measured}),
         ]
