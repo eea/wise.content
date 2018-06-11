@@ -8,6 +8,7 @@ from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
+from inspect import isclass
 
 FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
@@ -248,6 +249,10 @@ def default_value_from_field(context, field):
 
     term = vocab._terms[0]
 
+    # import pdb;pdb.set_trace()
+
+    if isclass(term.value):
+        return term.value, term.token
     return term.token
 
 
@@ -255,4 +260,5 @@ def all_values_from_field(context, field):
     name = field.field.value_type.vocabularyName
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 
+    # import pdb;pdb.set_trace()
     return [term.token for term in vocab._terms]
