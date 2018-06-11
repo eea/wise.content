@@ -157,10 +157,8 @@ def db_vocab(table, column):
 @provider(IVocabularyFactory)
 def monitoring_subprogramme_names(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
-
-    vocab = SimpleVocabulary(sorted(terms))
-
     return vocab
 
 
@@ -196,7 +194,8 @@ def monitoring_programme_vb_factory(context):
 @provider(IVocabularyFactory)
 def monitoring_programme_info_types(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    vocab = SimpleVocabulary(sorted(terms))
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
     return vocab
 
 
@@ -211,6 +210,7 @@ def marine_unit_id_vocab(ids):
         else:
             label = id
         terms.append(SimpleTerm(id, id, label))
+        terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)
 
@@ -227,7 +227,7 @@ def marine_unit_ids_vocab_factory(context):
         data = context.data
         count, ids = db.get_marine_unit_ids(**data)
 
-    return marine_unit_id_vocab(ids)
+    return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)
@@ -236,7 +236,7 @@ def marine_unit_id_vocab_factory(context):
     """
     ids = context.subform.get_available_marine_unit_ids()
 
-    return marine_unit_id_vocab(ids)
+    return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)
@@ -257,5 +257,6 @@ def a1314_unique_codes(context):
 
         for code, name in codes
     ]
+    terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)
