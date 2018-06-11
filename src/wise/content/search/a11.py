@@ -3,7 +3,7 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
+from .base import (ItemDisplay, ItemDisplayForm, MainForm,
                    MultiItemDisplayForm)
 from .utils import (all_values_from_field, db_objects_to_dict,
                     default_value_from_field,
@@ -116,18 +116,6 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
         element_names = pivot_data(element_names, 'ElementName')
 
         return [
-            # ('Element Names TEST', {
-            #     'Name1': [{'Other Data Here': x} for x in marine_units],
-            #     'Name2': [{'Other Data Here': x} for x in marine_units],
-            #     'Name3': [{'Other Data Here1': '1234', 'Other Data Here2': '123'},
-            #               {'Other Data Here1': 'qwe', 'Other Data Here2': 'asd'},
-            #               {'Other Data Here1': 'qwe', 'Other Data Here2': 'asd'}
-            #               ]
-            # }),
-            # ('Element Names', {
-            #     x.ElementName:
-            #         [{'subgroup': x.subgroup}, {'subgroup': x.subgroup}] for x in result_programme_list
-            # }),
             ('Element Names', element_names),
             ('Marine Unit(s)', {
                 '': [{'MarineUnitIDs': x} for x in marine_units]
@@ -162,14 +150,6 @@ class A11MonitorSubprogrammeForm(MultiItemDisplayForm):
         klass_join = sql.MSFD11MP
 
         if needed_ids:
-            # return db.get_unique_from_mapper_join(
-            #     self.mapper_class,
-            #     'SubMonitoringProgrammeName',
-            #     klass_join,
-            #     self.order_field,
-            #     klass_join.MPType.in_(needed_ids),
-            #     page=page
-            # )
 
             return db.get_item_by_conditions_joined(
                 self.mapper_class,
@@ -180,30 +160,11 @@ class A11MonitorSubprogrammeForm(MultiItemDisplayForm):
             )
 
 
-    # def get_extra_data(self):
-    #     if not self.item:
-    #         return {}
-    #
-    #     subprogramme_id = self.item.SubMonitoringProgrammeID
-    #     mc = sql.MSFD11SubProgramme
-    #
-    #     count, item = db.get_related_record(mc, 'Q4g_SubProgrammeID', subprogramme_id)
-    #     if item:
-    #         self.subprogramme = getattr(item, 'ID')
-    #     else:
-    #         self.subprogramme = 0
-    #
-    #     return 'Subprogramme info', item
-    #     # return [('Subprogramme info', item)]
-
-
 @register_form_section(A11MonitorSubprogrammeForm)
 class A11MPExtraInfo(ItemDisplay):
     title = "SubProgramme Info"
 
-    # data_template = ViewPageTemplateFile('pt/extra-data.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
-    # data_template = ViewPageTemplateFile('pt/item-display.pt')
 
     # TODO data from columns SubMonitoringProgrammeID and Q4g_SubProgrammeID
     # do not match, SubMonitoringProgrammeID contains spaces
@@ -246,7 +207,7 @@ class A11MPExtraInfo(ItemDisplay):
         return [
             ('Elements monitored', {
                 '': [{'ElementMonitored': x.Q9a_ElementMonitored} for x in elements_monitored
-                    ]
+                     ]
             }),
             ('Paramenters measured', {'': parameters_measured}),
         ]

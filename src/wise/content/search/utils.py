@@ -145,6 +145,8 @@ def data_to_xls(data):
     for wtitle, wdata in data:
         worksheet = workbook.add_worksheet(wtitle)
 
+        import pdb;pdb.set_trace()
+
         row0 = wdata[0]
         fields = sorted(get_obj_fields(row0))
 
@@ -190,7 +192,7 @@ def get_obj_fields(obj):
     return res
 
 
-def db_objects_to_dict(data, excluded_columns):
+def db_objects_to_dict(data, excluded_columns=()):
     """
     Transform a list of sqlalchemy DB objects into
     a list of dictionaries, needed for pivot_data()
