@@ -198,9 +198,11 @@ def db_objects_to_dict(data):
     :return: list of dictionaries
     """
     out = []
+
     for row in data:
         columns = row.__table__.columns.keys()
         d = dict()
+
         for col in columns:
             d.update({col: getattr(row, col)})
         out.append(d)
@@ -217,6 +219,19 @@ def pivot_data(data, pivot):
         out[p].append(d)
 
     return out
+
+
+def pivot_query(query, pivot):
+    """ Pivot results from a query over a table
+    """
+
+    cols = [x['name'] for x in query.column_descriptions]
+    res = [dict(zip(cols, row)) for row in query]
+
+    if len(cols) == 1:
+        return {pivot: res}
+
+    return pivot_data(res, pivot)
 
 
 def default_value_from_field(context, field):

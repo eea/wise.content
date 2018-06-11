@@ -2,7 +2,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 
 from .base import ItemDisplayForm, MarineUnitIDSelectForm
-from .utils import data_to_xls, pivot_data, register_form
+from .utils import data_to_xls, pivot_query, register_form
 
 
 @register_form
@@ -47,16 +47,23 @@ class A10ItemDisplay(ItemDisplayForm):
 
         target_id = self.item.MSFD10_Target_ID
 
-        res = db.get_a10_feature_targets(target_id)
-        ft = pivot_data(res, 'FeatureType')
+        t = sql.t_MSFD10_FeaturesPressures
+        c, res = db.get_table_records([
+            t.c.FeatureType,
+            t.c.PhysicalChemicalHabitatsFunctionalPressures,
+        ], t.c.MSFD10_Target == target_id)
+        ft = pivot_query(res, 'FeatureType')
 
         res = db.get_a10_criteria_indicators(target_id)
-        res = {
-            '':
-            [{'GESDescriptorsCriteriaIndicators': x[0]} for x in res]
-        }
+
+        t = sql.t_MSFD10_DESCrit
+        c, res = db.get_table_records(
+            [t.c.GESDescriptorsCriteriaIndicators],
+            t.c.MSFD10_Target == target_id
+        )
+        fr = pivot_query(res, 'GESDescriptorsCriteriaIndicators')
 
         return [
             ('Feature Type', ft),
-            ('Criteria Indicators', res),
+            ('Criteria Indicators', fr),
         ]

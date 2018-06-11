@@ -155,21 +155,17 @@ def get_item_by_conditions_joined(
     return [total, item]
 
 
-def get_a9_feature_impacts(msfd9_descriptor_id):
-    """ Used in extra_data for A9
-    """
-    conn = connection()
-    res = conn.execute(text("""
-SELECT DISTINCT FeatureType, FeaturesPressuresImpacts
-FROM MarineDB.dbo.MSFD9_Features
-WHERE MSFD9_Descriptor = :descriptor_id
-;
-"""), descriptor_id=msfd9_descriptor_id)
+def get_table_records(columns, *conditions, **kwargs):
+    order_by = kwargs.get('order_by')
+    sess = session()
+    q = sess.query(*columns).filter(*conditions)
 
-    items = []
-    for item in res:
-        items.append(item)
-    return sorted(items)
+    if order_by:
+        q = q.order_by(order_by)
+
+    total = q.count()
+
+    return total, q
 
 
 def get_available_marine_unit_ids(marine_unit_ids, klass):
@@ -178,7 +174,7 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
     sess = session()
     q = sess.query(klass.MarineUnitID).filter(
         klass.MarineUnitID.in_(marine_unit_ids)
-    ).distinct()
+    ).order_by(klass.MarineUnitID).distinct()
 
     total = q.count()
 
@@ -212,8 +208,10 @@ WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
     items = []
+
     for item in res:
         items.append(item)
+
     return sorted(items)
 
 
@@ -226,8 +224,10 @@ WHERE MSFD10_Target = :target_id
 """), target_id=target_id)
 
     items = []
+
     for item in res:
         items.append(item)
+
     return sorted(items)
 
 
