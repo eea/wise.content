@@ -3,7 +3,6 @@ import threading
 
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.sql import text
 from zope.sqlalchemy import register
 
 from wise.content.search import sql
@@ -199,38 +198,38 @@ def get_marine_unit_id_names(marine_unit_ids):
     return [total, q]
 
 
-def get_a10_feature_targets(target_id):
-    """ Used in extra_data for A10
-    """
-    conn = connection()
-    res = conn.execute(text("""
-SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
-FROM MarineDB.dbo.MSFD10_FeaturesPressures
-WHERE MSFD10_Target = :target_id
-"""), target_id=target_id)
-
-    items = []
-
-    for item in res:
-        items.append(item)
-
-    return sorted(items)
-
-
-def get_a10_criteria_indicators(target_id):
-    conn = connection()
-    res = conn.execute(text("""
-SELECT DISTINCT GESDescriptorsCriteriaIndicators
-FROM MarineDB.dbo.MSFD10_DESCrit
-WHERE MSFD10_Target = :target_id
-"""), target_id=target_id)
-
-    items = []
-
-    for item in res:
-        items.append(item)
-
-    return sorted(items)
+# def get_a10_feature_targets(target_id):
+#     """ Used in extra_data for A10
+#     """
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
+# FROM MarineDB.dbo.MSFD10_FeaturesPressures
+# WHERE MSFD10_Target = :target_id
+# """), target_id=target_id)
+#
+#     items = []
+#
+#     for item in res:
+#         items.append(item)
+#
+#     return sorted(items)
+#
+#
+# def get_a10_criteria_indicators(target_id):
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT DISTINCT GESDescriptorsCriteriaIndicators
+# FROM MarineDB.dbo.MSFD10_DESCrit
+# WHERE MSFD10_Target = :target_id
+# """), target_id=target_id)
+#
+#     items = []
+#
+#     for item in res:
+#         items.append(item)
+#
+#     return sorted(items)
 
 
 def get_related_record(klass, column, rel_id):

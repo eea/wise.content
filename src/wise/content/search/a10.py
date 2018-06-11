@@ -54,7 +54,7 @@ class A10ItemDisplay(ItemDisplayForm):
         ], t.c.MSFD10_Target == target_id)
         ft = pivot_query(res, 'FeatureType')
 
-        res = db.get_a10_criteria_indicators(target_id)
+        # res = db.get_a10_criteria_indicators(target_id)
 
         t = sql.t_MSFD10_DESCrit
         c, res = db.get_table_records(

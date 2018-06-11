@@ -3,7 +3,7 @@ from wise.content.search import db, sql
 
 from .base import ItemDisplayForm, MarineUnitIDSelectForm
 from .db import get_all_records
-from .utils import data_to_xls, pivot_data, pivot_query, register_form
+from .utils import data_to_xls, pivot_query, register_form
 
 
 @register_form
