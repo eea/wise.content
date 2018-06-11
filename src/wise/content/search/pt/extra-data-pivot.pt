@@ -9,8 +9,8 @@
                         <li class="nav-item">
 
                             <a class="nav-link" tal:define="utitle python: section_label or section_title"
-                               tal:attributes="id python:utitle.replace(' ', '_').replace('/','-').lower() + '-tab';
-                                href python:'#' + utitle.replace(' ', '_').replace('/','-').lower();
+                               tal:attributes="id python:utitle.replace(' ', '_').replace('/','-').replace(',' , '').lower() + '-tab';
+                                href python:'#' + utitle.replace(' ', '_').replace('/','-').replace(',' , '').lower();
                                 aria-controls python:utitle.replace(' ', '_').lower()"
                                data-toggle="tab"
                                role="tab"
@@ -25,7 +25,7 @@
                     <tal:block tal:repeat="section_label section" tal:define="istab python: 'tab-pane fade' if( len(info[1]) > 1) else ''" >
                         <div
                              tal:define="utitle python:section_label or section_title;"
-                             tal:attributes="id python: utitle.replace(' ', '_').replace('/','-').lower();
+                             tal:attributes="id python: utitle.replace(' ', '_').replace('/','-').replace(',' , '').lower();
                              class string: ${istab}"
                              role="tabpanel"
                         >
