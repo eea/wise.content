@@ -159,7 +159,6 @@ def monitoring_subprogramme_names(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
-
     return vocab
 
 
