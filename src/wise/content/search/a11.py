@@ -3,11 +3,10 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import (ItemDisplay, ItemDisplayForm, MainForm,
-                   MultiItemDisplayForm)
+from .base import ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
 from .utils import (all_values_from_field, db_objects_to_dict,
-                    default_value_from_field,
-                    pivot_data, register_form_art11, register_form_section)
+                    default_value_from_field, pivot_data, register_form_art11,
+                    register_form_section)
 
 
 class StartArticle11Form(MainForm):
@@ -30,8 +29,10 @@ class StartArticle11Form(MainForm):
         for k, v in data.items():
             if not v:
                 default = getattr(self, 'default_' + k, None)
+
                 if default:
                     values = default()
+
                     if isinstance(values, tuple):
                         value, token = values
                     else:
@@ -39,19 +40,18 @@ class StartArticle11Form(MainForm):
                     data[k] = value
                     widget = self.widgets[k]
                     widget.value = token
-                    # field = widget.field.bind(self)
-                    # field.default = token
-                    # widget.field = field
-                    # widget.ignoreRequest = True
                     widget.update()
 
         return data, errors
 
     def default_monitoring_programme_types(self):
-        return all_values_from_field(self, self.fields['monitoring_programme_types'])
+        return all_values_from_field(self,
+                                     self.fields['monitoring_programme_types'])
 
     def default_monitoring_programme_info_types(self):
-        return default_value_from_field(self, self.fields['monitoring_programme_info_types'])
+        return default_value_from_field(
+            self, self.fields['monitoring_programme_info_types']
+        )
 
 
 @register_form_art11
@@ -112,7 +112,8 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
             getattr(mapper_class_mp_marine, column) == monitoring_programme_id
         )
 
-        element_names = db_objects_to_dict(result_programme_list, excluded_columns)
+        element_names = db_objects_to_dict(result_programme_list,
+                                           excluded_columns)
         element_names = pivot_data(element_names, 'ElementName')
 
         return [
@@ -127,8 +128,6 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
 
     def get_mp_type_ids(self):
         return self.context.data.get('monitoring_programme_types', [])
-
-
 
 
 @register_form_art11
@@ -175,7 +174,8 @@ class A11MPExtraInfo(ItemDisplay):
         subprogramme_id = self.context.item.SubMonitoringProgrammeID
         mc = sql.MSFD11SubProgramme
 
-        count, item = db.get_related_record(mc, 'Q4g_SubProgrammeID', subprogramme_id)
+        count, item = db.get_related_record(
+            mc, 'Q4g_SubProgrammeID', subprogramme_id)
 
         if item:
             self.subprogramme = getattr(item, 'ID')
@@ -201,13 +201,17 @@ class A11MPExtraInfo(ItemDisplay):
             mapper_class_measure.SubProgramme == self.subprogramme
         )
         excluded_columns = ('ID', 'SubProgramme')
-        parameters_measured = db_objects_to_dict(parameters_measured, excluded_columns)
+        parameters_measured = db_objects_to_dict(parameters_measured,
+                                                 excluded_columns)
         # parameters_measured = pivot_data(parameters_measured, 'SubProgramme')
 
         return [
             ('Elements monitored', {
-                '': [{'ElementMonitored': x.Q9a_ElementMonitored} for x in elements_monitored
-                     ]
+                '': [
+                    {'ElementMonitored': x.Q9a_ElementMonitored}
+
+                    for x in elements_monitored
+                ]
             }),
             ('Paramenters measured', {'': parameters_measured}),
         ]
