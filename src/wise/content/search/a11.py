@@ -161,15 +161,23 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
                                            excluded_columns)
         element_names = pivot_data(element_names, 'ElementName')
 
-        return [
+        res = [
             ('Element Names', element_names),
-            ('Marine Unit(s)', {
-                '': [{'MarineUnitIDs': x} for x in marine_units]
-            }),
-            ('Target(s)', {
-                '': [{'Relevant Targets': x} for x in targets]
-            }),
         ]
+
+        if marine_units:
+            res.append(
+                ('Marine Unit(s)', {
+                    '': [{'MarineUnitIDs': x} for x in marine_units]
+                }))
+
+        if targets:
+            res.append(
+                ('Target(s)', {
+                    '': [{'Relevant Targets': x} for x in targets]
+                }))
+
+        return res
 
 
 @register_form_art11
