@@ -1,5 +1,6 @@
 import datetime
 from collections import defaultdict
+from inspect import isclass
 from io import BytesIO
 
 from six import string_types
@@ -8,7 +9,6 @@ from zope.component import getUtility
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
-from inspect import isclass
 
 FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
@@ -229,7 +229,9 @@ def pivot_data(data, pivot):
     for row in data:
         d = dict(row)
         p = d.pop(pivot)
-        out[p].append(d)
+
+        if any(d.values()):
+            out[p].append(d)
 
     return out
 
@@ -263,6 +265,7 @@ def default_value_from_field(context, field):
 
     if isclass(term.value):
         return term.value, term.token
+
     return term.token
 
 

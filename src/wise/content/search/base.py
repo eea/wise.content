@@ -25,6 +25,15 @@ class BaseUtil(object):
 
     value_template = ViewPageTemplateFile('pt/value-display.pt')
 
+    def title_as_id(self, text):
+        """ Given some text, return an id
+        """
+
+        return text.replace(' ', '_')\
+            .replace('/', '-')\
+            .replace(',', '')\
+            .lower()
+
     def name_as_title(self, text):
         """ Given a "CamelCase" text, changes it to "Title Text"
 
