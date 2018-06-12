@@ -26,8 +26,8 @@ class A10Form(MarineUnitIDSelectForm):
         target_ids = [row.MSFD10_Target_ID for row in data]
 
         mapper_class_features_pres = sql.t_MSFD10_FeaturesPressures
-        count_fp, data_fp = db.get_all_records(
-            mapper_class_features_pres,
+        count_fp, data_fp = db.get_table_records(
+            [mapper_class_features_pres],
             mapper_class_features_pres.c.MSFD10_Target.in_(target_ids)
         )
 

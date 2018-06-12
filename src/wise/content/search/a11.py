@@ -4,7 +4,7 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
-from .utils import (all_values_from_field, db_objects_to_dict,
+from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     default_value_from_field, pivot_data, register_form_art11,
                     register_form_section)
 
@@ -44,6 +44,9 @@ class StartArticle11Form(MainForm):
 
         return data, errors
 
+    def get_mp_type_ids(self):
+        return self.data.get('monitoring_programme_types', [])
+
     def default_monitoring_programme_types(self):
         return all_values_from_field(self,
                                      self.fields['monitoring_programme_types'])
@@ -65,12 +68,54 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
     css_class = 'left-side-form'
 
     def download_results(self):
-        return None
+        mp_type_ids = self.context.get_mp_type_ids()
+
+        klass_join_mp = sql.MSFD11MP
+        count_mp, data_mp = db.get_all_records_outerjoin(
+            self.mapper_class,
+            klass_join_mp,
+            klass_join_mp.MPType.in_(mp_type_ids)
+        )
+
+        mp_ids = [row.ID for row in data_mp]
+
+        mapper_class_mpl = sql.MSFD11MonitoringProgrammeList
+        count_mpl, data_mpl = db.get_all_records(
+            mapper_class_mpl,
+            mapper_class_mpl.MonitoringProgramme.in_(mp_ids)
+        )
+
+        mapper_class_mpmid = sql.MSFD11MonitoringProgrammeMarineUnitID
+        count_mpmid, data_mpmid = db.get_all_records_join(
+            [
+                mapper_class_mpmid.ID,
+                mapper_class_mpmid.MonitoringProgramme,
+                sql.MSFD11MarineUnitID.MarineUnitID
+             ],
+            sql.MSFD11MarineUnitID,
+            mapper_class_mpmid.MonitoringProgramme.in_(mp_ids)
+        )
+
+        mapper_class_rt = sql.MSFD11Q6aRelevantTarget
+        count_mpl, data_rt = db.get_all_records(
+            mapper_class_rt,
+            mapper_class_rt.MonitoringProgramme.in_(mp_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD11MonitoringProgramme', data_mp),
+            ('MSFD11MonitoringProgrammeList', data_mpl),
+            ('MSFD11MonitorProgMarineUnitID', data_mpmid),
+            ('MSFD11Q6aRelevantTarget', data_rt),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
         klass_join = sql.MSFD11MP
-        needed_ID = self.get_mp_type_ids()
+        needed_ID = self.context.get_mp_type_ids()
 
         if needed_ID:
             return db.get_item_by_conditions_joined(
@@ -126,9 +171,6 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
             }),
         ]
 
-    def get_mp_type_ids(self):
-        return self.context.data.get('monitoring_programme_types', [])
-
 
 @register_form_art11
 class A11MonitorSubprogrammeForm(MultiItemDisplayForm):
@@ -143,9 +185,53 @@ class A11MonitorSubprogrammeForm(MultiItemDisplayForm):
 
     # extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
 
+    def download_results(self):
+        mp_type_ids = self.context.get_mp_type_ids()
+
+        klass_join_mp = sql.MSFD11MP
+        count_rsp, data_rsp = db.get_all_records_outerjoin(
+            self.mapper_class,
+            klass_join_mp,
+            klass_join_mp.MPType.in_(mp_type_ids)
+        )
+
+        submonitor_programme_ids = [row.SubMonitoringProgrammeID
+                                    for row in data_rsp]
+
+        mapper_class_sp = sql.MSFD11SubProgramme
+        count_sp, data_sp = db.get_all_records(
+            mapper_class_sp,
+            mapper_class_sp.Q4g_SubProgrammeID.in_(submonitor_programme_ids)
+        )
+
+        subprograme_ids = [row.ID for row in data_sp]
+
+        mapper_class_em = sql.MSFD11Q9aElementMonitored
+        count_em, data_em = db.get_all_records(
+            mapper_class_em,
+            mapper_class_em.SubProgramme.in_(subprograme_ids)
+        )
+
+        mapper_class_mp = sql.MSFD11Q9bMeasurementParameter
+        count_mp, data_mp = db.get_all_records(
+            mapper_class_mp,
+            mapper_class_mp.SubProgramme.in_(subprograme_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD11ReferenceSubProgramme', data_rsp),
+            ('MSFD11SubProgramme', data_sp),
+            ('MSFD11Q9aElementMonitored', data_em),
+            ('MSFD11Q9bMeasurementParameter', data_mp),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
-        needed_ids = self.context.data.get('monitoring_programme_types', [])
+        # needed_ids = self.context.data.get('monitoring_programme_types', [])
+        needed_ids = self.context.get_mp_type_ids()
         klass_join = sql.MSFD11MP
 
         if needed_ids:
