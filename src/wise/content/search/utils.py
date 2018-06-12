@@ -145,10 +145,13 @@ def data_to_xls(data):
     for wtitle, wdata in data:
         worksheet = workbook.add_worksheet(wtitle)
 
-        import pdb;pdb.set_trace()
-
         row0 = wdata[0]
-        fields = sorted(get_obj_fields(row0))
+        is_tuple = isinstance(row0, tuple)
+        # import pdb; pdb.set_trace()
+        if not is_tuple:
+            fields = sorted(get_obj_fields(row0))
+        else:
+            fields = row0._fields
 
         # write titles
 
@@ -157,7 +160,10 @@ def data_to_xls(data):
 
         for j, row in enumerate(wdata):
             for i, f in enumerate(fields):
-                value = getattr(row, f)
+                if not is_tuple:
+                    value = getattr(row, f)
+                else:
+                    value = row[i]
 
                 if not isinstance(value,
                                   string_types + (float, int, type(None))):

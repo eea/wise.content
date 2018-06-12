@@ -19,20 +19,28 @@ class A10Form(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
         target_ids = [row.MSFD10_Target_ID for row in data]
+
         mapper_class_features_pres = sql.t_MSFD10_FeaturesPressures
         count_fp, data_fp = db.get_all_records(
             mapper_class_features_pres,
             mapper_class_features_pres.c.MSFD10_Target.in_(target_ids)
         )
 
+        mapper_class_des_crit = sql.t_MSFD10_DESCrit
+        count_dc, data_dc = db.get_all_records(
+            mapper_class_des_crit,
+            mapper_class_des_crit.c.MSFD10_Target.in_(target_ids)
+        )
 
         xlsdata = [
             ('MSFD10Target', data),      # worksheet title, row data
             ('MSFD10_FeaturesPressures', data_fp),
+            ('MSFD10_DESCrit', data_dc),
         ]
 
         return data_to_xls(xlsdata)

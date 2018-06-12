@@ -22,9 +22,6 @@ class StartArticle11Form(MainForm):
 
         return klass(self, self.request)
 
-    def download_results(self):
-        return None
-
     def extractData(self):
         """ Override to be able to provide defaults
         """
@@ -66,6 +63,9 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
     mapper_class = sql.MSFD11MonitoringProgramme
     order_field = 'ID'
     css_class = 'left-side-form'
+
+    def download_results(self):
+        return None
 
     def get_db_results(self):
         page = self.get_page()
