@@ -107,10 +107,23 @@ class A1314ItemDisplay(ItemDisplayForm):
     def download_results(self):
         muids = self.context.data.get('unique_codes', [])
         count, data = get_all_records(
-            self.mapper_class, self.mapper_class.UniqueCode.in_(muids)
+            self.mapper_class,
+            self.mapper_class.UniqueCode.in_(muids)
         )
 
-        return data_to_xls(data)
+        report_ids = [row.ReportID for row in data]
+        mc_report = sql.MSFD13ReportInfoFurtherInfo
+        count, data_report = get_all_records(
+            mc_report,
+            mc_report.ReportID.in_(report_ids)
+        )
+
+        xlsdata = [
+            ('MSFD11ReferenceSubProgramme', data),  # worksheet title, row data
+            ('MSFD13ReportInfoFurtherInfo', data_report),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
