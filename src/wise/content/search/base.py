@@ -139,7 +139,7 @@ class MainForm(Form):
         for k, v in data.items():
             if not v:
                 default = getattr(self, 'default_' + k, None)
-                # import pdb;pdb.set_trace()
+
                 if default:
                     data[k] = default()
                     self.widgets[k].value = data[k]

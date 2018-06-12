@@ -147,9 +147,9 @@ def data_to_xls(data):
 
         row0 = wdata[0]
         is_tuple = isinstance(row0, tuple)
-        # import pdb; pdb.set_trace()
+
         if not is_tuple:
-            fields = sorted(get_obj_fields(row0))
+            fields = sorted(get_obj_fields(row0, False))
         else:
             fields = row0._fields
 
@@ -177,13 +177,16 @@ def data_to_xls(data):
     return out
 
 
-def get_obj_fields(obj):
+def get_obj_fields(obj, use_blacklist=True):
     mapper = inspect(obj)
 
     res = []
     keys = sorted([c.key for c in mapper.attrs])
 
     BLACKLIST = ['ID', 'Import']
+
+    if not use_blacklist:
+        return keys
 
     for key in keys:
         flag = False
@@ -257,8 +260,6 @@ def default_value_from_field(context, field):
         return
 
     term = vocab._terms[0]
-
-    # import pdb;pdb.set_trace()
 
     if isclass(term.value):
         return term.value, term.token

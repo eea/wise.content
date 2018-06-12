@@ -257,3 +257,18 @@ def get_all_records(mapper_class, *conditions):
     q = sess.query(mapper_class).filter(*conditions)
 
     return [q.count(), q]
+
+
+def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
+    sess = session()
+    q = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
+
+    return [q.count(), q]
+
+
+def get_all_records_join(columns, klass_join, *conditions):
+    sess = session()
+    q = sess.query(*columns).join(klass_join).filter(*conditions)
+
+
+    return [q.count(), q]
