@@ -1,4 +1,5 @@
 from zope.schema import Choice
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from wise.content.search import db, sql
 from z3c.form.field import Fields
@@ -119,6 +120,8 @@ class A81aEcosystemPressures(ItemDisplay):
 class A81aEcosystemAsessment(ItemDisplay):
     title = 'Status Asessment'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -138,9 +141,8 @@ class A81aEcosystemAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        return 'Status Indicator', item
+
 
 # endregion Ecosystem
 
@@ -219,6 +221,8 @@ class A81aFunctionalGroupPressures(ItemDisplay):
 class A81aFunctionalGroupAsessment(ItemDisplay):
     title = 'Status Asessment'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -238,9 +242,8 @@ class A81aFunctionalGroupAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        return 'Status Indicator', item
+
 # endregion Functional Group
 
 
@@ -317,6 +320,8 @@ class A81aHabitatPressures(ItemDisplay):
 class A81aHabitatAsessment(ItemDisplay):
     title = 'Status Asessment'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -336,9 +341,7 @@ class A81aHabitatAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        return 'Status Indicator', item
 
 # endregion Habitat(s)
 
@@ -416,6 +419,8 @@ class A81aSpeciesPressures(ItemDisplay):
 class A81aSpeciesAsessment(ItemDisplay):
     title = 'Status Asessment'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -435,9 +440,7 @@ class A81aSpeciesAsessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Status Indicator', {'Feature': item}),
-        ]
+        return 'Status Indicator', item
 
 # endregion Species(s)
 
@@ -510,6 +513,8 @@ class A81aOtherItemDisplay(MultiItemDisplayForm):
 class A81aOtherAsessment(ItemDisplay):
     title = 'Status Asessment'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -531,9 +536,7 @@ class A81aOtherAsessment(ItemDisplay):
         # ft = pivot_data(res, 'FeatureType')
 
         if count:
-            return [
-                ('Status Indicator', {'Feature': item}),
-            ]
+            return 'Status Indicator', item
 
         return {}
 

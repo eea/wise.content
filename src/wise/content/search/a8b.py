@@ -1,4 +1,5 @@
 from zope.schema import Choice
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from wise.content.search import db, sql
 from z3c.form.field import Fields
@@ -67,15 +68,42 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        extraction_ids = [row.MSFD8b_ExtractionFishShellfish_ID for row in data]
+        mc_a = sql.MSFD8bExtractionFishShellfishAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_ExtractionFishShellfish_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bExtractionFishShellfishAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_ExtractionFishShellfish_Assesment.in_(assesment_ids)
+        )
+
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bExtractionFS', data),
+            ('MSFD8bExtractionFSAssesment', data_a),
+            ('MSFD8bExtractionFSAssesmentInd', data_ai),
+            # ('MSFD8bExtractionFishShellfishActivity', data_si),
+            # ('MSFD8bExtractionFishShellfishSumInfo2ImpactedElement', data_si),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bExtractionFishItemDisplay)
 class A81bExtractionFishAssessment(ItemDisplay):
     title = 'Asessment of extraction of fish and shellfish'
+
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
 
     def get_db_results(self):
         if self.context.item:
@@ -96,9 +124,7 @@ class A81bExtractionFishAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO
@@ -165,6 +191,8 @@ class A81bExtractionSeaweedSubForm(MarineUnitIDSelectForm):
 class A81bExtractionSeaweedAssessment(ItemDisplay):
     title = 'Asessment of extraction of seaweed, maerl and other'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -184,9 +212,8 @@ class A81bExtractionSeaweedAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
+
 
 # TODO
 # MSFD8bExtractionSeaweedMaerlOtherActivity is not directly related to
@@ -252,6 +279,8 @@ class A81bHazardousSubForm(MarineUnitIDSelectForm):
 class A81bHazardousAssessment(ItemDisplay):
     title = 'Asessment of hazardous substances'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -271,9 +300,8 @@ class A81bHazardousAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
+
 
 #  TODO
 # MSFD8bHazardousSubstancesActivity is not directly related to
@@ -339,6 +367,8 @@ class A81bHydroSubForm(MarineUnitIDSelectForm):
 class A81bHydroAssessment(ItemDisplay):
     title = 'Asessment of hydrological processes'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -358,9 +388,8 @@ class A81bHydroAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
+
 
 #  TODO
 # MSFD8bHydrologicalProcessesActivity is not directly related to
@@ -426,6 +455,8 @@ class A81bMarineLitterSubForm(MarineUnitIDSelectForm):
 class A81bMarineLitterAssessment(ItemDisplay):
     title = 'Asessment of marine litter'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -445,9 +476,8 @@ class A81bMarineLitterAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
+
 
 #  TODO
 # MSFD8bLitterActivity is not directly related to
@@ -512,6 +542,8 @@ class A81bMicrobialSubForm(MarineUnitIDSelectForm):
 class A81bMicrobialAssessment(ItemDisplay):
     title = 'Asessment of microbial pathogens'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -531,9 +563,7 @@ class A81bMicrobialAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO
@@ -601,6 +631,8 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
 class A81bNonIndigenousAssessment(ItemDisplay):
     title = 'Asessment of non-indigenous species'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -620,9 +652,7 @@ class A81bNonIndigenousAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
@@ -688,6 +718,8 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
 class A81bNoiseAssessment(ItemDisplay):
     title = 'Asessment of underwater noise'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -707,9 +739,7 @@ class A81bNoiseAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
@@ -772,6 +802,8 @@ class A81bNutrientSubForm(MarineUnitIDSelectForm):
 class A81bNutrientAssessment(ItemDisplay):
     title = 'Asessment of nutrients'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -791,9 +823,7 @@ class A81bNutrientAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
@@ -856,6 +886,8 @@ class A81bPhysicalDamageSubForm(MarineUnitIDSelectForm):
 class A81bPhysicalDamageAssessment(ItemDisplay):
     title = 'Asessment of physical damage'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -875,9 +907,7 @@ class A81bPhysicalDamageAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
@@ -940,6 +970,8 @@ class A81bPhysicalLosSubForm(MarineUnitIDSelectForm):
 class A81bPhysicalLosAssessment(ItemDisplay):
     title = 'Asessment of physical loss'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -959,9 +991,7 @@ class A81bPhysicalLosAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT
@@ -1024,6 +1054,8 @@ class A81bPollutantEventSubForm(MarineUnitIDSelectForm):
 class A81bPollutantEventAssessment(ItemDisplay):
     title = 'Asessment of pollutant events'
 
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+
     def get_db_results(self):
         if self.context.item:
             return db.get_related_record(
@@ -1043,9 +1075,7 @@ class A81bPollutantEventAssessment(ItemDisplay):
         )
         # ft = pivot_data(res, 'FeatureType')
 
-        return [
-            ('Assesment Indicator', {'Feature': item}),
-        ]
+        return 'Assesment Indicator', item
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT

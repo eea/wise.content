@@ -1,7 +1,8 @@
 <div tal:define="data view/get_extra_data" class="extra-details">
 
   <div tal:repeat="info data">
-    <tal:block tal:condition="python: len(data) > 1">
+    <tal:block tal:condition="python: len(info) > 1">
+
       <tal:section define="section python: info[1]; section_title python: info[0]">
 
         <div tal:repeat="section_label section">
