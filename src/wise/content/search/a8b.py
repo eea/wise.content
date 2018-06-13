@@ -99,7 +99,6 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
                 klass_join.Description,
                 klass_join.Limitations,
                 klass_join.MSFD8b_ExtractionFishShellfish
-
             ],
             klass_join,
             klass_join.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
@@ -206,10 +205,59 @@ class A81bExtractionSeaweedSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_ExtractionSeaweedMaerlOther_ID for row in data]
+        mc_a = sql.MSFD8bExtractionSeaweedMaerlOtherAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_ExtractionSeaweedMaerlOther.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_ExtractionSeaweedMaerlOther_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bExtractionSeaweedMaerlOtherAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_ExtractionSeaweedMaerlOther_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bExtractionSeaweedMaerlOtherActivity
+        klass_join = sql.MSFD8bExtractionSeaweedMaerlOtherActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_ExtractionSeaweedMaerlOther_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_ExtractionSeaweedMaerlOther_ActivityDescription,
+                klass_join.MSFD8b_ExtractionSeaweedMaerlOther_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.ExtractionType,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_ExtractionSeaweedMaerlOther
+            ],
+            klass_join,
+            klass_join.MSFD8b_ExtractionSeaweedMaerlOther.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bExtractionSeaweedMaerlOtherSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_ExtractionSeaweedMaerlOther.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bExtrSeaweedMaerlOther', data),
+            ('MSFD8bExtrSeaweedAssesment', data_a),
+            ('MSFD8bExtrSeaweedAssesIndicator', data_ai),
+            ('MSFD8bExtrSeaweedActivity', data_ac),
+            ('MSFD8bExtrSeaweedMaerlOtherSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bExtractionSeaweedItemDisplay)
@@ -297,7 +345,55 @@ class A81bHazardousSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_HazardousSubstances_ID for row in data]
+        mc_a = sql.MSFD8bHazardousSubstancesAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_HazardousSubstances.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_HazardousSubstances_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bHazardousSubstancesAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_HazardousSubstances_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bHazardousSubstancesActivity
+        klass_join = sql.MSFD8bHazardousSubstancesActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_HazardousSubstances_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_HazardousSubstances_ActivityDescription,
+                klass_join.MSFD8b_HazardousSubstances_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.HazardousSubstancesGroup,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_HazardousSubstances
+            ],
+            klass_join,
+            klass_join.MSFD8b_HazardousSubstances.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bHazardousSubstancesSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_HazardousSubstances.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bHazardSubstance', data),
+            ('MSFD8bHazardSubstancesAssesment', data_a),
+            ('MSFD8bHazardSubstAssesIndicator', data_ai),
+            ('MSFD8bHazardSubstancesActivity', data_ac),
+            ('MSFD8bHazardSubstancesSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bHazardousItemDisplay)
@@ -385,7 +481,54 @@ class A81bHydroSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_HydrologicalProcesses_ID for row in data]
+        mc_a = sql.MSFD8bHydrologicalProcessesAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_HydrologicalProcesses.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_HydrologicalProcesses_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bHydrologicalProcessesAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_HydrologicalProcesses_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bHydrologicalProcessesActivity
+        klass_join = sql.MSFD8bHydrologicalProcessesActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_HydrologicalProcesses_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_HydrologicalProcesses_ActivityDescription,
+                klass_join.MSFD8b_HydrologicalProcesses_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_HydrologicalProcesses
+            ],
+            klass_join,
+            klass_join.MSFD8b_HydrologicalProcesses.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bHydrologicalProcessesSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_HydrologicalProcesses.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bHydrologicalProcess', data),
+            ('MSFD8bHydroProcAssesment', data_a),
+            ('MSFD8bHydroProcAssesIndicator', data_ai),
+            ('MSFD8bHydroProcActivity', data_ac),
+            ('MSFD8bHydroProcSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bHydroItemDisplay)
@@ -473,7 +616,54 @@ class A81bMarineLitterSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_Litter_ID for row in data]
+        mc_a = sql.MSFD8bLitterAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_Litter.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_Litter_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bLitterAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_Litter_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bLitterActivity
+        klass_join = sql.MSFD8bLitterActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_Litter_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_Litter_ActivityDescription,
+                klass_join.MSFD8b_Litter_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_Litter
+            ],
+            klass_join,
+            klass_join.MSFD8b_Litter.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bLitterSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_Litter.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bLitter', data),
+            ('MSFD8bLitterAssesment', data_a),
+            ('MSFD8bLitterAssesIndicator', data_ai),
+            ('MSFD8bLitterActivity', data_ac),
+            ('MSFD8bLitterSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bMarineLitterItemDisplay)
@@ -560,7 +750,55 @@ class A81bMicrobialSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_MicrobialPathogens_ID for row in data]
+        mc_a = sql.MSFD8bMicrobialPathogensAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_MicrobialPathogens.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_MicrobialPathogens_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bMicrobialPathogensAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_MicrobialPathogens_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bMicrobialPathogensActivity
+        klass_join = sql.MSFD8bMicrobialPathogensActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_MicrobialPathogens_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_MicrobialPathogens_ActivityDescription,
+                klass_join.MSFD8b_MicrobialPathogens_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_MicrobialPathogens
+            ],
+            klass_join,
+            klass_join.MSFD8b_MicrobialPathogens.in_(base_ids)
+        )
+
+        # TODO missing table MSFD8bMicrobialPathogenSumInfo2ImpactedElement
+        # mc_sum = sql.MSFD8bMicrobialPathogenSumInfo2ImpactedElement
+        # count, data_sum = db.get_all_records(
+        #     mc_sum,
+        #     mc_sum.MSFD8b_MicrobialPathogens.in_(base_ids)
+        # )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bMicrobialPathogen', data),
+            ('MSFD8bMicroPathAssesment', data_a),
+            ('MSFD8bMicroPathAssesIndicator', data_ai),
+            ('MSFD8bMicroPathActivity', data_ac),
+            # ('MSFD8bMicroPathSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bMicrobialItemDisplay)
@@ -649,7 +887,54 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_NIS_ID for row in data]
+        mc_a = sql.MSFD8bNISAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_NIS.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_NIS_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bNISAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_NIS_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bNISActivity
+        klass_join = sql.MSFD8bNISActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_NIS_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_NIS_ActivityDescription,
+                klass_join.MSFD8b_NIS_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_NIS
+            ],
+            klass_join,
+            klass_join.MSFD8b_NIS.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bNISSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_NIS.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bNI', data),
+            ('MSFD8bNISAssesment', data_a),
+            ('MSFD8bNISAssesmentIndicator', data_ai),
+            ('MSFD8bNISActivity', data_ac),
+            ('MSFD8bNISSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bNonIndigenousItemDisplay)
@@ -736,7 +1021,54 @@ class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_Noise_ID for row in data]
+        mc_a = sql.MSFD8bNoiseAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_Noise.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_Noise_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bNoiseAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_Noise_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bNoiseActivity
+        klass_join = sql.MSFD8bNoiseActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_Noise_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_Noise_ActivityDescription,
+                klass_join.MSFD8b_Noise_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_Noise
+            ],
+            klass_join,
+            klass_join.MSFD8b_Noise.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bNoiseSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_Noise.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bNoise', data),
+            ('MSFD8bNoiseAssesment', data_a),
+            ('MSFD8bNoiseAssesIndicator', data_ai),
+            ('MSFD8bNoiseActivity', data_ac),
+            ('MSFD8bNoiseSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bNoiseItemDisplay)
@@ -812,7 +1144,7 @@ class A81bNutrientSubForm(MarineUnitIDSelectForm):
     mapper_class = sql.MSFD8bNutrient
 
     def get_subform(self):
-        return A81bNoiseItemDisplay(self, self.request)
+        return A81bNutrientItemDisplay(self, self.request)
 
     def download_results(self):
         muids = self.get_marine_unit_ids()
@@ -820,7 +1152,54 @@ class A81bNutrientSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_Nutrients_ID for row in data]
+        mc_a = sql.MSFD8bNutrientsAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_Nutrients.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_Nutrients_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bNutrientsAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_Nutrients_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bNutrientsActivity
+        klass_join = sql.MSFD8bNutrientsActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_Nutrients_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_Nutrients_ActivityDescription,
+                klass_join.MSFD8b_Nutrients_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_Nutrients
+            ],
+            klass_join,
+            klass_join.MSFD8b_Nutrients.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bNutrientsSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_Nutrients.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bNutrient', data),
+            ('MSFD8bNutrientsAssesment', data_a),
+            ('MSFD8bNutriAssesIndicator', data_ai),
+            ('MSFD8bNutrientsActivity', data_ac),
+            ('MSFD8bNutrientsSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bNutrientItemDisplay)
@@ -860,7 +1239,7 @@ class A81bNutrientActivities(ItemDisplay):
         if self.context.item:
             return db.get_related_record_join(
                 sql.MSFD8bNutrientsActivity,
-                sql.MSFD8b_Nutrients_ActivityDescription,
+                sql.MSFD8bNutrientsActivityDescription,
                 'MSFD8b_Nutrients',
                 self.context.item.MSFD8b_Nutrients_ID
             )
