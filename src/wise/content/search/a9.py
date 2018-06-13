@@ -20,10 +20,24 @@ class A9Form(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        descriptor_ids = [row.MSFD9_Descriptor_ID for row in data]
+
+        t_features = sql.t_MSFD9_Features
+        count, data_f = get_all_records(
+            t_features,
+            t_features.c.MSFD9_Descriptor.in_(descriptor_ids)
+        )
+
+        xlsdata = [
+            ('MSFD9Descriptor', data),
+            ('MSFD9_Features', data_f),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A9ItemDisplay(ItemDisplayForm):

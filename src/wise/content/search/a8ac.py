@@ -495,6 +495,35 @@ class A81cEconomicItemDisplay(MultiItemDisplayForm):
 
     # TODO: need to filter on topic
 
+    def download_results(self):
+        muids = self.get_marine_unit_ids()
+
+        count, data = db.get_all_records(
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
+        )
+
+        uses_ids = [row.MSFD8c_Uses_ID for row in data]
+
+        mc_pressure = sql.MSFD8cPressure
+        count, data_p = db.get_all_records(
+            mc_pressure,
+            mc_pressure.MSFD8c_Uses_ID.in_(uses_ids)
+        )
+
+        mc_depend = sql.MSFD8cDepend
+        count, data_d = db.get_all_records(
+            mc_depend,
+            mc_depend.MSFD8c_Uses_ID.in_(uses_ids)
+        )
+
+        xlsdata = [
+            ('MSFD8cUs', data),
+            ('MSFD8cPressure', data_p),
+            ('MSFD8cDepend', data_d),
+        ]
+
+        return data_to_xls(xlsdata)
 
 @register_form_section(A81cEconomicItemDisplay)
 class A81cEconomicPressures(ItemDisplay):
