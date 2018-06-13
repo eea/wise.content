@@ -86,14 +86,39 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
             mc_ai.MSFD8b_ExtractionFishShellfish_Assesment.in_(assesment_ids)
         )
 
+        mc_ac = sql.MSFD8bExtractionFishShellfishActivity
+        klass_join = sql.MSFD8bExtractionFishShellfishActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_ExtractionFishShellfish_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_ExtractionFishShellfish_ActivityDescription,
+                klass_join.MSFD8b_ExtractionFishShellfish_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_ExtractionFishShellfish
+
+            ],
+            klass_join,
+            klass_join.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
+        )
+
+        mc_sum = sql.MSFD8bExtractionFishShellfishSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
+        )
+
 
         xlsdata = [
             # worksheet title, row data
             ('MSFD8bExtractionFS', data),
             ('MSFD8bExtractionFSAssesment', data_a),
             ('MSFD8bExtractionFSAssesmentInd', data_ai),
-            # ('MSFD8bExtractionFishShellfishActivity', data_si),
-            # ('MSFD8bExtractionFishShellfishSumInfo2ImpactedElement', data_si),
+            ('MSFD8bExtractionFSActivity', data_ac),
+            ('MSFD8bExtractionFSSumInfo', data_sum),
         ]
 
         return data_to_xls(xlsdata)
