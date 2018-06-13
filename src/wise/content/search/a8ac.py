@@ -60,10 +60,39 @@ class A81aEcoSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        eco_ids = [row.MSFD8a_Ecosystem_ID for row in data]
+        mc_pi = sql.MSFD8aEcosystemPressuresImpact
+        count, data_pi = db.get_all_records(
+            mc_pi,
+            mc_pi.MSFD8a_Ecosystem.in_(eco_ids)
+        )
+
+        mc_sa = sql.MSFD8aEcosystemStatusAssessment
+        count, data_sa = db.get_all_records(
+            mc_sa,
+            mc_sa.MSFD8a_Ecosystem.in_(eco_ids)
+        )
+
+        eco_sa_ids = [row.MSFD8a_Ecosystem_StatusAssessment_ID for row in data_sa]
+        mc_si = sql.MSFD8aEcosystemStatusIndicator
+        count, data_si = db.get_all_records(
+            mc_si,
+            mc_si.MSFD8a_Ecosystem_StatusAssessment.in_(eco_sa_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aEcosystem', data),
+            ('MSFD8aEcosystemPressuresImpact', data_pi),
+            ('MSFD8aEcosysStatusAssessment', data_sa),
+            ('MSFD8aEcosystemStatusIndicator', data_si),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A81aEcoItemDisplay(MultiItemDisplayForm):
@@ -130,10 +159,40 @@ class A81aFunctSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        funct_ids = [row.MSFD8a_Functional_ID for row in data]
+        mc_pi = sql.MSFD8aFunctionalPressuresImpact
+        count, data_pi = db.get_all_records(
+            mc_pi,
+            mc_pi.MSFD8a_Functional.in_(funct_ids)
+        )
+
+        mc_sa = sql.MSFD8aFunctionalStatusAssessment
+        count, data_sa = db.get_all_records(
+            mc_sa,
+            mc_sa.MSFD8a_Functional.in_(funct_ids)
+        )
+
+        funct_sa_ids = [row.MSFD8a_Functional_StatusAssessment_ID for row in data_sa]
+        mc_si = sql.MSFD8aFunctionalStatusIndicator
+        count, data_si = db.get_all_records(
+            mc_si,
+            mc_si.MSFD8a_Functional_StatusAssessment.in_(funct_sa_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aFunctional', data),
+            ('MSFD8aFunctionalPressuresImpact', data_pi),
+            ('MSFD8aFunctStatusAssessment', data_sa),
+            ('MSFD8aFunctionalStatusIndicator', data_si),
+        ]
+
+        return data_to_xls(xlsdata)
+
 
 
 class A81aFunctItemDisplay(MultiItemDisplayForm):
@@ -199,10 +258,39 @@ class A81aHabitatSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        habitat_ids = [row.MSFD8a_Habitat_ID for row in data]
+        mc_hpi = sql.MSFD8aHabitatPressuresImpact
+        count, data_hpi = db.get_all_records(
+            mc_hpi,
+            mc_hpi.MSFD8a_Habitat.in_(habitat_ids)
+        )
+
+        mc_hsa = sql.MSFD8aHabitatStatusAssessment
+        count, data_hsa = db.get_all_records(
+            mc_hsa,
+            mc_hsa.MSFD8a_Habitat.in_(habitat_ids)
+        )
+
+        habitat_sa_ids = [row.MSFD8a_Habitat_StatusAssessment_ID for row in data_hsa]
+        mc_hsi = sql.MSFD8aHabitatStatusIndicator
+        count, data_hsi = db.get_all_records(
+            mc_hsi,
+            mc_hsi.MSFD8a_Habitat_StatusAssessment.in_(habitat_sa_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aHabitat', data),
+            ('MSFD8aHabitatPressuresImpact', data_hpi),
+            ('MSFD8aHabitatStatusAssessment', data_hsa),
+            ('MSFD8aHabitatStatusIndicator', data_hsi),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A81aHabitatItemDisplay(MultiItemDisplayForm):
@@ -269,10 +357,39 @@ class A81aSpeciesSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        species_ids = [row.MSFD8a_Species_ID for row in data]
+        mc_spi = sql.MSFD8aSpeciesPressuresImpact
+        count, data_spi = db.get_all_records(
+            mc_spi,
+            mc_spi.MSFD8a_Species.in_(species_ids)
+        )
+
+        mc_ssa = sql.MSFD8aSpeciesStatusAssessment
+        count, data_ssa = db.get_all_records(
+            mc_ssa,
+            mc_ssa.MSFD8a_Species.in_(species_ids)
+        )
+
+        species_sa_ids = [row.MSFD8a_Species_StatusAssessment_ID for row in data_ssa]
+        mc_ssi = sql.MSFD8aSpeciesStatusIndicator
+        count, data_ssi = db.get_all_records(
+            mc_ssi,
+            mc_ssi.MSFD8a_Species_StatusAssessment.in_(species_sa_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aSpecy', data),
+            ('MSFD8aSpeciesPressuresImpact', data_spi),
+            ('MSFD8aSpeciesStatusAssessment', data_ssa),
+            ('MSFD8aSpeciesStatusIndicator', data_ssi),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A81aSpeciesItemDisplay(MultiItemDisplayForm):
@@ -336,13 +453,37 @@ class A81aOtherSubForm(MarineUnitIDSelectForm):
     def get_subform(self):
         return A81aOtherItemDisplay(self, self.request)
 
+    # TODO MSFD8aOtherPressuresImpact table is missing
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        other_ids = [row.MSFD8a_Other_ID for row in data]
+        mc_other_sa = sql.MSFD8aOtherStatusAssessment
+        count, data_other_sa = db.get_all_records(
+            mc_other_sa,
+            mc_other_sa.MSFD8a_Other.in_(other_ids)
+        )
+
+        other_status_ids = [row.MSFD8a_Other_StatusAssessment_ID for row in data_other_sa]
+        mc_other_si = sql.MSFD8aOtherStatusIndicator
+        count, data_other_si = db.get_all_records(
+            mc_other_si,
+            mc_other_si.MSFD8a_Other_StatusAssessment.in_(other_status_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aOther', data),
+            ('MSFD8aOtherStatusAssessment', data_other_sa),
+            ('MSFD8aOtherStatusIndicator', data_other_si),
+        ]
+
+        return data_to_xls(xlsdata)
+
 
 
 class A81aOtherItemDisplay(MultiItemDisplayForm):
@@ -416,7 +557,12 @@ class A81aNisSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aNISInventory', data),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A81aNisItemDisplay(MultiItemDisplayForm):
@@ -450,10 +596,16 @@ class A81aPhysicalSubForm(MarineUnitIDSelectForm):
     def download_results(self):
         muids = self.get_marine_unit_ids()
         count, data = db.get_all_records(
-            self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
+            self.mapper_class,
+            self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8aPhysical', data),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 class A81aPhysicalItemDisplay(MultiItemDisplayForm):
