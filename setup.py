@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer for the wise.content package."""
 
-from setuptools import find_packages
-from setuptools import setup
-
+from setuptools import find_packages, setup
 
 long_description = '\n\n'.join([
     open('README.rst').read(),
@@ -41,6 +39,11 @@ setup(
         'plone.api',
         'plone.app.contenttypes',
         'python-redmine',
+
+        'zope.sqlalchemy',
+        'pymssql',
+        'xlsxwriter',
+        # 'pyodbc',
     ],
     extras_require={
         'test': [

@@ -1,0 +1,31 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
+  xmlns:z3c="http://namespaces.zope.org/z3c"
+  i18n_domain="wise.content">
+
+  <include file="utility.zcml" />
+
+  <browser:page
+    for="*"
+    name="msfd-c1"
+    class=".main.StartArticle8910View"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    for="*"
+    name="msfd-c2"
+    class=".main.StartArticle11View"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    for="*"
+    name="msfd-c3"
+    class=".main.StartArticle1314View"
+    permission="zope2.View"
+    />
+
+</configure>
