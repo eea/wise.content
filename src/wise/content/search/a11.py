@@ -3,7 +3,7 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
+from .base import EmbededForm, ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     default_value_from_field, pivot_data, register_form_art11,
                     register_form_section)
@@ -57,11 +57,35 @@ class StartArticle11Form(MainForm):
         )
 
 
+
 @register_form_art11
-class A11MonitoringProgrammeForm(ItemDisplayForm):
-    """
-    """
+class A11MonitoringProgrammeForm(EmbededForm):
     title = "Monitoring Programmes"
+
+    fields = Fields(interfaces.IMonitoringProgramme)
+    fields['country'].widgetFactory = CheckBoxFieldWidget
+    fields['region'].widgetFactory = CheckBoxFieldWidget
+    fields['marine_unit_id'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A11MonProgDisplay(self, self.request)
+
+    def get_subform_data(self):
+        return self.fields
+
+    def default_country(self):
+        return all_values_from_field(self, self.fields['country'])
+
+    def default_region(self):
+        return all_values_from_field(self, self.fields['region'])
+
+    def default_marine_unit_id(self):
+        return all_values_from_field(self, self.fields['marine_unit_id'])
+
+
+class A11MonProgDisplay(ItemDisplayForm):
+    title = "Monitoring Programmes display"
+
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     mapper_class = sql.MSFD11MonitoringProgramme
     order_field = 'ID'
@@ -91,7 +115,7 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
                 mapper_class_mpmid.ID,
                 mapper_class_mpmid.MonitoringProgramme,
                 sql.MSFD11MarineUnitID.MarineUnitID
-             ],
+            ],
             sql.MSFD11MarineUnitID,
             mapper_class_mpmid.MonitoringProgramme.in_(mp_ids)
         )
@@ -113,9 +137,12 @@ class A11MonitoringProgrammeForm(ItemDisplayForm):
         return data_to_xls(xlsdata)
 
     def get_db_results(self):
+
+        # import pdb; pdb.set_trace()
+
         page = self.get_page()
         klass_join = sql.MSFD11MP
-        needed_ID = self.context.get_mp_type_ids()
+        needed_ID = self.context.context.get_mp_type_ids()
 
         if needed_ID:
             return db.get_item_by_conditions_joined(

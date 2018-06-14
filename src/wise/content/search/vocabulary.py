@@ -1,9 +1,11 @@
 import csv
 import logging
+import json
 
 from lxml.etree import parse
 from pkg_resources import resource_filename
 from sqlalchemy.sql.schema import Table
+from sqlalchemy import and_
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -209,6 +211,145 @@ def monitoring_programme_info_types(context):
     vocab = SimpleVocabulary(terms)
 
     return vocab
+
+
+@provider(IVocabularyFactory)
+def art11_country(context):
+    if not hasattr(context, 'subform'):
+        mp_type_ids = context.context.get_mp_type_ids()
+    else:
+        mp_type_ids = context.get_mp_type_ids()
+
+    mon_ids = db.get_unique_from_mapper(
+        sql.MSFD11MP,
+        'MON',
+        sql.MSFD11MP.MPType.in_(mp_type_ids)
+    )
+
+    res = db.get_unique_from_mapper(
+        sql.MSFD11MON,
+        'MemberState',
+        sql.MSFD11MON.ID.in_(mon_ids)
+    )
+    res = [x.strip() for x in res]
+
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    # import pdb; pdb.set_trace()
+
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def art11_region(context):
+    if not hasattr(context, 'subform'):
+        json_str = json.loads(context.json())
+        mp_type_ids = context.context.get_mp_type_ids()
+    else:
+        json_str = json.loads(context.subform.json())
+        mp_type_ids = context.get_mp_type_ids()
+    countries_form_data = [field['options'] for field in json_str['fields'] if field['label'] == 'Country']
+    countries = [country['value'] for country in countries_form_data[0] if country['checked']]
+
+    mon_ids = db.get_unique_from_mapper(
+        sql.MSFD11MP,
+        'MON',
+        sql.MSFD11MP.MPType.in_(mp_type_ids)
+    )
+
+    if countries:
+        condition = and_(
+            sql.MSFD11MON.MemberState.in_(countries),
+            sql.MSFD11MON.ID.in_(mon_ids)
+        )
+    else:
+        condition = sql.MSFD11MON.ID.in_(mon_ids)
+
+    res = db.get_unique_from_mapper(
+        sql.MSFD11MON,
+        'Region',
+        condition
+    )
+    res = [x.strip() for x in res]
+
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+@provider(IVocabularyFactory)
+def art11_marine_unit_id(context):
+    if not hasattr(context, 'subform'):
+        json_str = json.loads(context.json())
+    else:
+        json_str = json.loads(context.subform.json())
+    countries_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Country'
+    ]
+    countries = [
+        country['value']
+        for country in countries_form_data[0]
+        if country['checked']
+    ]
+    regions_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Region'
+    ]
+    regions = [
+        region['value']
+        for region in regions_form_data[0]
+        if region['checked']
+    ]
+
+    if countries and regions:
+        mon_ids = db.get_unique_from_mapper(
+            sql.MSFD11MON,
+            'ID',
+            and_(sql.MSFD11MON.MemberState.in_(countries),
+                 sql.MSFD11MON.Region.in_(regions))
+
+        )
+    elif countries:
+        mon_ids = db.get_unique_from_mapper(
+            sql.MSFD11MON,
+            'ID',
+            sql.MSFD11MON.MemberState.in_(countries)
+        )
+    else:
+        mon_ids = db.get_unique_from_mapper(
+            sql.MSFD11MON,
+            'ID'
+        )
+
+    mon_ids = [str(x).strip() for x in mon_ids]
+
+    mon_prog_ids = db.get_unique_from_mapper(
+        sql.MSFD11MP,
+        'MonitoringProgramme',
+        sql.MSFD11MP.MON.in_(mon_ids)
+    )
+    mon_prog_ids = [x.strip() for x in mon_prog_ids]
+
+    count, marine_units = db.get_all_records_outerjoin(
+        sql.MSFD11MarineUnitID,
+        sql.MSFD11MonitoringProgrammeMarineUnitID,
+        sql.MSFD11MonitoringProgrammeMarineUnitID.MonitoringProgramme.in_(mon_prog_ids)
+    )
+
+    terms = [SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID) for x in marine_units]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    # import pdb; pdb.set_trace()
+
+    return vocab
+
 
 
 def marine_unit_id_vocab(ids):

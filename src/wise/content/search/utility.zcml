@@ -36,6 +36,21 @@
     />
 
   <utility
+    component=".vocabulary.art11_country"
+    name="wise_search_art11_country"
+    />
+
+  <utility
+    component=".vocabulary.art11_region"
+    name="wise_search_art11_region"
+    />
+
+  <utility
+    component=".vocabulary.art11_marine_unit_id"
+    name="wise_search_art11_marine_unit_id"
+    />
+
+  <utility
     component=".vocabulary.a1314_report_types"
     name="wise_search_a1314_report_types"
     />

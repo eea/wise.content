@@ -88,6 +88,25 @@ class IStartArticle11(Interface):
         required=False
     )
 
+class IMonitoringProgramme(Interface):
+    country = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country"),
+        required=False
+    )
+
+    region = List(
+        title=u"Region",
+        value_type=Choice(vocabulary="wise_search_art11_region"),
+        required=False
+    )
+
+    marine_unit_id = List(
+        title=u"Marine Unit IDs",
+        value_type=Choice(vocabulary="wise_search_art11_marine_unit_id"),
+        required=False
+    )
+
 
 # TODO nod used, delete this later
 class I11Subprogrammes(Interface):
