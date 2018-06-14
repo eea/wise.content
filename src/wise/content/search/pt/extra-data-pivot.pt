@@ -21,7 +21,7 @@
       </tal:block>
     </ul>
 
-    <div tal:attributes="class string:tab-content;id string:tabContents2">
+    <div tal:attributes="class string:tab-content;"  id="tabContents2">
       <tal:block tal:repeat="section_label section"
            tal:define="istab python: 'tab-pane fade' if( len(info[1]) > 1) else ''" >
       <div
