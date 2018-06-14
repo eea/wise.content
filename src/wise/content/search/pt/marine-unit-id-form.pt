@@ -26,7 +26,7 @@
       </div>
     </tal:widgets>
 
-    <div style="margin-top: 2rem; margin-bottom:2rem; height: 3rem;">
+    <div style="margin-top: 2rem; margin-bottom:2rem; height: 3rem;clear: both;">
       <span id="form-buttons-prev-top"></span>
       <span id="form-buttons-next-top"></span>
     </div>
