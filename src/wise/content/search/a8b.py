@@ -1283,7 +1283,54 @@ class A81bPhysicalDamageSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_PhysicalDamage_ID for row in data]
+        mc_a = sql.MSFD8bPhysicalDamageAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_PhysicalDamage.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_PhysicalDamage_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bPhysicalDamageAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_PhysicalDamage_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bPhysicalDamageActivity
+        klass_join = sql.MSFD8bPhysicalDamageActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_PhysicalDamage_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_PhysicalDamage_ActivityDescription,
+                klass_join.MSFD8b_PhysicalDamage_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_PhysicalDamage
+            ],
+            klass_join,
+            klass_join.MSFD8b_PhysicalDamage.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bPhysicalDamageSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_PhysicalDamage.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bPhysicalDamage', data),
+            ('MSFD8bPhysicalDamageAssesment', data_a),
+            ('MSFD8bPhysicalAssesIndicator', data_ai),
+            ('MSFD8bPhysicalDamageActivity', data_ac),
+            ('MSFD8bPhysicalDamageSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bPhysicalDamageItemDisplay)
@@ -1367,7 +1414,54 @@ class A81bPhysicalLosSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_PhysicalLoss_ID for row in data]
+        mc_a = sql.MSFD8bPhysicalLossAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_PhysicalLoss.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_PhysicalLoss_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bPhysicalLossAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_PhysicalLoss_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bPhysicalLossActivity
+        klass_join = sql.MSFD8bPhysicalLossActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_PhysicalLoss_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_PhysicalLoss_ActivityDescription,
+                klass_join.MSFD8b_PhysicalLoss_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_PhysicalLoss
+            ],
+            klass_join,
+            klass_join.MSFD8b_PhysicalLoss.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bPhysicalLossSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_PhysicalLoss.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bPhysicalLos', data),
+            ('MSFD8bPhysicalLossAssesment', data_a),
+            ('MSFD8bPhysLossAssesIndicator', data_ai),
+            ('MSFD8bPhysicalLossActivity', data_ac),
+            ('MSFD8bPhysicalLossSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bPhysicalLosItemDisplay)
@@ -1451,7 +1545,54 @@ class A81bPollutantEventSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_PollutantEvents_ID for row in data]
+        mc_a = sql.MSFD8bPollutantEventsAssesment
+        count, data_a = db.get_all_records(
+            mc_a,
+            mc_a.MSFD8b_PollutantEvents.in_(base_ids)
+        )
+
+        assesment_ids = [row.MSFD8b_PollutantEvents_Assesment_ID for row in data_a]
+        mc_ai = sql.MSFD8bPollutantEventsAssesmentIndicator
+        count, data_ai = db.get_all_records(
+            mc_ai,
+            mc_ai.MSFD8b_PollutantEvents_Assesment.in_(assesment_ids)
+        )
+
+        mc_ac = sql.MSFD8bPollutantEventsActivity
+        klass_join = sql.MSFD8bPollutantEventsActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_PollutantEvents_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_PollutantEvents_ActivityDescription,
+                klass_join.MSFD8b_PollutantEvents_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_PollutantEvents
+            ],
+            klass_join,
+            klass_join.MSFD8b_PollutantEvents.in_(base_ids)
+        )
+
+        mc_sum = sql.MSFD8bPollutantEventsSumInfo2ImpactedElement
+        count, data_sum = db.get_all_records(
+            mc_sum,
+            mc_sum.MSFD8b_PollutantEvents.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bPollutantEvent', data),
+            ('MSFD8bPollutantEventsAssesment', data_a),
+            ('MSFD8bPolEventsAssesIndicator', data_ai),
+            ('MSFD8bPollutantEventsActivity', data_ac),
+            ('MSFD8bPollutantEventsSum', data_sum),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 @register_form_section(A81bPollutantEventItemDisplay)
@@ -1535,7 +1676,33 @@ class A81bAcidificationSubForm(MarineUnitIDSelectForm):
             self.mapper_class, self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        return data_to_xls(data)
+        base_ids = [row.MSFD8b_Acidification_ID for row in data]
+
+        mc_ac = sql.MSFD8bAcidificationActivity
+        klass_join = sql.MSFD8bAcidificationActivityDescription
+        count, data_ac = db.get_all_records_join(
+            [
+                mc_ac.MSFD8b_Acidification_Activity_ID,
+                mc_ac.Activity,
+                mc_ac.ActivityRank,
+                mc_ac.MSFD8b_Acidification_ActivityDescription,
+                klass_join.MSFD8b_Acidification_ActivityDescription_ID,
+                klass_join.MarineUnitID,
+                klass_join.Description,
+                klass_join.Limitations,
+                klass_join.MSFD8b_Acidification
+            ],
+            klass_join,
+            klass_join.MSFD8b_Acidification.in_(base_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('MSFD8bAcidification', data),
+            ('MSFD8bAcidificationActivity', data_ac),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 #  TODO CHECK IF IMPLEMENTATION IS CORRECT

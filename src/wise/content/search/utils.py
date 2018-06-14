@@ -143,6 +143,8 @@ def data_to_xls(data):
     workbook = xlsxwriter.Workbook(out, {'in_memory': True})
 
     for wtitle, wdata in data:
+        if wdata.count() == 0:
+            continue
         worksheet = workbook.add_worksheet(wtitle)
 
         row0 = wdata[0]
