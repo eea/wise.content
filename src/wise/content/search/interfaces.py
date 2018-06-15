@@ -88,6 +88,7 @@ class IStartArticle11(Interface):
         required=False
     )
 
+
 class IMonitoringProgramme(Interface):
     country = List(
         title=u"Country",
@@ -108,12 +109,16 @@ class IMonitoringProgramme(Interface):
     )
 
 
-# TODO nod used, delete this later
-class I11Subprogrammes(Interface):
-    monitoring_subprogramme_names = List(
-        title=u"Monitoring subprogramme names",
-        value_type=Choice(
-            vocabulary="wise_search_monitoring_subprogramme_names"),
+class IMonitoringSubprogramme(Interface):
+    country = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country_ms"),
+        required=False
+    )
+
+    region = List(
+        title=u"Region",
+        value_type=Choice(vocabulary="wise_search_art11_region_ms"),
         required=False
     )
 

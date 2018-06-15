@@ -41,8 +41,18 @@
     />
 
   <utility
+    component=".vocabulary.art11_country_ms"
+    name="wise_search_art11_country_ms"
+    />
+
+  <utility
     component=".vocabulary.art11_region"
     name="wise_search_art11_region"
+    />
+
+  <utility
+    component=".vocabulary.art11_region_ms"
+    name="wise_search_art11_region_ms"
     />
 
   <utility

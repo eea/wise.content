@@ -13,6 +13,7 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 from wise.content.search import db, sql
 
 from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
+from .a11 import ART11_GlOBALS
 
 
 def populate_labels():
@@ -237,7 +238,40 @@ def art11_country(context):
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
-    # import pdb; pdb.set_trace()
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def art11_country_ms(context):
+    if not hasattr(context, 'subform'):
+        mp_type_ids = context.context.get_mp_type_ids()
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.context.subform.get_mptypes_subprog)
+    else:
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.subform.get_mptypes_subprog)
+        mp_type_ids = context.get_mp_type_ids()
+
+    submonprog_ids = []
+    for x in mp_type_ids:
+        submonprog_ids.append(mptypes_subprog[int(x)])
+
+    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+
+    # import pdb;pdb.set_trace()
+
+    res = db.get_unique_from_mapper(
+        sql.MSFD11MONSub,
+        'MemberState',
+        sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+    )
+    res = [x.strip() for x in res]
+
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
 
     return vocab
 
@@ -280,12 +314,61 @@ def art11_region(context):
 
     return vocab
 
+
+@provider(IVocabularyFactory)
+def art11_region_ms(context):
+    if not hasattr(context, 'subform'):
+        json_str = json.loads(context.json())
+        mp_type_ids = context.context.get_mp_type_ids()
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.context.subform.get_mptypes_subprog)
+    else:
+        json_str = json.loads(context.subform.json())
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.subform.get_mptypes_subprog)
+        mp_type_ids = context.get_mp_type_ids()
+
+    countries_form_data = [field['options'] for field in json_str['fields'] if field['label'] == 'Country']
+    countries = [country['value'] for country in countries_form_data[0] if country['checked']]
+
+    submonprog_ids = []
+    for x in mp_type_ids:
+        submonprog_ids.append(mptypes_subprog[int(x)])
+
+    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+
+    if countries:
+        condition = and_(
+            sql.MSFD11MONSub.MemberState.in_(countries),
+            sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+        )
+    else:
+        condition = sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+
+    res = db.get_unique_from_mapper(
+        sql.MSFD11MONSub,
+        'Region',
+        condition
+    )
+    res = [x.strip() for x in res]
+
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
 @provider(IVocabularyFactory)
 def art11_marine_unit_id(context):
     if not hasattr(context, 'subform'):
         json_str = json.loads(context.json())
+        # mp_type_ids = context.context.get_mp_type_ids()
     else:
         json_str = json.loads(context.subform.json())
+        # mp_type_ids = context.get_mp_type_ids()
     countries_form_data = [
         field['options']
         for field in json_str['fields']
@@ -332,7 +415,9 @@ def art11_marine_unit_id(context):
     mon_prog_ids = db.get_unique_from_mapper(
         sql.MSFD11MP,
         'MonitoringProgramme',
-        sql.MSFD11MP.MON.in_(mon_ids)
+        and_(sql.MSFD11MP.MON.in_(mon_ids)
+             # ,sql.MSFD11MP.MPType.in_(mp_type_ids)
+             )
     )
     mon_prog_ids = [x.strip() for x in mon_prog_ids]
 
@@ -349,7 +434,6 @@ def art11_marine_unit_id(context):
     # import pdb; pdb.set_trace()
 
     return vocab
-
 
 
 def marine_unit_id_vocab(ids):

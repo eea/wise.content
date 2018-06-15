@@ -64,7 +64,7 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
         .distinct()\
         .order_by(col)
 
-    return [str(x[0]).strip() for x in res]
+    return [unicode(x[0]).strip() for x in res]
 
 
 def get_unique_from_mapper_join(
