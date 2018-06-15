@@ -7,8 +7,8 @@
       section python: info[1];
       istab python: 'tab-pane fade' if(len(section) > 1) else ''
       ">
-      <h4 >
 
+      <h4>
         <span tal:content="section_title">Section title</span>
         <select>
           <tal:block tal:repeat="tab_title section">
@@ -22,7 +22,6 @@
           </option>
           </tal:block>
         </select>
-
       </h4>
 
       <div class="deactivated-tabs-wrapper" >
