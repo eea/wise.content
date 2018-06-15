@@ -10,7 +10,7 @@ class A10Form(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 10 form
     """
 
-    title = 'Article 10 (Targets)'
+    record_title = title = 'Article 10 (Targets)'
     mapper_class = sql.MSFD10Target
 
     def get_subform(self):

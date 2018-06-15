@@ -6,14 +6,8 @@
   <metal:block use-macro="context/@@ploneform-macros/fields" />
 
   <tal:block tal:condition="python: view.item ">
-    <tal:block tal:condition="python: view.item_title(view.item)">
-      <h3 tal:define="info python: view.item_title(view.item)">
-        <!-- Record: -->
-         <span tal:replace="python: info[0]">Class</span>
-         <!-- # -->
-         <!-- <span tal:replace="python: info[1]">10</span> -->
-      </h3>
-    </tal:block>
+  <h3 tal:content="view/get_record_title">Article title here</h3>
+  Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
   </tal:block>
 
   <div tal:content="structure view/data_template | nothing"></div>
@@ -51,7 +45,7 @@
 
       <span style="width: 35%; display: inline-block; height: 40px; text-align: center; position: absolute; ">
         <span style=" position: relative; height: 40px; top: 25%;" >
-          Page <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
+          Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
         </span>
       </span>
 

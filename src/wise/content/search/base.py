@@ -108,6 +108,14 @@ class BaseUtil(object):
 
         return context
 
+    def get_record_title(self):
+        context = self
+
+        while not hasattr(context, 'record_title'):
+            context = context.context
+
+        return context.record_title
+
 
 class MainForm(Form):
     """ The main forms need to inherit from this clas
@@ -123,9 +131,9 @@ class MainForm(Form):
     # method = 'get'
 
     main_forms = (
-        ('msfd-c1', ('Article 8, 9 & 10', '2012 reporting exercise')),
+        ('msfd-c1', ('Articles 8, 9 & 10', '2012 reporting exercise')),
         ('msfd-c2', ('Article 11', '2014 reporting exercise')),
-        ('msfd-c3', ('Article 13 & 14', '2015 reporting exercise')),
+        ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
     )
 
     @buttonAndHandler(u'Apply filters', name='continue')
@@ -414,15 +422,16 @@ class ItemDisplayForm(EmbededForm):
 
         return res
 
-    def item_title(self, item):
-        state = inspect(item)
-
-        if state.identity:
-            id = state.identity[0]
-        else:
-            id = 0
-
-        return (item.__class__.__name__, id)
+    # def item_title(self, item):
+    #     import pdb; pdb.set_trace()
+    #     state = inspect(item)
+    #
+    #     if state.identity:
+    #         id = state.identity[0]
+    #     else:
+    #         id = 0
+    #
+    #     return (item.__class__.__name__, id)
 
 
 class MultiItemDisplayForm(ItemDisplayForm):

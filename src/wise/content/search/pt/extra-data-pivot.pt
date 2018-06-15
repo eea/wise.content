@@ -7,30 +7,31 @@
       section python: info[1];
       istab python: 'tab-pane fade' if(len(section) > 1) else ''
       ">
-      <h4 tal:content="section_title">Section title</h4>
+      <h4 >
 
-      <div class="tabs-wrapper" >
-        <ul
-          class="nav nav-tabs"
-          role="tablist"
-          tal:condition="python: len(section) > 1" >
+        <span tal:content="section_title">Section title</span>
+        <select>
           <tal:block tal:repeat="tab_title section">
-            <li class="nav-item">
-              <a class="nav-link"
-                tal:define="utitle python: tab_title or section_title"
-                tal:attributes="
-                title utitle;
-                id python:view.title_as_id(utitle) + '-tab';
-                href python:'#' + view.title_as_id(utitle);
-                aria-controls python:utitle.replace(' ', '_').lower()"
-                data-toggle="tab"
-                role="tab"
-                aria-selected="true"
-                tal:content="python: view.print_value(utitle)"
-                >Section title here</a>
-            </li>
+          <option
+           tal:define="utitle python: tab_title or section_title"
+           tal:attributes="title utitle;
+           value python:view.title_as_id(utitle);"
+           tal:content="python: view.print_value(utitle)"
+           >
+           Section title here
+          </option>
           </tal:block>
-        </ul>
+        </select>
+
+      </h4>
+
+      <div class="deactivated-tabs-wrapper" >
+
+        <!-- <ul -->
+        <!--   class="nav nav&#45;tabs" -->
+        <!--   role="tablist" -->
+        <!--   tal:condition="python: len(section) > 1" > -->
+        <!-- </ul> -->
 
         <div class="tab-content">
           <tal:sec tal:repeat="tab_title section">

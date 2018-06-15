@@ -11,7 +11,7 @@ class A9Form(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 9 form
     """
 
-    title = 'Article 9 (GES determination)'
+    record_title = title = 'Article 9 (GES determination)'
     mapper_class = sql.MSFD9Descriptor
 
     def get_subform(self):

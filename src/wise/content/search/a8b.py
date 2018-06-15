@@ -1,6 +1,6 @@
 from zope.schema import Choice
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 from z3c.form.field import Fields
 
@@ -18,7 +18,7 @@ class A81bForm(EmbededForm):
     Allows selecting between Extraction of fish, seaweed, etc
     """
 
-    title = 'Article 8.1b (Analysis of pressure impacts)'
+    record_title = title = 'Article 8.1b (Analysis of pressure impacts)'
 
     @property
     def fields(self):
@@ -72,7 +72,8 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
             self.mapper_class.MarineUnitID.in_(muids)
         )
 
-        extraction_ids = [row.MSFD8b_ExtractionFishShellfish_ID for row in data]
+        extraction_ids = [row.MSFD8b_ExtractionFishShellfish_ID
+                          for row in data]
         mc_a = sql.MSFD8bExtractionFishShellfishAssesment
         count, data_a = db.get_all_records(
             mc_a,

@@ -16,6 +16,7 @@ class StartArticle1314Form(MainForm):
     """
     fields = Fields(interfaces.IStartArticles1314)
     name = 'msfd-c3'
+    record_title = 'Articles 13 & 14'
 
     def get_subform(self):
         return MarineUnitIDsForm(self, self.request)

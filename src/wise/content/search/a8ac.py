@@ -1,6 +1,6 @@
 from zope.schema import Choice
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 from z3c.form.field import Fields
 
@@ -18,7 +18,8 @@ class A81aForm(EmbededForm):
     Allows selecting between Ecosystem, Functional, etc
     """
 
-    title = 'Article 8.1a (Analysis of the environmental status)'
+    record_title = title = \
+        'Article 8.1a (Analysis of the environmental status)'
 
     @property
     def fields(self):
@@ -635,7 +636,8 @@ class A81cForm(MarineUnitIDSelectForm):
 
     Class for Article 8.1c Economic and social analysis
     """
-    title = 'Article 8.1c (Economic and social analysis)'
+
+    record_title = title = 'Article 8.1c (Economic and social analysis)'
     mapper_class = sql.MSFD8cUs
 
     def get_subform(self):

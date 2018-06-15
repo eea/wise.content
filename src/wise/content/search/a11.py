@@ -4,7 +4,8 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, ItemDisplay, ItemDisplayForm, MainForm, MultiItemDisplayForm
+from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
+                   MultiItemDisplayForm)
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     default_value_from_field, pivot_data, register_form_art11,
                     register_form_section)
@@ -14,6 +15,8 @@ ART11_GlOBALS = dict()
 class StartArticle11Form(MainForm):
     """
     """
+
+    record_title = 'Article 11'
     name = 'msfd-c2'
     fields = Fields(interfaces.IStartArticle11)
     fields['monitoring_programme_types'].widgetFactory = CheckBoxFieldWidget
@@ -57,7 +60,6 @@ class StartArticle11Form(MainForm):
         return default_value_from_field(
             self, self.fields['monitoring_programme_info_types']
         )
-
 
 
 @register_form_art11
