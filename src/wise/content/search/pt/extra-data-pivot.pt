@@ -12,7 +12,6 @@
       <div class="tabs-wrapper" >
         <ul
           class="nav nav-tabs"
-          id="tabs2"
           role="tablist"
           tal:condition="python: len(section) > 1" >
           <tal:block tal:repeat="tab_title section">
