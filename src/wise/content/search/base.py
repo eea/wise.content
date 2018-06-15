@@ -349,6 +349,7 @@ class ItemDisplayForm(EmbededForm):
 
     template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
+    extra_data = None
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
 
     mapper_class = None     # This will be used to retrieve the item
@@ -416,7 +417,12 @@ class ItemDisplayForm(EmbededForm):
     def item_title(self, item):
         state = inspect(item)
 
-        return (item.__class__.__name__, state.identity[0])
+        if state.identity:
+            id = state.identity[0]
+        else:
+            id = 0
+
+        return (item.__class__.__name__, id)
 
 
 class MultiItemDisplayForm(ItemDisplayForm):

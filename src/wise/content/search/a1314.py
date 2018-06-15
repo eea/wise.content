@@ -98,6 +98,7 @@ class A1314ItemDisplay(ItemDisplayForm):
     """ The implementation for the Article 9 (GES determination) form
     """
     extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
+    pivot_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     css_class = "left-side-form"
 
@@ -129,13 +130,18 @@ class A1314ItemDisplay(ItemDisplayForm):
         page = self.get_page()
         mc = self.mapper_class
 
-        res = db.get_item_by_conditions(
-            mc, self.order_field,
+        count, item, extra_data = db.get_collapsed_item(
+            mc,
+            self.order_field,
+            [{'InfoType': ['InfoText']}],
             mc.UniqueCode.in_(self.context.data.get('unique_codes', [])),
             page=page,
         )
+        # extra_data
+        print(extra_data)
+        self.extra_data = extra_data.items()
 
-        return res
+        return [count, item]
 
     def get_extra_data(self):
         if not self.item:
@@ -147,3 +153,8 @@ class A1314ItemDisplay(ItemDisplayForm):
         count, item = db.get_related_record(mc, 'ReportID', report_id)
 
         return ('Report info', item)
+
+    def extras(self):
+        html = self.pivot_template(extra_data=self.extra_data)
+
+        return self.extra_data_template() + html

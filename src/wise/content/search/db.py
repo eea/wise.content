@@ -3,9 +3,11 @@ import threading
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
 from wise.content.search import sql
+from wise.content.search.utils import pivot_data, pivot_query
 
 DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
 
@@ -117,6 +119,73 @@ def get_marine_unit_ids(**data):
     l = sorted([x[0] for x in query])
 
     return (query.count(), l)
+
+
+# def group(l, p):
+#     res = defaultdict(list)
+#
+#     for row in l:
+#         pass
+#
+#     return l
+
+
+def get_collapsed_item(mapper_class, order_field, collapses, *conditions,
+                       **kwargs):
+    """ Group items
+    """
+    page = kwargs.get('page', 0)
+    sess = session()
+
+    order_field = getattr(mapper_class, order_field)
+    cols = []
+    blacklist = []
+
+    for d in collapses:
+        for k, v in d.items():
+            blacklist.append(k)
+            blacklist.extend(v)
+
+    for name, var in vars(mapper_class).items():
+        if name in blacklist:
+            continue
+
+        if name.startswith('_'):
+            continue
+
+        if getattr(var, 'primary_key', False) is True:
+            continue
+
+        prop = var.property
+
+        if isinstance(prop, RelationshipProperty):
+            continue
+
+        cols.append(name)
+
+    mapped_cols = [getattr(mapper_class, n) for n in cols]
+    q = sess.query(*mapped_cols).filter(*conditions).distinct()
+    all_items = q.all()
+    total = len(all_items)
+    item_values = all_items[page]
+    print("Item values", item_values)
+    # import pdb; pdb.set_trace()
+    # item = q.offset(page).limit(1).first()
+    # total = q.count()
+
+    collapse_conditions = [mc == v for mc, v in zip(mapped_cols, item_values)]
+    item = mapper_class(**{c: v for c, v in zip(cols, item_values)})
+
+    extra_data = {}
+
+    for d in collapses:
+        for k, cs in d.items():
+            cols = [k] + cs
+            c_cols = [getattr(mapper_class, c) for c in cols]
+            q = sess.query(*c_cols).filter(*collapse_conditions)
+            extra_data[k] = pivot_query(q, k)
+
+    return [total, item, extra_data]
 
 
 def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
@@ -269,6 +338,5 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
 def get_all_records_join(columns, klass_join, *conditions):
     sess = session()
     q = sess.query(*columns).join(klass_join).filter(*conditions)
-
 
     return [q.count(), q]
