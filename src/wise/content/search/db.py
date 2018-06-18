@@ -9,33 +9,32 @@ from zope.sqlalchemy import register
 from wise.content.search import sql
 from wise.content.search.utils import pivot_query
 
-DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
+DB = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb/MarineDB')
+DB_2018 = os.environ.get('MSFDURI',
+                         'mssql+pymssql://SA:bla3311!@msdb/MSFD2018_test')
 
 threadlocals = threading.local()
 
 
-# def connection():
-#     if hasattr(threadlocals, 'connection'):
-#         return threadlocals.connection
-#
-#     session = _make_session()
-#     threadlocals.connection = session.connection()
-#
-#     return threadlocals.connection
-
-
 def session():
-    if hasattr(threadlocals, 'session'):
-        return threadlocals.session
+    session_name = getattr(threadlocals, 'session_name')
 
-    session = _make_session()
-    threadlocals.session = session
+    if hasattr(threadlocals, session_name):
+        return getattr(threadlocals, session_name)
+
+    if session_name == 'session':
+        dsn = DB
+    elif session_name == 'session_2018':
+        dsn = DB_2018
+
+    session = _make_session(dsn)
+    setattr(threadlocals, session_name, session)
 
     return session
 
 
-def _make_session():
-    engine = create_engine(DB)
+def _make_session(dsn):
+    engine = create_engine(dsn)
     Session = scoped_session(sessionmaker(bind=engine))
     register(Session, keep_session=True)
 
@@ -264,40 +263,6 @@ def get_marine_unit_id_names(marine_unit_ids):
     total = q.count()
 
     return [total, q]
-
-
-# def get_a10_feature_targets(target_id):
-#     """ Used in extra_data for A10
-#     """
-#     conn = connection()
-#     res = conn.execute(text("""
-# SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
-# FROM MarineDB.dbo.MSFD10_FeaturesPressures
-# WHERE MSFD10_Target = :target_id
-# """), target_id=target_id)
-#
-#     items = []
-#
-#     for item in res:
-#         items.append(item)
-#
-#     return sorted(items)
-#
-#
-# def get_a10_criteria_indicators(target_id):
-#     conn = connection()
-#     res = conn.execute(text("""
-# SELECT DISTINCT GESDescriptorsCriteriaIndicators
-# FROM MarineDB.dbo.MSFD10_DESCrit
-# WHERE MSFD10_Target = :target_id
-# """), target_id=target_id)
-#
-#     items = []
-#
-#     for item in res:
-#         items.append(item)
-#
-#     return sorted(items)
 
 
 def get_related_record(klass, column, rel_id):

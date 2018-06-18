@@ -12,7 +12,8 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
-from .db import get_available_marine_unit_ids, get_item_by_conditions
+from .db import (get_available_marine_unit_ids, get_item_by_conditions,
+                 threadlocals)
 from .interfaces import IMainForm
 from .utils import (default_value_from_field, get_obj_fields,
                     get_registered_form_sections, print_value,
@@ -135,6 +136,7 @@ class MainForm(Form):
         ('msfd-c1', ('Articles 8, 9 & 10', '2012 reporting exercise')),
         ('msfd-c2', ('Article 11', '2014 reporting exercise')),
         ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
+        ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
     )
 
     @buttonAndHandler(u'Apply filters', name='continue')
@@ -221,6 +223,10 @@ class MainFormWrapper(FormWrapper):
     """
 
     index = ViewPageTemplateFile('pt/layout.pt')
+
+    def __init__(self, context, request):
+        FormWrapper.__init__(self, context, request)
+        threadlocals.session_name = self.form.session_name
 
     def render(self):
         if 'text/html' not in self.request.response.getHeader('Content-Type'):

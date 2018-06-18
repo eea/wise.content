@@ -397,3 +397,37 @@ def get_a9_descriptors(marine_unit_id, page=0):
 #     res = sess.query(col).distinct().order_by(col)
 #
 #     return [x[0] for x in res]
+
+
+# def get_a10_feature_targets(target_id):
+#     """ Used in extra_data for A10
+#     """
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
+# FROM MarineDB.dbo.MSFD10_FeaturesPressures
+# WHERE MSFD10_Target = :target_id
+# """), target_id=target_id)
+#
+#     items = []
+#
+#     for item in res:
+#         items.append(item)
+#
+#     return sorted(items)
+#
+#
+# def get_a10_criteria_indicators(target_id):
+#     conn = connection()
+#     res = conn.execute(text("""
+# SELECT DISTINCT GESDescriptorsCriteriaIndicators
+# FROM MarineDB.dbo.MSFD10_DESCrit
+# WHERE MSFD10_Target = :target_id
+# """), target_id=target_id)
+#
+#     items = []
+#
+#     for item in res:
+#         items.append(item)
+#
+#     return sorted(items)
