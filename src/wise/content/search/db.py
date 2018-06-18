@@ -168,8 +168,7 @@ def get_collapsed_item(mapper_class, order_field, collapses, *conditions,
     all_items = q.all()
     total = len(all_items)
     item_values = all_items[page]
-    print("Item values", item_values)
-    # import pdb; pdb.set_trace()
+    # print("Item values", item_values)
     # item = q.offset(page).limit(1).first()
     # total = q.count()
 

@@ -138,8 +138,7 @@ class A1314ItemDisplay(ItemDisplayForm):
             mc.UniqueCode.in_(self.context.data.get('unique_codes', [])),
             page=page,
         )
-        # extra_data
-        print(extra_data)
+        # print(extra_data)
         self.extra_data = extra_data.items()
 
         return [count, item]

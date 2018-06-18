@@ -8,23 +8,28 @@
       istab python: 'tab-pane fade' if(len(section) > 1) else ''
       ">
 
-      <h4>
+      <!-- <h4></h4> -->
+      <div>
         <span tal:content="section_title">Section title</span>
-        <select>
+        <!-- <select> -->
+        <ul>
           <tal:block tal:repeat="tab_title section">
-          <option
+          <!-- <option -->
+          <li
            tal:define="utitle python: tab_title or section_title"
            tal:attributes="title utitle;
            value python:view.title_as_id(utitle);"
-           tal:content="python: view.print_value(utitle)"
+           tal:content="structure python: view.print_value(utitle)"
            >
            Section title here
-          </option>
+          <!-- </option> -->
+          </li>
           </tal:block>
-        </select>
-      </h4>
+        </ul>
+        <!-- </select> -->
+      </div>
 
-      <div class="deactivated-tabs-wrapper" >
+      <div class="tabs-wrapper" >
 
         <!-- <ul -->
         <!--   class="nav nav&#45;tabs" -->

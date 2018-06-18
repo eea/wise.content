@@ -1,9 +1,9 @@
-from sqlalchemy.inspection import inspect
 from zope.browserpage.viewpagetemplatefile import \
     ViewPageTemplateFile as Z3ViewPageTemplateFile
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
+from eea.cache import cache
 from plone.z3cform.layout import FormWrapper
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -15,7 +15,8 @@ from z3c.form.form import Form
 from .db import get_available_marine_unit_ids, get_item_by_conditions
 from .interfaces import IMainForm
 from .utils import (default_value_from_field, get_obj_fields,
-                    get_registered_form_sections, print_value)
+                    get_registered_form_sections, print_value,
+                    request_cache_key)
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -178,6 +179,7 @@ class MainForm(Form):
                 # discovery is done in the update() method of subforms
                 self.subform_content = self.subform()
 
+    @cache(request_cache_key)
     def render(self):
         download_action = self.find_download_action()
 

@@ -1,5 +1,6 @@
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from sqlalchemy import and_
+
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
@@ -11,6 +12,7 @@ from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     register_form_section)
 
 ART11_GlOBALS = dict()
+
 
 class StartArticle11Form(MainForm):
     """
@@ -285,19 +287,24 @@ class A11MonitorSubprogrammeForm(EmbededForm):
             sub_mon_prog_ids_3 = db.get_unique_from_mapper(
                 sql.MSFD11SubProgrammeIDMatch,
                 'Q4g_SubProgrammeID',
-                sql.MSFD11SubProgrammeIDMatch.MP_ReferenceSubProgramme.in_(sub_mon_prog_ids_1)
+                sql.MSFD11SubProgrammeIDMatch.MP_ReferenceSubProgramme.in_(
+                    sub_mon_prog_ids_1
+                )
             )
-            sub_mon_prog_ids_all = sub_mon_prog_ids_1 + sub_mon_prog_ids_2 + sub_mon_prog_ids_3
+            sub_mon_prog_ids_all = (sub_mon_prog_ids_1 + sub_mon_prog_ids_2
+                                    + sub_mon_prog_ids_3)
 
             subprogramme_ids = db.get_unique_from_mapper(
                 sql.MSFD11SubProgramme,
                 'ID',
-                sql.MSFD11SubProgramme.Q4g_SubProgrammeID.in_(sub_mon_prog_ids_all)
+                sql.MSFD11SubProgramme.Q4g_SubProgrammeID.in_(
+                    sub_mon_prog_ids_all)
             )
             subprogramme_ids = [int(x) for x in subprogramme_ids]
             mapper_dict.update({mpid: subprogramme_ids})
 
         ART11_GlOBALS.update({'get_mptypes_subprog': mapper_dict})
+
         return mapper_dict
 
     def get_subform(self):

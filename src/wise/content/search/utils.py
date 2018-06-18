@@ -1,5 +1,7 @@
 import datetime
 from collections import defaultdict
+from cPickle import dumps
+from hashlib import md5
 from inspect import isclass
 from io import BytesIO
 
@@ -276,3 +278,11 @@ def all_values_from_field(context, field):
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 
     return [term.token for term in vocab._terms]
+
+
+def request_cache_key(func, self):
+    form = sorted(self.request.form.items())
+    bits = dumps(form)
+    key = md5(bits).hexdigest()
+
+    return key
