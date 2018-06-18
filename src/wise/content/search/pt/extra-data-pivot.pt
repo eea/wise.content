@@ -1,7 +1,7 @@
 <div
   tal:define="data options/extra_data | view/get_extra_data"
   class="extra-details">
-
+  Section title:
   <select class="notselect" id="extra-details-select">
     <tal:block tal:repeat="info data" >
 
