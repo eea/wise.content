@@ -282,7 +282,7 @@ def all_values_from_field(context, field):
 
 def request_cache_key(func, self):
     form = sorted(self.request.form.items())
-    bits = dumps(form)
+    bits = self.__class__.__name__ + dumps(form)
     key = md5(bits).hexdigest()
 
     return key

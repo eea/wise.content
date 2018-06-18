@@ -7,21 +7,21 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
 from wise.content.search import sql
-from wise.content.search.utils import pivot_data, pivot_query
+from wise.content.search.utils import pivot_query
 
 DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
 
 threadlocals = threading.local()
 
 
-def connection():
-    if hasattr(threadlocals, 'connection'):
-        return threadlocals.connection
-
-    session = _make_session()
-    threadlocals.connection = session.connection()
-
-    return threadlocals.connection
+# def connection():
+#     if hasattr(threadlocals, 'connection'):
+#         return threadlocals.connection
+#
+#     session = _make_session()
+#     threadlocals.connection = session.connection()
+#
+#     return threadlocals.connection
 
 
 def session():
