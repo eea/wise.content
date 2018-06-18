@@ -122,6 +122,13 @@ class IMonitoringSubprogramme(Interface):
         required=False
     )
 
+    marine_unit_id = List(
+        title=u"Marine Unit IDs",
+        value_type=Choice(vocabulary="wise_search_art11_marine_unit_id_ms"),
+        required=False
+    )
+
+
 
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(

@@ -5,7 +5,7 @@ import json
 from lxml.etree import parse
 from pkg_resources import resource_filename
 from sqlalchemy.sql.schema import Table
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -330,8 +330,16 @@ def art11_region_ms(context):
             context.subform.get_mptypes_subprog)
         mp_type_ids = context.get_mp_type_ids()
 
-    countries_form_data = [field['options'] for field in json_str['fields'] if field['label'] == 'Country']
-    countries = [country['value'] for country in countries_form_data[0] if country['checked']]
+    countries_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Country'
+    ]
+    countries = [
+        country['value']
+        for country in countries_form_data[0]
+        if country['checked']
+    ]
 
     submonprog_ids = []
     for x in mp_type_ids:
@@ -428,6 +436,119 @@ def art11_marine_unit_id(context):
     )
 
     terms = [SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID) for x in marine_units]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    # import pdb; pdb.set_trace()
+
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def art11_marine_unit_id_ms(context):
+    if not hasattr(context, 'subform'):
+        json_str = json.loads(context.json())
+        mp_type_ids = context.context.get_mp_type_ids()
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.context.subform.get_mptypes_subprog)
+    else:
+        json_str = json.loads(context.subform.json())
+        mptypes_subprog = ART11_GlOBALS.get(
+            'get_mptypes_subprog',
+            context.subform.get_mptypes_subprog)
+        mp_type_ids = context.get_mp_type_ids()
+
+    countries_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Country'
+    ]
+    countries = [
+        country['value']
+        for country in countries_form_data[0]
+        if country['checked']
+    ]
+    regions_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Region'
+    ]
+    regions = [
+        region['value']
+        for region in regions_form_data[0]
+        if region['checked']
+    ]
+
+    submonprog_ids = []
+    for x in mp_type_ids:
+        submonprog_ids.append(mptypes_subprog[int(x)])
+
+    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+
+    if countries and regions:
+        subprogramme_ids = db.get_unique_from_mapper(
+            sql.MSFD11MONSub,
+            'SubProgramme',
+            and_(sql.MSFD11MONSub.MemberState.in_(countries),
+                 sql.MSFD11MONSub.Region.in_(regions),
+                 sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids))
+
+        )
+    elif countries:
+        subprogramme_ids = db.get_unique_from_mapper(
+            sql.MSFD11MONSub,
+            'SubProgramme',
+            and_(sql.MSFD11MONSub.MemberState.in_(countries),
+                 sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids))
+        )
+    else:
+        subprogramme_ids = db.get_unique_from_mapper(
+            sql.MSFD11MONSub,
+            'SubProgramme',
+            sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+        )
+
+    subprogramme_ids = [int(x) for x in subprogramme_ids]
+
+    q4g_subprogids_1 = db.get_unique_from_mapper(
+        sql.MSFD11SubProgramme,
+        'Q4g_SubProgrammeID',
+        sql.MSFD11SubProgramme.ID.in_(subprogramme_ids)
+    )
+    q4g_subprogids_2 = db.get_unique_from_mapper(
+        sql.MSFD11SubProgrammeIDMatch,
+        'MP_ReferenceSubProgramme',
+        sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+    )
+
+    mc_ref_sub = sql.MSFD11ReferenceSubProgramme
+    mp_from_ref_sub = db.get_unique_from_mapper(
+        sql.MSFD11ReferenceSubProgramme,
+        'MP',
+        or_(mc_ref_sub.SubMonitoringProgrammeID.in_(q4g_subprogids_1),
+            mc_ref_sub.SubMonitoringProgrammeID.in_(q4g_subprogids_2)
+            )
+    )
+    mp_from_ref_sub = [int(x) for x in mp_from_ref_sub]
+
+    mon_prog_ids = db.get_unique_from_mapper(
+        sql.MSFD11MP,
+        'MonitoringProgramme',
+        sql.MSFD11MP.ID.in_(mp_from_ref_sub)
+    )
+
+    mc_ = sql.MSFD11MonitoringProgrammeMarineUnitID
+    count, marine_units = db.get_all_records_outerjoin(
+        sql.MSFD11MarineUnitID,
+        mc_,
+        mc_.MonitoringProgramme.in_(mon_prog_ids)
+    )
+
+    terms = [
+        SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID)
+        for x in marine_units
+    ]
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 

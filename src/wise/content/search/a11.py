@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces, sql
@@ -257,12 +257,16 @@ class A11MonitorSubprogrammeForm(EmbededForm):
     fields = Fields(interfaces.IMonitoringSubprogramme)
     fields['country'].widgetFactory = CheckBoxFieldWidget
     fields['region'].widgetFactory = CheckBoxFieldWidget
+    fields['marine_unit_id'].widgetFactory = CheckBoxFieldWidget
 
     # create a mapping between
     # MPTypes - SubProgramme
-    # ReferenceSubProgramme - Subprogramme
     @property
     def get_mptypes_subprog(self):
+        mapping = ART11_GlOBALS.get('get_mptypes_subprog', None)
+        if mapping:
+            return mapping
+
         mptypes = db.get_all_columns_from_mapper(sql.MSFD11MPType, 'ID')
         mapper_dict = dict()
 
@@ -316,6 +320,9 @@ class A11MonitorSubprogrammeForm(EmbededForm):
     def default_region(self):
         return all_values_from_field(self, self.fields['region'])
 
+    def default_marine_unit_id(self):
+        return all_values_from_field(self, self.fields['marine_unit_id'])
+
 
 class A11MonSubDisplay(MultiItemDisplayForm):
 
@@ -330,13 +337,51 @@ class A11MonSubDisplay(MultiItemDisplayForm):
     # extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
 
     def download_results(self):
-        mp_type_ids = self.context.get_mp_type_ids()
+        mp_type_ids = self.context.context.get_mp_type_ids()
+        countries = self.context.data.get('country', [])
+        regions = self.context.data.get('region', [])
+        marine_unit_id = self.context.data.get('marine_unit_id', [])
+
+        count, mon_prog_ids = db.get_all_records_outerjoin(
+            sql.MSFD11MonitoringProgrammeMarineUnitID,
+            sql.MSFD11MarineUnitID,
+            sql.MSFD11MarineUnitID.MarineUnitID.in_(marine_unit_id)
+        )
+        mon_prog_ids = [row.MonitoringProgramme for row in mon_prog_ids]
+        mp_ids = db.get_unique_from_mapper(
+            sql.MSFD11MP,
+            'ID',
+            sql.MSFD11MP.MonitoringProgramme.in_(mon_prog_ids)
+        )
+
+        subprogramme_ids = db.get_unique_from_mapper(
+            sql.MSFD11MONSub,
+            'SubProgramme',
+            and_(sql.MSFD11MONSub.MemberState.in_(countries),
+                 sql.MSFD11MONSub.Region.in_(regions))
+        )
+        subprogramme_ids = [int(i) for i in subprogramme_ids]
+
+        q4g_subprogids_1 = db.get_unique_from_mapper(
+            sql.MSFD11SubProgramme,
+            'Q4g_SubProgrammeID',
+            sql.MSFD11SubProgramme.ID.in_(subprogramme_ids)
+        )
+        q4g_subprogids_2 = db.get_unique_from_mapper(
+            sql.MSFD11SubProgrammeIDMatch,
+            'MP_ReferenceSubProgramme',
+            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+        )
 
         klass_join_mp = sql.MSFD11MP
         count_rsp, data_rsp = db.get_all_records_outerjoin(
             self.mapper_class,
             klass_join_mp,
-            klass_join_mp.MPType.in_(mp_type_ids)
+            and_(klass_join_mp.MPType.in_(mp_type_ids),
+                 self.mapper_class.MP.in_(mp_ids),
+                 or_(self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_1),
+                     self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_2))
+                 ),
         )
 
         submonitor_programme_ids = [row.SubMonitoringProgrammeID
@@ -373,19 +418,58 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         return data_to_xls(xlsdata)
 
     def get_db_results(self):
-        # import pdb;pdb.set_trace()
         page = self.get_page()
         # needed_ids = self.context.data.get('monitoring_programme_types', [])
         needed_ids = self.context.context.get_mp_type_ids()
         klass_join = sql.MSFD11MP
 
-        if needed_ids:
+        countries = self.context.data.get('country', [])
+        regions = self.context.data.get('region', [])
+        marine_unit_id = self.context.data.get('marine_unit_id', [])
 
+        count, mon_prog_ids = db.get_all_records_outerjoin(
+            sql.MSFD11MonitoringProgrammeMarineUnitID,
+            sql.MSFD11MarineUnitID,
+            sql.MSFD11MarineUnitID.MarineUnitID.in_(marine_unit_id)
+        )
+        mon_prog_ids = [row.MonitoringProgramme for row in mon_prog_ids]
+        mp_ids = db.get_unique_from_mapper(
+            sql.MSFD11MP,
+            'ID',
+            sql.MSFD11MP.MonitoringProgramme.in_(mon_prog_ids)
+        )
+
+        # import pdb;pdb.set_trace()
+
+        subprogramme_ids = db.get_unique_from_mapper(
+            sql.MSFD11MONSub,
+            'SubProgramme',
+            and_(sql.MSFD11MONSub.MemberState.in_(countries),
+                 sql.MSFD11MONSub.Region.in_(regions))
+        )
+        subprogramme_ids = [int(i) for i in subprogramme_ids]
+
+        q4g_subprogids_1 = db.get_unique_from_mapper(
+            sql.MSFD11SubProgramme,
+            'Q4g_SubProgrammeID',
+            sql.MSFD11SubProgramme.ID.in_(subprogramme_ids)
+        )
+        q4g_subprogids_2 = db.get_unique_from_mapper(
+            sql.MSFD11SubProgrammeIDMatch,
+            'MP_ReferenceSubProgramme',
+            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+        )
+
+        if needed_ids:
             return db.get_item_by_conditions_joined(
                 self.mapper_class,
                 klass_join,
                 self.order_field,
-                klass_join.MPType.in_(needed_ids),
+                and_(klass_join.MPType.in_(needed_ids),
+                     self.mapper_class.MP.in_(mp_ids),
+                     or_(self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_1),
+                         self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_2))
+                     ),
                 page=page
             )
 
@@ -407,6 +491,15 @@ class A11MPExtraInfo(ItemDisplay):
 
         count, item = db.get_related_record(
             mc, 'Q4g_SubProgrammeID', subprogramme_id)
+
+        if not item:
+            subprogramme_id = db.get_unique_from_mapper(
+                sql.MSFD11SubProgrammeIDMatch,
+                'Q4g_SubProgrammeID',
+                sql.MSFD11SubProgrammeIDMatch.MP_ReferenceSubProgramme == subprogramme_id
+            )
+            count, item = db.get_related_record(
+                mc, 'Q4g_SubProgrammeID', subprogramme_id)
 
         if item:
             self.subprogramme = getattr(item, 'ID')

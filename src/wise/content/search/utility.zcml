@@ -61,6 +61,11 @@
     />
 
   <utility
+    component=".vocabulary.art11_marine_unit_id_ms"
+    name="wise_search_art11_marine_unit_id_ms"
+    />
+
+  <utility
     component=".vocabulary.a1314_report_types"
     name="wise_search_a1314_report_types"
     />
@@ -84,12 +89,5 @@
     component=".vocabulary.monitoring_programme_info_types"
     name="wise_search_monitoring_programme_info_types"
     />
-
-<!-- TODO not used, delete this later -->
-  <utility
-    component=".vocabulary.monitoring_subprogramme_names"
-    name="wise_search_monitoring_subprogramme_names"
-    />
-
 
 </configure>
