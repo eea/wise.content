@@ -22,6 +22,7 @@ class StartArticle11Form(MainForm):
     name = 'msfd-c2'
     fields = Fields(interfaces.IStartArticle11)
     fields['monitoring_programme_types'].widgetFactory = CheckBoxFieldWidget
+    session_name = 'session'
 
     def get_subform(self):
         klass = self.data.get('monitoring_programme_info_types')
@@ -264,6 +265,7 @@ class A11MonitorSubprogrammeForm(EmbededForm):
     @property
     def get_mptypes_subprog(self):
         mapping = ART11_GlOBALS.get('get_mptypes_subprog', None)
+
         if mapping:
             return mapping
 
