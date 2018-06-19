@@ -1,10 +1,8 @@
 <div
   tal:define="data options/extra_data | view/get_extra_data"
   class="extra-details">
-  Section title:
-  <select class="notselect" id="extra-details-select">
     <tal:block tal:repeat="info data" >
-
+      <div class="extra-details-section">
       <tal:section
         define="section_title python: info[0];
         section python: info[1];
@@ -15,44 +13,22 @@
 
             <!--<span tal:content="section_title">Section title</span>-->
             <!-- <select> -->
-
+        <span class="section-title" tal:content="section_title">...</span>
+        <select class="notselect extra-details-select">
               <tal:block tal:repeat="tab_title section">
                 <tal:block tal:define="utitle python: tab_title or section_title">
 
-                  <option tal:attributes="title utitle; value python:view.title_as_id(utitle);"
+                  <option tal:attributes="title utitle; value python:view.title_as_id(tab_title);"
                    tal:content="structure python: view.print_value(utitle)">Section title here</option>
-                  <!-- <option -->
-                  <!--<div
-                   tal:define="utitle python: tab_title or section_title"
-                   tal:attributes="title utitle;
-                   value python:view.title_as_id(utitle);"
-                   tal:content="structure python: view.print_value(utitle)"
-                   >
-                   Section title here
-                  &lt;!&ndash; </option> &ndash;&gt;
-                  </div>-->
+
                 </tal:block>
 
               </tal:block>
 
+        </select>
 
-      </tal:section>
-    </tal:block>
-  </select>
-
-
-  <!-- </select> -->
-
-  <div class="tabs-wrapper" >
-
-    <tal:block tal:repeat="info data" >
-      <tal:section
-        define="section_title python: info[0];
-        section python: info[1];
-        istab python: 'tab-pane fade' if(len(section) > 1) else ''
-      ">
-
-        <div class="tab-content">
+        <div class="tabs-wrapper" >
+          <div class="tab-content">
             <tal:section tal:repeat="tab_title section">
 
               <div
@@ -60,32 +36,36 @@
                 tal:attributes="
                 class string: tab-panel;
                 id python: view.title_as_id(utitle);"
-                role="tabpanel"
-                >
+                      role="tabpanel"
+              >
 
                 <tal:def define="section_data python:section[tab_title]">
                   <table class="listing" tal:condition="section_data">
                     <thead>
                       <tr tal:define="row_labels python:section_data[0].keys()">
                         <th tal:repeat="l row_labels"
-                          tal:content="python:view.name_as_title(l)">Label</th>
+                            tal:content="python:view.name_as_title(l)">Label</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr tal:repeat="row section_data" >
                         <td tal:repeat="v row/values"
-                          tal:content="structure python: view.print_value(v)">Value</td>
+                            tal:content="structure python: view.print_value(v)">Value</td>
                       </tr>
                     </tbody>
                   </table>
                 </tal:def>
+
               </div>
 
             </tal:section>
 
+          </div>
         </div>
 
       </tal:section>
+      </div>
     </tal:block>
-  </div>
+
+
 </div>
