@@ -10,9 +10,9 @@ from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
-from wise.content.search import db, sql
+from wise.content.search import db, sql, sql2018
 
-from .utils import FORMS, FORMS_ART11, LABELS, SUBFORMS
+from .utils import FORMS, FORMS_2018, FORMS_ART11, LABELS, SUBFORMS
 from .a11 import ART11_GlOBALS
 
 
@@ -137,6 +137,14 @@ class SubFormsVocabulary(SimpleVocabulary):
         return d
 
 
+def vocab_from_values(values):
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in values]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
 def db_vocab(table, column):
     """ Builds a vocabulary based on unique values in a column table
     """
@@ -166,14 +174,18 @@ def db_vocab(table, column):
     return vocab
 
 
-# TODO not used, delete this later
-@provider(IVocabularyFactory)
-def monitoring_subprogramme_names(context):
-    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
-    terms.sort(key=lambda t: t.title)
-    vocab = SimpleVocabulary(terms)
-
-    return vocab
+def get_json_subform_data(json_str, field_title):
+    _form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == field_title
+    ]
+    data = [
+        x['value']
+        for x in _form_data[0]
+        if x['checked']
+    ]
+    return data
 
 
 @provider(IVocabularyFactory)
@@ -284,8 +296,16 @@ def art11_region(context):
     else:
         json_str = json.loads(context.subform.json())
         mp_type_ids = context.get_mp_type_ids()
-    countries_form_data = [field['options'] for field in json_str['fields'] if field['label'] == 'Country']
-    countries = [country['value'] for country in countries_form_data[0] if country['checked']]
+    countries_form_data = [
+        field['options']
+        for field in json_str['fields']
+        if field['label'] == 'Country'
+    ]
+    countries = [
+        country['value']
+        for country in countries_form_data[0]
+        if country['checked']
+    ]
 
     mon_ids = db.get_unique_from_mapper(
         sql.MSFD11MP,
@@ -618,3 +638,103 @@ def a1314_unique_codes(context):
     terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)
+
+
+# Articles 8, 9, 10
+# reporting year 2018
+@provider(IVocabularyFactory)
+def articles_vocabulary_factory_2018(context):
+    terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_2018.items()]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def a2018_country(context):
+    # import pdb;pdb.set_trace()
+    if hasattr(context, 'subform'):
+        mapper_class = context.subform.mapper_class
+    else:
+        mapper_class = context.mapper_class
+
+    # mapper_class = getattr(context, 'mapper_class', context.subform.mapper_class)
+
+    count, res = db.get_all_records_outerjoin(
+        sql2018.ReportedInformation,
+        mapper_class
+    )
+
+    res = [x.CountryCode for x in res]
+    res = list(set(res))
+
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_marine_reporting_unit(context):
+    if hasattr(context, 'subform'):
+        json_str = json.loads(context.subform.json())
+        mapper_class = context.subform.mapper_class
+    else:
+        json_str = json.loads(context.json())
+        mapper_class = context.mapper_class
+
+    countries = get_json_subform_data(json_str, 'Country Code')
+
+    mc_countries = sql2018.ReportedInformation
+    conditions = []
+    if countries:
+        conditions.append(mc_countries.CountryCode.in_(countries))
+
+    count, res = db.get_all_records_outerjoin(
+        mapper_class,
+        mc_countries,
+        *conditions
+    )
+    res = [x.MarineReportingUnit for x in res]
+
+    # import pdb;pdb.set_trace()
+
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_ges_component_art9(context):
+    if hasattr(context, 'subform'):
+        json_str = json.loads(context.subform.json())
+        mapper_class = context.subform.mapper_class
+    else:
+        json_str = json.loads(context.json())
+        mapper_class = context.mapper_class
+
+    countries = get_json_subform_data(json_str, 'Country Code')
+
+    mc_countries = sql2018.ReportedInformation
+    conditions = []
+    if countries:
+        conditions.append(mc_countries.CountryCode.in_(countries))
+
+    count, res = db.get_all_records_outerjoin(
+        mapper_class,
+        mc_countries,
+        *conditions
+    )
+    res = [x.GESComponent for x in res]
+
+    # import pdb;pdb.set_trace()
+
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_feature(context):
+    res = []
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_ges_component(context):
+    res = []
+    return vocab_from_values(res)

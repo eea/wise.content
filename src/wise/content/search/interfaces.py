@@ -129,7 +129,6 @@ class IMonitoringSubprogramme(Interface):
     )
 
 
-
 class IMarineUnitIDsSelect(Interface):
     marine_unit_ids = List(
         title=u"MarineUnitIDs",
@@ -145,6 +144,13 @@ class IArticleSelect(Interface):
                      required=False,
                      default='',
                      vocabulary="wise_search_articles")
+
+
+class IArticleSelect2018(Interface):
+    article = Choice(title=u"Article",
+                     required=False,
+                     default='',
+                     vocabulary="wise_search_articles_2018")
 
 
 class IMarineUnitIDSelect(Interface):
@@ -164,4 +170,57 @@ class IA1314UniqueCodes(Interface):
         # interested",
         required=False,
         value_type=Choice(vocabulary="wise_search_a1314_unique_codes")
+    )
+
+
+# Articles 8, 9, 10
+# 2018 reporting year
+
+class ICountryCodeMarineReportingUnits(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+    marine_reporting_unit = List(
+        title=u"Marine Reporting Unit",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_marine_reporting_unit")
+    )
+
+
+class ICountryCode(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+
+class ICountryCodeGESComponents(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component_art9")
+    )
+
+
+class IFeaturesGESComponents(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature")
+    )
+
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component")
     )
