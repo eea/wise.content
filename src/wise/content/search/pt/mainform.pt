@@ -1,6 +1,6 @@
 <div id="wise-search-form">
   <div id="wise-search-form-top">
-    <ul class="nav nav-pills topnav">
+    <ul class="nav nav-pills topnav hidden-xs">
       <tal:rep tal:repeat="info view/main_forms">
         <li tal:define="name python:info[0];
           maintitle python: info[1][0];
@@ -17,6 +17,25 @@
         </li>
       </tal:rep>
     </ul>
+
+    <div class="visible-xs">
+      <select class="notselect" id="mobile-select-article" >
+        <tal:rep tal:repeat="info view/main_forms" >
+          <tal:block tal:define="name python:info[0];
+          maintitle python: info[1][0];
+          subtitle python: info[1][1];
+          active python: view.name == name">
+            <option tal:attributes="value string:./@@${name}; data-maintitle maintitle; data-subtitle subtitle;
+              selected python: active and 'selected'"
+                    tal:content="python: info[1][0] + ' ' + info[1][1]"
+            >
+            </option>
+          </tal:block>
+
+        </tal:rep>
+      </select>
+    </div>
+
 
     <!-- <h2 tal:content="view/title">Title here</h2> -->
     <div tal:condition="not: view/subform_content">
