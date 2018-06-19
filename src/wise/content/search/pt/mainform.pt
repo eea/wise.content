@@ -20,7 +20,7 @@
 
     <div class="visible-xs" style="clear: both;">
       <div>
-        Select articles:
+        Select article:
       </div>
         <select class="notselect" id="mobile-select-article" >
           <tal:rep tal:repeat="info view/main_forms" >
