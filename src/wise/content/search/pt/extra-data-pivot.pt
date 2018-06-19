@@ -1,6 +1,7 @@
 <div
   tal:define="data options/extra_data | view/get_extra_data"
   class="extra-details">
+
     <tal:block tal:repeat="info data" >
       <div class="extra-details-section">
       <tal:section
@@ -13,7 +14,7 @@
 
             <!--<span tal:content="section_title">Section title</span>-->
             <!-- <select> -->
-        <h5 class="section-title" tal:content="section_title">...</h5>
+        <h4 class="section_title" tal:content="section_title">...</h4>
         <select class="notselect extra-details-select">
               <tal:block tal:repeat="tab_title section">
                 <tal:block tal:define="utitle python: tab_title or section_title">

@@ -14,38 +14,43 @@
 
   <tal:block tal:define="sections view/get_sections | nothing">
 
-    <div id="tabs-wrapper" tal:condition="sections">
-      <!-- Nav tabs -->
-
-      <ul class="nav nav-tabs" id="tabs" role="tablist"  >
+    <div id="tabs-wrapper" tal:condition="sections" class="extra-details">
+      <div class="extra-details-section">
+        <h5 class="section-title" tal:condition="python: len(sections) > 1">Select section</h5>
 
         <tal:block tal:repeat="section sections">
-
-          <li class="nav-item" tal:condition="section/item">
-            <a class="nav-link" tal:define="utitle section/title"
-               tal:attributes="id python:utitle.replace(' ', '_').replace(',' , '').lower() + '-tab';
-           href python:'#' + utitle.replace(' ', '_').replace(',' , '').lower();
-           aria-controls python:utitle.replace(' ', '_').replace(',' , '').lower();
-           title  section/title"
-               data-toggle="tab"
-               role="tab"
-               aria-selected="true"
-               tal:content="section/title">Section title here</a>
-          </li>
+          <h5 class="" tal:content="section/title" tal:condition="python: len(sections) == 1">Select section</h5>
         </tal:block>
 
-      </ul>
-      <!-- Tab panes -->
-      <div class="tab-content" id="tabContents" >
-        <tal:loop repeat="section sections">
-          <div class="tab-pane fade"
+        <select class="notselect extra-details-select">
+          <tal:block tal:repeat="section sections">
+
+            <tal:block tal:define="utitle section/title">
+              <!--<h4 class="section_title" tal:content="utitle">...</h4>-->
+              <option tal:attributes="title utitle; value python:view.title_as_id(utitle);"
+                      tal:condition="section/item"
+                      tal:content="structure python: view.print_value(utitle)">Section title here</option>
+            </tal:block>
+
+
+
+          </tal:block>
+
+
+        </select>
+
+        <!-- Tab panes -->
+        <div class="tab-content" id="tabContents" >
+          <tal:loop repeat="section sections">
+            <div class="tab-panel"
                tal:condition="section/item"
                tal:define="utitle section/title"
-               tal:attributes="id python:utitle.replace(' ', '_').replace(',' , '').lower()"
+               tal:attributes="id python:view.title_as_id(utitle)"
                role="tabpanel"
                tal:content="structure section"
-          >...</div>
-        </tal:loop>
+            >...</div>
+          </tal:loop>
+        </div>
       </div>
     </div>
   </tal:block>
