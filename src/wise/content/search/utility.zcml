@@ -90,4 +90,37 @@
     name="wise_search_monitoring_programme_info_types"
     />
 
+  <!--
+    Articles 8, 9, 10 reporting year 2018
+  -->
+  <utility
+    component=".vocabulary.articles_vocabulary_factory_2018"
+    name="wise_search_articles_2018"
+    />
+
+  <utility
+    component=".vocabulary.a2018_country"
+    name="wise_search_a2018_country"
+    />
+
+  <utility
+    component=".vocabulary.a2018_marine_reporting_unit"
+    name="wise_search_a2018_marine_reporting_unit"
+    />
+
+  <utility
+    component=".vocabulary.a2018_ges_component_art9"
+    name="wise_search_a2018_ges_component_art9"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature"
+    name="wise_search_a2018_feature"
+    />
+
+  <utility
+    component=".vocabulary.a2018_ges_component"
+    name="wise_search_a2018_ges_component"
+    />
+
 </configure>

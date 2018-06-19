@@ -81,13 +81,17 @@ StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 class StartArticle89102018Form(MainForm):
     name = 'msfd-c4'
 
-    fields = Fields(interfaces.IArticleSelect)
+    fields = Fields(interfaces.IArticleSelect2018)
     session_name = 'session_2018'
 
     def get_subform(self):
-
-        if self.data['article']:
-            return MemberRegionAreaForm(self, self.request)
+        article = self.data['article']
+        if article:
+            if isinstance(article, tuple):
+                klass = article[0]
+            else:
+                klass = article
+            return klass(self, self.request)
 
     def default_article(self):
         return default_value_from_field(self, self.fields['article'])
@@ -101,3 +105,4 @@ scan('a8ac')
 scan('a8b')
 scan('a9')
 scan('a10')
+scan('a89102018')
