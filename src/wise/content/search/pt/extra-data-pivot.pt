@@ -14,19 +14,26 @@
 
             <!--<span tal:content="section_title">Section title</span>-->
             <!-- <select> -->
-        <h4 class="section-title"><span tal:replace="section_title">...</span>:</h4>
-        <select class="notselect extra-details-select">
-              <tal:block tal:repeat="tab_title section">
-                <tal:block tal:define="utitle python: tab_title or section_title">
+        <div>
 
-                  <option tal:attributes="title utitle; value python:view.title_as_id(tab_title);"
-                   tal:content="structure python: view.print_value(utitle)">Section title here</option>
+          <h4 class="section-title"><span tal:replace="section_title">...</span>:</h4>
+          <select class="notselect extra-details-select">
+            <tal:block tal:repeat="tab_title section">
+              <tal:block tal:define="utitle python: tab_title or section_title">
 
-                </tal:block>
+                <option tal:attributes="title utitle; value python:view.title_as_id(tab_title);"
+                        tal:content="structure python: view.print_value(utitle)">Section title here</option>
+               <!-- <span tal:content="python : section.index">...</span>-->
 
               </tal:block>
 
-        </select>
+            </tal:block>
+
+          </select>
+
+        </div>
+
+
 
         <div class="tabs-wrapper" >
           <div class="tab-content">
