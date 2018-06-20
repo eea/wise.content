@@ -8,35 +8,23 @@
         define="section_title python: info[0];
         section python: info[1];">
 
-        <!-- <h4></h4> -->
-
-            <!--<span tal:content="section_title">Section title</span>-->
-            <!-- <select> -->
         <div class="section-select">
 
           <h4 class="section-title"><span tal:replace="section_title">...</span>:</h4>
           <select class="notselect extra-details-select">
             <tal:block tal:repeat="tab_title section">
               <tal:block tal:define="utitle python: tab_title or section_title">
-
                 <option tal:attributes="title utitle; value python:view.title_as_id(tab_title);"
                         tal:content="structure python: view.print_value(utitle)">Section title here</option>
-               <!-- <span tal:content="python : section.index">...</span>-->
-
               </tal:block>
-
             </tal:block>
-
           </select>
 
         </div>
 
-
-
         <div class="tabs-wrapper" >
           <div class="tab-content">
             <tal:section tal:repeat="tab_title section">
-
               <div
                 tal:define="utitle python:tab_title or section_title;"
                 tal:attributes="
@@ -44,7 +32,6 @@
                 id python: view.title_as_id(utitle);"
                       role="tabpanel"
               >
-
                 <tal:def define="section_data python:section[tab_title]">
                   <table class="listing" tal:condition="section_data">
                     <thead>
@@ -61,9 +48,7 @@
                     </tbody>
                   </table>
                 </tal:def>
-
               </div>
-
             </tal:section>
 
           </div>
