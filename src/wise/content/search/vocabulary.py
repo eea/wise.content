@@ -693,7 +693,8 @@ def a2018_marine_reporting_unit(context):
         mc_countries,
         *conditions
     )
-    res = [x.MarineReportingUnit for x in res]
+    # res = [x.MarineReportingUnit for x in res]
+    res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
 
     # import pdb;pdb.set_trace()
 
@@ -721,20 +722,41 @@ def a2018_ges_component_art9(context):
         mc_countries,
         *conditions
     )
-    res = [x.GESComponent for x in res]
+    # res = [x.GESComponent for x in res]
+    res = ['GesComponent%s' % x for x in range(0, 10)]
 
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_feature_art9(context):
     # import pdb;pdb.set_trace()
+    if hasattr(context, 'features_mc'):
+        features_mc = context.features_mc
+        # mapper_class = context.subform.mapper_class
+    else:
+        features_mc = context.context.features_mc
+        # mapper_class = context.mapper_class
 
+    res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_feature(context):
-    res = []
+    
+
+    res = ['Feature%s' % x for x in range(0, 10)]
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_ges_component(context):
-    res = []
+    res = ['GesComponent%s' % x for x in range(0, 10)]
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_mru_indicators(context):
+    res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
     return vocab_from_values(res)

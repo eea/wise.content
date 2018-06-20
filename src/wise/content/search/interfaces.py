@@ -146,13 +146,6 @@ class IArticleSelect(Interface):
                      vocabulary="wise_search_articles")
 
 
-class IArticleSelect2018(Interface):
-    article = Choice(title=u"Article",
-                     required=False,
-                     default='',
-                     vocabulary="wise_search_articles_2018")
-
-
 class IMarineUnitIDSelect(Interface):
     marine_unit_id = Choice(
         title=u"MarineUnitID",
@@ -175,6 +168,12 @@ class IA1314UniqueCodes(Interface):
 
 # Articles 8, 9, 10
 # 2018 reporting year
+class IArticleSelect2018(Interface):
+    article = Choice(title=u"Article",
+                     required=False,
+                     default='',
+                     vocabulary="wise_search_articles_2018")
+
 
 class ICountryCodeMarineReportingUnits(Interface):
     country_code = List(
@@ -223,4 +222,20 @@ class IFeaturesGESComponents(Interface):
         title=u"GES Component",
         required=False,
         value_type=Choice(vocabulary="wise_search_a2018_ges_component")
+    )
+
+
+class IFeatures(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_art9")
+    )
+
+
+class IIndicatorsMarineReportingUnit(Interface):
+    marine_reporting_unit = List(
+        title=u"Marine Reporting Unit",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_mru_indicators")
     )

@@ -114,6 +114,11 @@
     />
 
   <utility
+    component=".vocabulary.a2018_feature_art9"
+    name="wise_search_a2018_feature_art9"
+    />
+
+  <utility
     component=".vocabulary.a2018_feature"
     name="wise_search_a2018_feature"
     />
@@ -121,6 +126,11 @@
   <utility
     component=".vocabulary.a2018_ges_component"
     name="wise_search_a2018_ges_component"
+    />
+
+  <utility
+    component=".vocabulary.a2018_mru_indicators"
+    name="wise_search_a2018_mru_indicators"
     />
 
 </configure>
