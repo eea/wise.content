@@ -6,15 +6,13 @@
       <div class="extra-details-section">
       <tal:section
         define="section_title python: info[0];
-        section python: info[1];
-        istab python: 'tab-pane fade' if(len(section) > 1) else ''
-        ">
+        section python: info[1];">
 
         <!-- <h4></h4> -->
 
             <!--<span tal:content="section_title">Section title</span>-->
             <!-- <select> -->
-        <div>
+        <div class="section-select">
 
           <h4 class="section-title"><span tal:replace="section_title">...</span>:</h4>
           <select class="notselect extra-details-select">
