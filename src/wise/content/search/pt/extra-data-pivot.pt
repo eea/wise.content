@@ -3,7 +3,7 @@
   class="extra-details">
 
     <tal:block tal:repeat="info data" >
-      <div class="extra-details-section">
+      <div class="extra-details-section" tal:condition="python: len(info[1])>0">
       <tal:section
         define="section_title python: info[0];
         section python: info[1];">
