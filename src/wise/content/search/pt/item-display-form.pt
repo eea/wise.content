@@ -7,7 +7,7 @@
 
   <tal:block tal:condition="python: view.item ">
   <h3 tal:content="view/get_record_title">Article title here</h3>
-  Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
+  <span class="pagination-text">Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span></span>
   </tal:block>
 
   <div tal:content="structure view/data_template | nothing"></div>
@@ -35,7 +35,7 @@
 
       <span style="width: 35%; display: inline-block; height: 40px; text-align: center; position: absolute; ">
         <span style=" position: relative; height: 40px; top: 25%;" >
-          Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span>
+          <span>Result <span tal:content="python: int(view.data.get('page', '0')) + 1">1</span> of <span tal:content="view/count"></span></span>
         </span>
       </span>
 
