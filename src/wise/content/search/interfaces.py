@@ -233,9 +233,21 @@ class IFeatures(Interface):
     )
 
 
-class IIndicatorsMarineReportingUnit(Interface):
+class IIndicatorsGESFeatureMRU(Interface):
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component_ind")
+    )
+
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_ind")
+    )
+
     marine_reporting_unit = List(
         title=u"Marine Reporting Unit",
         required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_mru_indicators")
+        value_type=Choice(vocabulary="wise_search_a2018_mru_ind")
     )

@@ -79,6 +79,7 @@ StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 
 # TOD: implement a8910 for 2018
 class StartArticle89102018Form(MainForm):
+    record_title = 'Articles 8, 9, 10'
     name = 'msfd-c4'
 
     fields = Fields(interfaces.IArticleSelect2018)

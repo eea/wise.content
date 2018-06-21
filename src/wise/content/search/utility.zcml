@@ -129,8 +129,18 @@
     />
 
   <utility
-    component=".vocabulary.a2018_mru_indicators"
-    name="wise_search_a2018_mru_indicators"
+    component=".vocabulary.a2018_ges_component_ind"
+    name="wise_search_a2018_ges_component_ind"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature_ind"
+    name="wise_search_a2018_feature_ind"
+    />
+
+  <utility
+    component=".vocabulary.a2018_mru_ind"
+    name="wise_search_a2018_mru_ind"
     />
 
 </configure>
