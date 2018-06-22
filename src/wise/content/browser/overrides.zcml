@@ -25,4 +25,12 @@
     permission="eea.pdf.download"
   />
 
+  <browser:page
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    name="change-password"
+    class=".overrides.PasswordAccountPanelOverride"
+    permission="cmf.SetOwnPassword"
+    layer="wise.content.interfaces.IWiseContentLayer"
+  />
+
 </configure>
