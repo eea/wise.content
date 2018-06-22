@@ -741,6 +741,42 @@ def a2018_feature_art9(context):
     features_mc = context.features_mc
     json_str = json.loads(context.json())
 
+    res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+    return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def a2018_feature_art81c(context):
+    if not hasattr(context, 'features_mc'):
+        context_orig = context
+        context = context.context
+
+    mapper_class = context.mapper_class
+    features_mc = context.features_mc
+    json_str = json.loads(context.json())
+
+    countries = get_json_subform_data(json_str, 'Country Code')
+    mrus = get_json_subform_data(json_str, 'Marine Reporting Unit')
+
+    mc_countries = sql2018.ReportedInformation
+    conditions = list()
+    if countries:
+        conditions.append(mc_countries.CountryCode.in_(countries))
+    if mrus:
+        conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+
+    count, id_marine_units = db.get_all_records_outerjoin(
+        mapper_class,
+        mc_countries,
+        *conditions
+    )
+    id_marine_units = [int(x.Id) for x in id_marine_units]
+
+    res = db.get_unique_from_mapper(
+        features_mc,
+        'Feature',
+        features_mc.IdMarineUnit.in_(id_marine_units)
+    )
 
     res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
     return vocab_from_values(res)

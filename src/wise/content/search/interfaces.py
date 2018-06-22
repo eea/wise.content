@@ -233,6 +233,14 @@ class IFeatures(Interface):
     )
 
 
+class IFeatures81c(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_art81c")
+    )
+
+
 class IIndicatorsGESFeatureMRU(Interface):
     ges_component = List(
         title=u"GES Component",

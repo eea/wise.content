@@ -231,9 +231,156 @@ class A2018Article81ab(EmbededForm):
 
 class A2018Art81cDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     def get_db_results(self):
-        return 0, []
+        page = self.get_page()
+        countries = self.context.context.data.get('country_code', ())
+        features = self.context.data.get('feature', ())
+        mrus = self.context.data.get('marine_reporting_unit', ())
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        mc_countries = sql2018.ReportedInformation
+
+        conditions = list()
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_marine_units = [int(x.Id) for x in id_marine_units]
+
+        res = db.get_item_by_conditions(
+            features_mc,
+            'Id',
+            and_(features_mc.Feature.in_(features),
+                 features_mc.IdMarineUnit.in_(id_marine_units)),
+            page=page
+        )
+
+        return res
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        id_feature = self.item.get('Id', 0)
+        excluded_columns = ('Id', 'IdFeature')
+
+        nace_codes = db.get_unique_from_mapper(
+            sql2018.ART8ESAFeatureNACE,
+            'NACECode',
+            sql2018.ART8ESAFeatureNACE.IdFeature == id_feature
+        )
+
+        ges_components = db.get_unique_from_mapper(
+            sql2018.ART8ESAFeatureGESComponent,
+            'GESComponent',
+            sql2018.ART8ESAFeatureGESComponent.IdFeature == id_feature
+        )
+
+        cost_degradation = db.get_all_columns_from_mapper(
+            sql2018.ART8ESACostDegradation,
+            'Id',
+            sql2018.ART8ESACostDegradation.IdFeature == id_feature
+        )
+        cost_degradation = db_objects_to_dict(cost_degradation,
+                                              excluded_columns)
+
+        ids_cost_degradation = [x.Id for x in cost_degradation]
+        mc = sql2018.ART8ESACostDegradationIndicator
+        cost_degradation_indicators = db.get_unique_from_mapper(
+            mc,
+            'IndicatorCode',
+            mc.IdCostDegradation.in_(ids_cost_degradation)
+        )
+
+        uses_activities = db.get_all_columns_from_mapper(
+            sql2018.ART8ESAUsesActivity,
+            'Id',
+            sql2018.ART8ESAUsesActivity.IdFeature == id_feature
+        )
+        uses_activities = db_objects_to_dict(uses_activities,
+                                             excluded_columns)
+
+        ids_uses_act = [x.Id for x in uses_activities]
+        uses_act_indicators = db.get_unique_from_mapper(
+            sql2018.ART8ESAUsesActivitiesIndicator,
+            'IndicatorCode',
+            sql2018.ART8ESAUsesActivitiesIndicator.IdUsesActivities.in_(ids_uses_act)
+        )
+
+        uses_act_eco = db.get_unique_from_mapper(
+            sql2018.ART8ESAUsesActivitiesEcosystemService,
+            'EcosystemServiceCode',
+            sql2018.ART8ESAUsesActivitiesEcosystemService.IdUsesActivities.in_(ids_uses_act)
+        )
+
+        uses_act_pres = db.get_unique_from_mapper(
+            sql2018.ART8ESAUsesActivitiesPressure,
+            'PressureCode',
+            sql2018.ART8ESAUsesActivitiesPressure.IdUsesActivities.in_(ids_uses_act)
+        )
+
+        res = list()
+        if nace_codes:
+            res.append(
+                ('NACEcode(s)', {
+                    '': [{'NACECode': x} for x in nace_codes]
+                }))
+        if ges_components:
+            res.append(
+                ('GEScomponent(s)', {
+                    '': [{'GESComponent': x} for x in ges_components]
+                }))
+        if cost_degradation:
+            res.append(
+                ('Cost Degradation', {'': cost_degradation})
+            )
+        if cost_degradation_indicators:
+            res.append(
+                ('Cost Degradation Indicator(s)', {
+                    '': [{'IndicatorCode': x} for x in cost_degradation_indicators]
+                }))
+        if uses_activities:
+            res.append(
+                ('Uses Activities', {'': uses_activities})
+            )
+        if uses_act_indicators:
+            res.append(
+                ('Uses Activities Indicator(s)', {
+                    '': [{'IndicatorCode': x} for x in uses_act_indicators]
+                }))
+        if uses_act_eco:
+            res.append(
+                ('Uses Activities Ecosystem Service(s)', {
+                    '': [{'EcosystemServiceCode': x} for x in uses_act_eco]
+                }))
+        if uses_act_pres:
+            res.append(
+                ('Uses Activities Pressure(s)', {
+                    '': [{'PressureCode': x} for x in uses_act_pres]
+                }))
+
+        return res
+
+
+class A2018Features81cForm(EmbededForm):
+
+    fields = Fields(interfaces.IFeatures81c)
+    fields['feature'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        klass = self.context.display_klass
+        return klass(self, self.request)
+
+    def default_feature(self):
+        return all_values_from_field(self, self.fields['feature'])
 
 
 @register_form_2018
@@ -248,7 +395,7 @@ class A2018Article81c(EmbededForm):
     fields['marine_reporting_unit'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return A2018FeaturesForm(self, self.request)
+        return A2018Features81cForm(self, self.request)
 
     def default_country_code(self):
         return all_values_from_field(self, self.fields['country_code'])
@@ -315,7 +462,6 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             *conditions
         )
         ids_ind_ass_ges = [int(x.IdIndicatorAssessment) for x in ids_ind_ass]
-
 
         ids_ind_ass_marine = db.get_unique_from_mapper(
             marine_mc,

@@ -119,6 +119,11 @@
     />
 
   <utility
+    component=".vocabulary.a2018_feature_art81c"
+    name="wise_search_a2018_feature_art81c"
+    />
+
+  <utility
     component=".vocabulary.a2018_feature"
     name="wise_search_a2018_feature"
     />
