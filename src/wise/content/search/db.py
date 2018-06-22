@@ -3,37 +3,38 @@ import threading
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
 from wise.content.search import sql
+from wise.content.search.utils import pivot_query
 
-DB = os.environ.get('MSFDURI', "mssql+pymssql://SA:bla3311!@msdb/MarineDB")
+DB = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb/MarineDB')
+DB_2018 = os.environ.get('MSFDURI',
+                         'mssql+pymssql://SA:bla3311!@msdb/MSFD2018_test')
 
 threadlocals = threading.local()
 
 
-def connection():
-    if hasattr(threadlocals, 'connection'):
-        return threadlocals.connection
-
-    session = _make_session()
-    threadlocals.connection = session.connection()
-
-    return threadlocals.connection
-
-
 def session():
-    if hasattr(threadlocals, 'session'):
-        return threadlocals.session
+    session_name = getattr(threadlocals, 'session_name')
 
-    session = _make_session()
-    threadlocals.session = session
+    if hasattr(threadlocals, session_name):
+        return getattr(threadlocals, session_name)
+
+    if session_name == 'session':
+        dsn = DB
+    elif session_name == 'session_2018':
+        dsn = DB_2018
+
+    session = _make_session(dsn)
+    setattr(threadlocals, session_name, session)
 
     return session
 
 
-def _make_session():
-    engine = create_engine(DB)
+def _make_session(dsn):
+    engine = create_engine(dsn)
     Session = scoped_session(sessionmaker(bind=engine))
     register(Session, keep_session=True)
 
@@ -62,7 +63,7 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
         .distinct()\
         .order_by(col)
 
-    return [x[0].strip() for x in res]
+    return [unicode(x[0]).strip() for x in res]
 
 
 def get_unique_from_mapper_join(
@@ -117,6 +118,72 @@ def get_marine_unit_ids(**data):
     l = sorted([x[0] for x in query])
 
     return (query.count(), l)
+
+
+# def group(l, p):
+#     res = defaultdict(list)
+#
+#     for row in l:
+#         pass
+#
+#     return l
+
+
+def get_collapsed_item(mapper_class, order_field, collapses, *conditions,
+                       **kwargs):
+    """ Group items
+    """
+    page = kwargs.get('page', 0)
+    sess = session()
+
+    order_field = getattr(mapper_class, order_field)
+    cols = []
+    blacklist = []
+
+    for d in collapses:
+        for k, v in d.items():
+            blacklist.append(k)
+            blacklist.extend(v)
+
+    for name, var in vars(mapper_class).items():
+        if name in blacklist:
+            continue
+
+        if name.startswith('_'):
+            continue
+
+        if getattr(var, 'primary_key', False) is True:
+            continue
+
+        prop = var.property
+
+        if isinstance(prop, RelationshipProperty):
+            continue
+
+        cols.append(name)
+
+    mapped_cols = [getattr(mapper_class, n) for n in cols]
+    q = sess.query(*mapped_cols).filter(*conditions).distinct()
+    all_items = q.all()
+    total = len(all_items)
+    item_values = all_items[page]
+    # print("Item values", item_values)
+    # item = q.offset(page).limit(1).first()
+    # total = q.count()
+
+    collapse_conditions = [mc == v for mc, v in zip(mapped_cols, item_values)]
+    item = mapper_class(**{c: v for c, v in zip(cols, item_values)})
+
+    extra_data = {}
+
+    for d in collapses:
+        for k, cs in d.items():
+            cols = [k] + cs
+            c_cols = [getattr(mapper_class, c) for c in cols]
+            q = sess.query(*c_cols).filter(*collapse_conditions)
+            extra_data[k] = pivot_query(q, k)
+
+    return [total, item, extra_data]
 
 
 def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
@@ -198,40 +265,6 @@ def get_marine_unit_id_names(marine_unit_ids):
     return [total, q]
 
 
-# def get_a10_feature_targets(target_id):
-#     """ Used in extra_data for A10
-#     """
-#     conn = connection()
-#     res = conn.execute(text("""
-# SELECT DISTINCT FeatureType, PhysicalChemicalHabitatsFunctionalPressures
-# FROM MarineDB.dbo.MSFD10_FeaturesPressures
-# WHERE MSFD10_Target = :target_id
-# """), target_id=target_id)
-#
-#     items = []
-#
-#     for item in res:
-#         items.append(item)
-#
-#     return sorted(items)
-#
-#
-# def get_a10_criteria_indicators(target_id):
-#     conn = connection()
-#     res = conn.execute(text("""
-# SELECT DISTINCT GESDescriptorsCriteriaIndicators
-# FROM MarineDB.dbo.MSFD10_DESCrit
-# WHERE MSFD10_Target = :target_id
-# """), target_id=target_id)
-#
-#     items = []
-#
-#     for item in res:
-#         items.append(item)
-#
-#     return sorted(items)
-
-
 def get_related_record(klass, column, rel_id):
     sess = session()
     q = sess.query(klass).filter(
@@ -269,6 +302,5 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
 def get_all_records_join(columns, klass_join, *conditions):
     sess = session()
     q = sess.query(*columns).join(klass_join).filter(*conditions)
-
 
     return [q.count(), q]

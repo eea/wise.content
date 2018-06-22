@@ -36,6 +36,36 @@
     />
 
   <utility
+    component=".vocabulary.art11_country"
+    name="wise_search_art11_country"
+    />
+
+  <utility
+    component=".vocabulary.art11_country_ms"
+    name="wise_search_art11_country_ms"
+    />
+
+  <utility
+    component=".vocabulary.art11_region"
+    name="wise_search_art11_region"
+    />
+
+  <utility
+    component=".vocabulary.art11_region_ms"
+    name="wise_search_art11_region_ms"
+    />
+
+  <utility
+    component=".vocabulary.art11_marine_unit_id"
+    name="wise_search_art11_marine_unit_id"
+    />
+
+  <utility
+    component=".vocabulary.art11_marine_unit_id_ms"
+    name="wise_search_art11_marine_unit_id_ms"
+    />
+
+  <utility
     component=".vocabulary.a1314_report_types"
     name="wise_search_a1314_report_types"
     />
@@ -60,11 +90,62 @@
     name="wise_search_monitoring_programme_info_types"
     />
 
-<!-- TODO not used, delete this later -->
+  <!--
+    Articles 8, 9, 10 reporting year 2018
+  -->
   <utility
-    component=".vocabulary.monitoring_subprogramme_names"
-    name="wise_search_monitoring_subprogramme_names"
+    component=".vocabulary.articles_vocabulary_factory_2018"
+    name="wise_search_articles_2018"
     />
 
+  <utility
+    component=".vocabulary.a2018_country"
+    name="wise_search_a2018_country"
+    />
+
+  <utility
+    component=".vocabulary.a2018_marine_reporting_unit"
+    name="wise_search_a2018_marine_reporting_unit"
+    />
+
+  <utility
+    component=".vocabulary.a2018_ges_component_art9"
+    name="wise_search_a2018_ges_component_art9"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature_art9"
+    name="wise_search_a2018_feature_art9"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature_art81c"
+    name="wise_search_a2018_feature_art81c"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature"
+    name="wise_search_a2018_feature"
+    />
+
+  <utility
+    component=".vocabulary.a2018_ges_component"
+    name="wise_search_a2018_ges_component"
+    />
+
+  <utility
+    component=".vocabulary.a2018_ges_component_ind"
+    name="wise_search_a2018_ges_component_ind"
+    />
+
+  <utility
+    component=".vocabulary.a2018_feature_ind"
+    name="wise_search_a2018_feature_ind"
+    />
+
+  <utility
+    component=".vocabulary.a2018_mru_ind"
+    name="wise_search_a2018_mru_ind"
+    />
 
 </configure>

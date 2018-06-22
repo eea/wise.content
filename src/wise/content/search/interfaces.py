@@ -89,12 +89,42 @@ class IStartArticle11(Interface):
     )
 
 
-# TODO nod used, delete this later
-class I11Subprogrammes(Interface):
-    monitoring_subprogramme_names = List(
-        title=u"Monitoring subprogramme names",
-        value_type=Choice(
-            vocabulary="wise_search_monitoring_subprogramme_names"),
+class IMonitoringProgramme(Interface):
+    country = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country"),
+        required=False
+    )
+
+    region = List(
+        title=u"Region",
+        value_type=Choice(vocabulary="wise_search_art11_region"),
+        required=False
+    )
+
+    marine_unit_id = List(
+        title=u"Marine Unit IDs",
+        value_type=Choice(vocabulary="wise_search_art11_marine_unit_id"),
+        required=False
+    )
+
+
+class IMonitoringSubprogramme(Interface):
+    country = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country_ms"),
+        required=False
+    )
+
+    region = List(
+        title=u"Region",
+        value_type=Choice(vocabulary="wise_search_art11_region_ms"),
+        required=False
+    )
+
+    marine_unit_id = List(
+        title=u"Marine Unit IDs",
+        value_type=Choice(vocabulary="wise_search_art11_marine_unit_id_ms"),
         required=False
     )
 
@@ -133,4 +163,99 @@ class IA1314UniqueCodes(Interface):
         # interested",
         required=False,
         value_type=Choice(vocabulary="wise_search_a1314_unique_codes")
+    )
+
+
+# Articles 8, 9, 10
+# 2018 reporting year
+class IArticleSelect2018(Interface):
+    article = Choice(title=u"Article",
+                     required=False,
+                     default='',
+                     vocabulary="wise_search_articles_2018")
+
+
+class ICountryCodeMarineReportingUnits(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+    marine_reporting_unit = List(
+        title=u"Marine Reporting Unit",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_marine_reporting_unit")
+    )
+
+
+class ICountryCode(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+
+class ICountryCodeGESComponents(Interface):
+    country_code = List(
+        title=u"Country Code",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_country")
+    )
+
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component_art9")
+    )
+
+
+class IFeaturesGESComponents(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature")
+    )
+
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component")
+    )
+
+
+class IFeatures(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_art9")
+    )
+
+
+class IFeatures81c(Interface):
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_art81c")
+    )
+
+
+class IIndicatorsGESFeatureMRU(Interface):
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component_ind")
+    )
+
+    feature = List(
+        title=u"Features",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_feature_ind")
+    )
+
+    marine_reporting_unit = List(
+        title=u"Marine Reporting Unit",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_mru_ind")
     )

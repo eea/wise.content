@@ -1,9 +1,9 @@
-from sqlalchemy.inspection import inspect
 from zope.browserpage.viewpagetemplatefile import \
     ViewPageTemplateFile as Z3ViewPageTemplateFile
 from zope.component import queryMultiAdapter
 from zope.interface import implements
 
+from eea.cache import cache
 from plone.z3cform.layout import FormWrapper
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -12,10 +12,12 @@ from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
-from .db import get_available_marine_unit_ids, get_item_by_conditions
+from .db import (get_available_marine_unit_ids, get_item_by_conditions,
+                 threadlocals)
 from .interfaces import IMainForm
 from .utils import (default_value_from_field, get_obj_fields,
-                    get_registered_form_sections, print_value)
+                    get_registered_form_sections, print_value,
+                    request_cache_key)
 from .widget import MarineUnitIDSelectFieldWidget
 
 
@@ -108,6 +110,14 @@ class BaseUtil(object):
 
         return context
 
+    def get_record_title(self):
+        context = self
+
+        while not hasattr(context, 'record_title'):
+            context = context.context
+
+        return context.record_title
+
 
 class MainForm(Form):
     """ The main forms need to inherit from this clas
@@ -123,9 +133,10 @@ class MainForm(Form):
     # method = 'get'
 
     main_forms = (
-        ('msfd-c1', ('Article 8, 9 & 10', '2012 reporting exercise')),
+        ('msfd-c1', ('Articles 8, 9 & 10', '2012 reporting exercise')),
         ('msfd-c2', ('Article 11', '2014 reporting exercise')),
-        ('msfd-c3', ('Article 13 & 14', '2015 reporting exercise')),
+        ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
+        ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
     )
 
     @buttonAndHandler(u'Apply filters', name='continue')
@@ -170,6 +181,7 @@ class MainForm(Form):
                 # discovery is done in the update() method of subforms
                 self.subform_content = self.subform()
 
+    @cache(request_cache_key)
     def render(self):
         download_action = self.find_download_action()
 
@@ -211,6 +223,10 @@ class MainFormWrapper(FormWrapper):
     """
 
     index = ViewPageTemplateFile('pt/layout.pt')
+
+    def __init__(self, context, request):
+        FormWrapper.__init__(self, context, request)
+        threadlocals.session_name = self.form.session_name
 
     def render(self):
         if 'text/html' not in self.request.response.getHeader('Content-Type'):
@@ -349,6 +365,7 @@ class ItemDisplayForm(EmbededForm):
 
     template = ViewPageTemplateFile('pt/item-display-form.pt')
     data_template = ViewPageTemplateFile('pt/item-display.pt')
+    extra_data = None
     extra_data_template = ViewPageTemplateFile('pt/extra-data.pt')
 
     mapper_class = None     # This will be used to retrieve the item
@@ -413,10 +430,16 @@ class ItemDisplayForm(EmbededForm):
 
         return res
 
-    def item_title(self, item):
-        state = inspect(item)
-
-        return (item.__class__.__name__, state.identity[0])
+    # def item_title(self, item):
+    #     import pdb; pdb.set_trace()
+    #     state = inspect(item)
+    #
+    #     if state.identity:
+    #         id = state.identity[0]
+    #     else:
+    #         id = 0
+    #
+    #     return (item.__class__.__name__, id)
 
 
 class MultiItemDisplayForm(ItemDisplayForm):

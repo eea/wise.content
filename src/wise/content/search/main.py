@@ -1,3 +1,4 @@
+
 from plone.z3cform.layout import wrap_form
 from wise.content.search import interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
@@ -17,6 +18,7 @@ class StartArticle8910Form(MainForm):
     name = 'msfd-c1'
 
     fields = Fields(interfaces.IArticleSelect)
+    session_name = 'session'
 
     def get_subform(self):
 
@@ -74,9 +76,34 @@ class MarineUnitIDsForm(EmbededForm):
 StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
 StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 
+
+# TOD: implement a8910 for 2018
+class StartArticle89102018Form(MainForm):
+    record_title = 'Articles 8, 9, 10'
+    name = 'msfd-c4'
+
+    fields = Fields(interfaces.IArticleSelect2018)
+    session_name = 'session_2018'
+
+    def get_subform(self):
+        article = self.data['article']
+        if article:
+            if isinstance(article, tuple):
+                klass = article[0]
+            else:
+                klass = article
+            return klass(self, self.request)
+
+    def default_article(self):
+        return default_value_from_field(self, self.fields['article'])
+
+
+StartArticle89102018View = wrap_form(StartArticle89102018Form, MainFormWrapper)
+
 # discover and register associated views
 
 scan('a8ac')
 scan('a8b')
 scan('a9')
 scan('a10')
+scan('a89102018')

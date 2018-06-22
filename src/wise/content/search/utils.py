@@ -1,5 +1,7 @@
 import datetime
 from collections import defaultdict
+from cPickle import dumps
+from hashlib import md5
 from inspect import isclass
 from io import BytesIO
 
@@ -10,6 +12,7 @@ from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
 
+FORMS_2018 = {}
 FORMS_ART11 = {}
 FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
@@ -24,6 +27,16 @@ def class_id(obj):
         klass = obj.__class__
 
     return klass.__name__.lower()
+
+
+def register_form_2018(klass):
+    """ Register form classes for articles 8, 9, 10
+    for reporting year 2018
+    """
+
+    FORMS_2018[class_id(klass)] = klass
+
+    return klass
 
 
 def register_form_art11(klass):
@@ -143,6 +156,8 @@ def data_to_xls(data):
     workbook = xlsxwriter.Workbook(out, {'in_memory': True})
 
     for wtitle, wdata in data:
+        if wdata.count() == 0:
+            continue
         worksheet = workbook.add_worksheet(wtitle)
 
         row0 = wdata[0]
@@ -183,7 +198,7 @@ def get_obj_fields(obj, use_blacklist=True):
     res = []
     keys = sorted([c.key for c in mapper.attrs])
 
-    BLACKLIST = ['ID', 'Import']
+    BLACKLIST = ['ID', 'Import', 'Id']
 
     if not use_blacklist:
         return keys
@@ -274,3 +289,11 @@ def all_values_from_field(context, field):
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 
     return [term.token for term in vocab._terms]
+
+
+def request_cache_key(func, self):
+    form = sorted(self.request.form.items())
+    bits = self.__class__.__name__ + dumps(form)
+    key = md5(bits).hexdigest()
+
+    return key
