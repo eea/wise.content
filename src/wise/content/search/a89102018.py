@@ -15,43 +15,76 @@ from sqlalchemy import and_, or_
 
 class Art9Display(ItemDisplayForm):
     css_class = 'left-side-form'
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    show_extra_data = True
 
     def get_db_results(self):
         page = self.get_page()
         mapper_class = self.context.context.mapper_class
         features_mc = self.context.context.features_mc
-        ges_deter_mc = sql2018.ART9GESGESDetermination
+        determination_mc = sql2018.ART9GESGESDetermination
         country_codes = self.context.context.data.get('country_code', ())
         ges_components = self.context.context.data.get('ges_component', ())
         features = self.context.data.get('feature', ())
+
+        count, id_ges_components = db.get_all_records_join(
+            [determination_mc.IdGESComponent,
+             features_mc.Feature],
+            features_mc,
+            features_mc.Feature.in_(features)
+        )
+        id_ges_components = [x.IdGESComponent for x in id_ges_components]
+        id_ges_components = tuple(set(id_ges_components))
 
         count, res = db.get_item_by_conditions_joined(
             mapper_class,
             sql2018.ReportedInformation,
             'Id',
             and_(sql2018.ReportedInformation.CountryCode.in_(country_codes),
-                 mapper_class.GESComponent.in_(ges_components)),
+                 mapper_class.GESComponent.in_(ges_components),
+                 or_(mapper_class.Id.in_(id_ges_components),
+                     mapper_class.JustificationDelay.is_(None),
+                     mapper_class.JustificationNonUse.is_(None))
+                 ),
             page=page
         )
-        # import pdb;pdb.set_trace()
+        if not res:
+            return 0, []
+        
         if getattr(res, 'JustificationDelay', 0) \
                 or getattr(res, 'JustificationNonUse', 0):
+            self.show_extra_data = False
             return count, res
 
-        condition = list()
-        if features:
-            ges_deter_ids = db.get_unique_from_mapper(
-                features_mc,
-                'IdGESDetermination',
-                features_mc.Feature.in_(features)
+        self.show_extra_data = True
+        id_ges_comp = res.Id
+        res = db.get_related_record(
+            determination_mc,
+            'IdGESComponent',
+            id_ges_comp
+        )
+        return res
+
+    def get_extra_data(self):
+        if not self.item or not self.show_extra_data:
+            return {}
+
+        mc = sql2018.ART9GESMarineUnit
+        id_ges_deter = self.item.Id
+
+        marine_units = db.get_unique_from_mapper(
+            mc,
+            'MarineReportingUnit',
+            mc.IdGESDetermination == id_ges_deter
+        )
+
+        res = list()
+        if marine_units:
+            res.append(
+                ('Indicators Dataset', {'': marine_units})
             )
-            ges_deter_ids = [int(x) for x in ges_deter_ids]
-            condition.append(ges_deter_mc.Id.in_(ges_deter_ids))
 
-        # res = db.get_item_by_conditions()
-        # TODO finish this
-
-        return 0, []
+        return res
 
 
 @register_form_2018

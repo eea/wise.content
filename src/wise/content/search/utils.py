@@ -198,7 +198,7 @@ def get_obj_fields(obj, use_blacklist=True):
     res = []
     keys = sorted([c.key for c in mapper.attrs])
 
-    BLACKLIST = ['ID', 'Import',]
+    BLACKLIST = ['ID', 'Import', 'Id']
 
     if not use_blacklist:
         return keys

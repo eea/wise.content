@@ -741,6 +741,32 @@ def a2018_feature_art9(context):
     features_mc = context.features_mc
     json_str = json.loads(context.json())
 
+    countries = get_json_subform_data(json_str, 'Country Code')
+    ges_components = get_json_subform_data(json_str, 'GES Component')
+
+    mc_countries = sql2018.ReportedInformation
+    conditions = list()
+    if countries:
+        conditions.append(mc_countries.CountryCode.in_(countries))
+    if ges_components:
+        conditions.append(mapper_class.GESComponent.in_(ges_components))
+
+    count, id_marine_units = db.get_all_records_outerjoin(
+        mapper_class,
+        mc_countries,
+        *conditions
+    )
+    id_ges_components = [int(x.Id) for x in id_marine_units]
+
+    count, ids_ges_determination = db.get_all_records_join(
+        [sql2018.ART9GESGESDetermination.IdGESComponent,
+         sql2018.ART9GESGESDeterminationFeature.Feature],
+        sql2018.ART9GESGESDeterminationFeature,
+        sql2018.ART9GESGESDetermination.IdGESComponent.in_(id_ges_components)
+    )
+    res = [x.Feature for x in ids_ges_determination]
+    res = tuple(set(res))
+
     res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
     return vocab_from_values(res)
 
