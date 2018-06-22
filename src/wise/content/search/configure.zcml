@@ -32,7 +32,7 @@
     for="*"
     name="msfd-c4"
     class=".main.StartArticle89102018View"
-    permission="zope2.View"
+    permission="cmf.ModifyPortalContent"
     />
 
 </configure>
