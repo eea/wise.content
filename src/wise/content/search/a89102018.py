@@ -124,6 +124,48 @@ class A2018FeaturesForm(EmbededForm):
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
+    target_ids = tuple()
+
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        target_mc = self.context.context.target_mc
+
+        count, target = db.get_all_records(
+            target_mc,
+            target_mc.Id.in_(self.target_ids)
+        )
+        id_marine_units = [x.IdMarineUnit for x in target]
+
+        count, marine_unit = db.get_all_records(
+            sql2018.ART10TargetsMarineUnit,
+            sql2018.ART10TargetsMarineUnit.Id.in_(id_marine_units)
+        )
+
+        count, target_feature = db.get_all_records(
+            sql2018.ART10TargetsTargetFeature,
+            sql2018.ART10TargetsTargetFeature.IdTarget.in_(self.target_ids)
+        )
+
+        count, target_ges = db.get_all_records(
+            sql2018.ART10TargetsTargetGESComponent,
+            sql2018.ART10TargetsTargetGESComponent.IdTarget.in_(self.target_ids)
+        )
+
+        count, target_progress = db.get_all_records(
+            sql2018.ART10TargetsProgressAssessment,
+            sql2018.ART10TargetsProgressAssessment.IdTarget.in_(self.target_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART10TargetsMarineUnit', marine_unit),
+            ('ART10TargetsTarget', target),
+            ('ART10TargetsTargetFeature', target_feature),
+            ('ART10TargetsTargetGESComponent', target_ges),
+            ('ART10TargetsProgressAssessment', target_progress),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
@@ -155,6 +197,7 @@ class A2018Art10Display(ItemDisplayForm):
         )
 
         target_ids = tuple(set(target_ids) & set(features_ids) & set(ges_components_ids))
+        self.target_ids = target_ids
 
         mc = sql2018.ART10TargetsTarget
         res = db.get_item_by_conditions(
