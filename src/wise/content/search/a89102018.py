@@ -597,6 +597,55 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
 
+    conditions_ind_assess = list()
+
+    def download_results(self):
+        if not self.conditions_ind_assess:
+            return []
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        ges_components_mc = self.context.context.ges_components_mc
+        marine_mc = self.context.context.marine_mc
+
+        count, indicator_assessment = db.get_all_records(
+            mapper_class,
+            *self.conditions_ind_assess
+        )
+
+        ids_indicator = [x.Id for x in indicator_assessment]
+
+        count, indicator_dataset = db.get_all_records(
+            sql2018.IndicatorsDataset,
+            sql2018.IndicatorsDataset.IdIndicatorAssessment.in_(ids_indicator)
+        )
+
+        count, feature_ges_comp = db.get_all_records(
+            ges_components_mc,
+            ges_components_mc.IdIndicatorAssessment.in_(ids_indicator)
+        )
+        id_ges_components = [x.Id for x in feature_ges_comp]
+
+        count, feature_feature = db.get_all_records(
+            features_mc,
+            features_mc.IdGESComponent.in_(id_ges_components)
+        )
+
+        count, marine_unit = db.get_all_records(
+            marine_mc,
+            marine_mc.IdIndicatorAssessment.in_(ids_indicator)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('IndicatorsIndicatorAssessment', indicator_assessment),
+            ('IndicatorsDataset', indicator_dataset),
+            ('IndicatorsFeatureFeature', feature_feature),
+            ('IndicatorsFeatureGESComponent', feature_ges_comp),
+            ('IndicatorsMarineUnit', marine_unit),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
         countries = self.context.context.data.get('country_code', ())
@@ -646,6 +695,8 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             conditions.append(mapper_class.Id.in_(ids_indicator_main))
         if ids_ind_ass_ges:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_ges))
+
+        self.conditions_ind_assess = conditions
 
         res = db.get_item_by_conditions(
             mapper_class,
