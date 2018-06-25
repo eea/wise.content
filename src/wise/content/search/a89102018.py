@@ -232,9 +232,145 @@ class A2018FeaturesGESComponentsForm(EmbededForm):
 
 class A2018Art81abDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     def get_db_results(self):
-        return 0, []
+        page = self.get_page()
+        countries = self.context.context.data.get('country_code', [])
+        mrus = self.context.context.data.get('marine_reporting_unit', [])
+        features = self.context.data.get('feature', [])
+        ges_components = self.context.data.get('ges_component', [])
+        mapper_class = self.context.context.mapper_class
+        overall_status_mc = self.context.context.features_mc
+        mc_countries = sql2018.ReportedInformation
+
+        conditions = list()
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_marine_units = [int(x.Id) for x in id_marine_units]
+
+        res = db.get_item_by_conditions(
+            overall_status_mc,
+            'Id',
+            and_(overall_status_mc.Feature.in_(features),
+                 overall_status_mc.GESComponent.in_(ges_components)),
+            page=page
+        )
+
+        return res
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        id_overall = self.item.get('Id', 0)
+        excluded_columns = ('Id', 'IdOverallStatus')
+
+        pressure_codes = db.get_unique_from_mapper(
+            sql2018.ART8GESOverallStatusPressure,
+            'PressureCode',
+            sql2018.ART8GESOverallStatusPressure.IdOverallStatus == id_overall
+        )
+
+        target_codes = db.get_unique_from_mapper(
+            sql2018.ART8GESOverallStatusTarget,
+            'TargetCode',
+            sql2018.ART8GESOverallStatusTarget.IdOverallStatus == id_overall
+        )
+
+        element_status = db.get_all_columns_from_mapper(
+            sql2018.ART8GESElementStatu,
+            'Id',
+            sql2018.ART8GESElementStatu.IdOverallStatus == id_overall
+        )
+        element_status = db_objects_to_dict(element_status,
+                                            excluded_columns)
+        element_status_pivot = list()
+        for x in element_status:
+            element = x.pop('Element', None)
+            element2 = x.pop('Element2', None)
+            x['Element / Element2'] = ' / '.join((element, element2))
+            element_status_pivot.append(x)
+
+        element_status_pivot = pivot_data(element_status_pivot,
+                                          'Element / Element2')
+        # TODO get the Id for the selected element status
+        id_elem_status = [x.Id for x in element_status_pivot]
+
+        conditions = list()
+        conditions.append(sql2018.ART8GESCriteriaStatu.IdOverallStatus == id_overall)
+        if element_status_pivot:
+            conditions.append(
+                sql2018.ART8GESCriteriaStatu.IdElementStatus.in_(id_elem_status)
+            )
+
+        criteria_status = db.get_all_columns_from_mapper(
+            sql2018.ART8GESCriteriaStatu,
+            'Id',
+            *conditions
+        )
+        criteria_status = db_objects_to_dict(criteria_status,
+                                             excluded_columns)
+        criteria_status = pivot_data(criteria_status, 'Criteria')
+
+        # TODO get the Id for the selected criteria status
+        id_criteria_status = [x.Id for x in criteria_status]
+        criteria_value = db.get_all_columns_from_mapper(
+            sql2018.ART8GESCriteriaValue,
+            'Id',
+            sql2018.ART8GESCriteriaValue.IdCriteriaStatus.in_(id_criteria_status)
+        )
+        criteria_value = db_objects_to_dict(criteria_value,
+                                            excluded_columns)
+        criteria_value = pivot_data(criteria_value, 'Parameter')
+
+        # TODO get the Id for the selected criteria value
+        id_criteria_value = [x.Id for x in criteria_value]
+
+        criteria_value_ind = db.get_unique_from_mapper(
+            sql2018.ART8GESCriteriaValuesIndicator,
+            'IndicatorCode',
+            sql2018.ART8GESCriteriaValuesIndicator.IdCriteriaValues.in_(id_criteria_value)
+        )
+
+        res = list()
+        if pressure_codes:
+            res.append(
+                ('Pressure code(s)', {
+                    '': [{'PressureCode': x} for x in pressure_codes]
+                }))
+        if target_codes:
+            res.append(
+                ('Target code(s)', {
+                    '': [{'TargetCode': x} for x in target_codes]
+                }))
+        if element_status_pivot:
+            res.append(
+                ('Element Status', element_status_pivot)
+            )
+        if criteria_status:
+            res.append(
+                ('Criteria Status', criteria_status)
+            )
+        if criteria_value:
+            res.append(
+                ('Criteria Value', criteria_value)
+            )
+        if criteria_value_ind:
+            res.append(
+                ('Criteria Value Indicator', {
+                    '': [{'IndicatorCode': x} for x in criteria_value_ind]
+                }))
+
+        return res
 
 
 @register_form_2018
