@@ -18,6 +18,43 @@ class Art9Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     show_extra_data = True
 
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        determination_mc = sql2018.ART9GESGESDetermination
+
+        count, ges_component = db.get_all_records(
+            mapper_class,
+            self.condition_ges_component
+        )
+        id_ges_comp = [x.Id for x in ges_component]
+
+        count, ges_determination = db.get_all_records(
+            determination_mc,
+            determination_mc.IdGESComponent.in_(id_ges_comp)
+        )
+        id_ges_deter = [x.Id for x in id_ges_comp]
+
+        count, ges_deter_feature = db.get_all_records(
+            features_mc,
+            features_mc.IdGESDetermination.in_(id_ges_deter)
+        )
+
+        count, ges_marine_unit = db.get_all_records(
+            sql2018.ART9GESMarineUnit,
+            sql2018.ART9GESMarineUnit.IdGESDetermination.in_(id_ges_deter)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART9GESGESComponent', ges_component),
+            ('ART9GESGESDetermination', ges_determination),
+            ('ART9GESGESDeterminationFeature', ges_deter_feature),
+            ('ART9GESMarineUnit', ges_marine_unit),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
         mapper_class = self.context.context.mapper_class
@@ -36,16 +73,20 @@ class Art9Display(ItemDisplayForm):
         id_ges_components = [x.IdGESComponent for x in id_ges_components]
         id_ges_components = tuple(set(id_ges_components))
 
+        self.condition_ges_component = and_(
+            sql2018.ReportedInformation.CountryCode.in_(country_codes),
+            mapper_class.GESComponent.in_(ges_components),
+            or_(mapper_class.Id.in_(id_ges_components),
+                mapper_class.JustificationDelay.is_(None),
+                mapper_class.JustificationNonUse.is_(None)
+                )
+        )
+
         count, res = db.get_item_by_conditions_joined(
             mapper_class,
             sql2018.ReportedInformation,
             'Id',
-            and_(sql2018.ReportedInformation.CountryCode.in_(country_codes),
-                 mapper_class.GESComponent.in_(ges_components),
-                 or_(mapper_class.Id.in_(id_ges_components),
-                     mapper_class.JustificationDelay.is_(None),
-                     mapper_class.JustificationNonUse.is_(None))
-                 ),
+            self.condition_ges_component,
             page=page
         )
         if not res:
@@ -277,6 +318,76 @@ class A2018Art81abDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        overall_status_mc = self.context.context.features_mc
+
+        count, overall_status = db.get_all_records(
+            overall_status_mc,
+            self.conditions_overall_status
+        )
+        id_marine_unit = [x.IdMarineUnit for x in overall_status]
+        id_overall_status = [x.Id for x in overall_status]
+
+        count, marine_unit = db.get_all_records(
+            sql2018.ART8GESMarineUnit,
+            sql2018.ART8GESMarineUnit.Id.in_(id_marine_unit)
+        )
+
+        mc = sql2018.ART8GESOverallStatusPressure
+        count, overall_status_pressure = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+
+        mc = sql2018.ART8GESOverallStatusTarget
+        count, overall_status_target = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+
+        mc = sql2018.ART8GESElementStatu
+        count, element_status = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+        id_element_status = [x.Id for x in element_status]
+
+        mc = sql2018.ART8GESCriteriaStatu
+        count, criteria_status = db.get_all_records(
+            mc,
+            and_(mc.IdOverallStatus.in_(id_overall_status),
+                 mc.IdElementStatus.in_(id_element_status))
+        )
+        id_criteria_status = [x.Id for x in criteria_status]
+
+        mc = sql2018.ART8GESCriteriaValue
+        count, criteria_value = db.get_all_records(
+            mc,
+            mc.IdCriteriaStatus.in_(id_criteria_status)
+        )
+        id_criteria_value = [x.Id for x in criteria_value]
+
+        mc = sql2018.ART8GESCriteriaValuesIndicator
+        count, criteria_value_ind = db.get_all_records(
+            mc,
+            mc.IdCriteriaValues.in_(id_criteria_value)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART8GESMarineUnit', marine_unit),
+            ('ART8GESOverallStatu', overall_status),
+            ('ART8GESOverallStatusPressure', overall_status_pressure),
+            ('ART8GESOverallStatusTarget', overall_status_target),
+            ('ART8GESElementStatu', element_status),
+            ('ART8GESCriteriaStatu', criteria_status),
+            ('ART8GESCriteriaValue', criteria_value),
+            ('ART8GESCriteriaValuesIndicator', criteria_value_ind),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
         countries = self.context.context.data.get('country_code', [])
@@ -300,11 +411,16 @@ class A2018Art81abDisplay(ItemDisplayForm):
         )
         id_marine_units = [int(x.Id) for x in id_marine_units]
 
+        self.conditions_overall_status = and_(
+            overall_status_mc.Feature.in_(features),
+            overall_status_mc.GESComponent.in_(ges_components),
+            overall_status_mc.IdMarineUnit.in_(id_marine_units)
+        )
+
         res = db.get_item_by_conditions(
             overall_status_mc,
             'Id',
-            and_(overall_status_mc.Feature.in_(features),
-                 overall_status_mc.GESComponent.in_(ges_components)),
+            self.conditions_overall_status,
             page=page
         )
 
