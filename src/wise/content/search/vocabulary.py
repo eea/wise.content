@@ -150,6 +150,30 @@ def vocab_from_values(values):
     return vocab
 
 
+def vocab_from_values_with_count(values, column):
+    dict_count = dict()
+    for x in values:
+        col = getattr(x, column)
+        if col in dict_count:
+            dict_count[col] += 1
+        else:
+            dict_count[col] = 1
+
+    terms = [
+        SimpleTerm(x, x, "{} [{}]".format(LABELS.get(x, x), dict_count[x]))
+        for x in dict_count.keys()
+    ]
+    # TODO fix UnicodeDecodeError
+    # Article Indicators, country Lithuania
+    try:
+        terms.sort(key=lambda t: t.title)
+    except UnicodeDecodeError:
+        pass
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
 def db_vocab(table, column):
     """ Builds a vocabulary based on unique values in a column table
     """
@@ -664,15 +688,22 @@ def a2018_country(context):
     mapper_class = context.mapper_class
     # mapper_class = getattr(context, 'mapper_class', context.subform.mapper_class)
 
-    count, res = db.get_all_records_outerjoin(
-        sql2018.ReportedInformation,
-        mapper_class
+    count, res = db.get_all_records_join(
+        [
+            mapper_class.Id,
+            sql2018.ReportedInformation.CountryCode
+        ],
+        sql2018.ReportedInformation
     )
+    # count, res = db.get_all_records_outerjoin(
+    #     sql2018.ReportedInformation,
+    #     mapper_class
+    # )
 
-    res = [x.CountryCode for x in res]
-    res = list(set(res))
+    # res = [x.CountryCode for x in res]
+    # res = list(set(res))
 
-    return vocab_from_values(res)
+    return vocab_from_values_with_count(res, 'CountryCode')
 
 
 @provider(IVocabularyFactory)
@@ -938,15 +969,20 @@ def a2018_ges_component_ind(context):
     )
     ids_indicator = [int(x.Id) for x in ids_indicator]
 
-    res = db.get_unique_from_mapper(
+    # res = db.get_unique_from_mapper(
+    #     ges_comp_mc,
+    #     'GESComponent',
+    #     ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
+    # )
+
+    count, res = db.get_all_records(
         ges_comp_mc,
-        'GESComponent',
         ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
     )
 
     # import pdb;pdb.set_trace()
     # res = ['GESComponent%s' % x for x in range(0, 10)]
-    return vocab_from_values(res)
+    return vocab_from_values_with_count(res, 'GESComponent')
 
 
 @provider(IVocabularyFactory)
@@ -988,15 +1024,20 @@ def a2018_feature_ind(context):
     )
     ids_ges_comp = [int(x) for x in ids_ges_comp]
 
-    res = db.get_unique_from_mapper(
+    # res = db.get_unique_from_mapper(
+    #     features_mc,
+    #     'Feature',
+    #     features_mc.IdGESComponent.in_(ids_ges_comp)
+    # )
+
+    count, res = db.get_all_records(
         features_mc,
-        'Feature',
         features_mc.IdGESComponent.in_(ids_ges_comp)
     )
 
     # import pdb;pdb.set_trace()
     # res = ['Feature%s' % x for x in range(0, 10)]
-    return vocab_from_values(res)
+    return vocab_from_values_with_count(res, 'Feature')
 
 
 @provider(IVocabularyFactory)
@@ -1047,8 +1088,9 @@ def a2018_mru_ind(context):
         marine_mc,
         mapper_class.Id.in_(ids_indicator),
     )
-    res = [x.MarineReportingUnit for x in marine_units]
-    res = tuple(set(res))
+    res = marine_units
+    # res = [x.MarineReportingUnit for x in marine_units]
+    # res = tuple(set(res))
 
     # res = db.get_unique_from_mapper(
     #     marine_mc,
@@ -1057,4 +1099,4 @@ def a2018_mru_ind(context):
     # )
 
     # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
-    return vocab_from_values(res)
+    return vocab_from_values_with_count(res, 'MarineReportingUnit')
