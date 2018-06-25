@@ -401,6 +401,91 @@ class A2018Article81ab(EmbededForm):
 class A2018Art81cDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    id_marine_units = list()
+
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        features = self.context.data.get('feature', ())
+
+        conditions = list()
+        conditions.append(features_mc.IdMarineUnit.in_(self.id_marine_units))
+        if features:
+            conditions.append(features_mc.Feature.in_(features))
+
+        count, feature = db.get_all_records(
+            features_mc,
+            *conditions
+        )
+        id_marine_units = [x.IdMarineUnit for x in feature]
+        id_feature = [x.Id for x in feature]
+
+        count, marine_unit = db.get_all_records(
+            mapper_class,
+            mapper_class.Id.in_(id_marine_units)
+        )
+
+        count, feature_nace = db.get_all_records(
+            sql2018.ART8ESAFeatureNACE,
+            sql2018.ART8ESAFeatureNACE.IdFeature.in_(id_feature)
+        )
+
+        count, feature_ges_comp = db.get_all_records(
+            sql2018.ART8ESAFeatureGESComponent,
+            sql2018.ART8ESAFeatureGESComponent.IdFeature.in_(id_feature)
+        )
+
+        count, cost_degradation = db.get_all_records(
+            sql2018.ART8ESACostDegradation,
+            sql2018.ART8ESACostDegradation.IdFeature.in_(id_feature)
+        )
+        id_cost_degrad = [x.Id for x in cost_degradation]
+
+        mc = sql2018.ART8ESACostDegradationIndicator
+        count, cost_degradation_ind = db.get_all_records(
+            mc,
+            mc.IdCostDegradation.in_(id_cost_degrad)
+        )
+
+        count, uses_activity = db.get_all_records(
+            sql2018.ART8ESAUsesActivity,
+            sql2018.ART8ESAUsesActivity.IdFeature.in_(id_feature)
+        )
+        id_uses_act = [x.Id for x in uses_activity]
+
+        mc = sql2018.ART8ESAUsesActivitiesIndicator
+        count, uses_activity_ind = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        mc = sql2018.ART8ESAUsesActivitiesEcosystemService
+        count, uses_activity_eco = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        mc = sql2018.ART8ESAUsesActivitiesPressure
+        count, uses_activity_pres = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART8ESAMarineUnit', marine_unit),
+            ('ART8ESAFeature', feature),
+            ('ART8ESAFeatureNACE', feature_nace),
+            ('ART8ESAFeatureGESComponent', feature_ges_comp),
+            ('ART8ESACostDegradation', cost_degradation),
+            ('ART8ESACostDegradationIndicator', cost_degradation_ind),
+            ('ART8ESAUsesActivity', uses_activity),
+            ('ART8ESAUsesActivitiesIndicator', uses_activity_ind),
+            ('ART8ESAUsesActEcosystemService', uses_activity_eco),
+            ('ART8ESAUsesActivitiesPressure', uses_activity_pres),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
@@ -423,6 +508,7 @@ class A2018Art81cDisplay(ItemDisplayForm):
             *conditions
         )
         id_marine_units = [int(x.Id) for x in id_marine_units]
+        self.id_marine_units = id_marine_units
 
         res = db.get_item_by_conditions(
             features_mc,
