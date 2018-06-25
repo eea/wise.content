@@ -9,9 +9,14 @@ from zope.sqlalchemy import register
 from wise.content.search import sql
 from wise.content.search.utils import pivot_query
 
-DB = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb/MarineDB')
-DB_2018 = os.environ.get('MSFDURI',
-                         'mssql+pymssql://SA:bla3311!@msdb/MSFD2018_test')
+DSN = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
+
+DBS = {
+    'session': 'MarineDB',
+    'session_2018': 'MSFD2018_test'
+}
+
+USE_DB = 'USE {}'
 
 threadlocals = threading.local()
 
@@ -22,14 +27,10 @@ def session():
     if hasattr(threadlocals, session_name):
         return getattr(threadlocals, session_name)
 
-    if session_name == 'session':
-        dsn = DB
-    elif session_name == 'session_2018':
-        dsn = DB_2018
+    session = _make_session(DSN)
+    session.execute(USE_DB.format(DBS[session_name]))
 
-    session = _make_session(dsn)
     setattr(threadlocals, session_name, session)
-
     return session
 
 
