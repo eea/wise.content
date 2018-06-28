@@ -150,6 +150,30 @@ def vocab_from_values(values):
     return vocab
 
 
+def vocab_from_values_with_count(values, column):
+    dict_count = dict()
+    for x in values:
+        col = getattr(x, column)
+        if col in dict_count:
+            dict_count[col] += 1
+        else:
+            dict_count[col] = 1
+
+    terms = [
+        SimpleTerm(x, x, "{} [{}]".format(LABELS.get(x, x), dict_count[x]))
+        for x in dict_count.keys()
+    ]
+    # TODO fix UnicodeDecodeError
+    # Article Indicators, country Lithuania
+    try:
+        terms.sort(key=lambda t: t.title)
+    except UnicodeDecodeError:
+        pass
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
 def db_vocab(table, column):
     """ Builds a vocabulary based on unique values in a column table
     """
@@ -664,6 +688,13 @@ def a2018_country(context):
     mapper_class = context.mapper_class
     # mapper_class = getattr(context, 'mapper_class', context.subform.mapper_class)
 
+    # count, res = db.get_all_records_join(
+    #     [
+    #         mapper_class.Id,
+    #         sql2018.ReportedInformation.CountryCode
+    #     ],
+    #     sql2018.ReportedInformation
+    # )
     count, res = db.get_all_records_outerjoin(
         sql2018.ReportedInformation,
         mapper_class
@@ -944,6 +975,11 @@ def a2018_ges_component_ind(context):
         ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
     )
 
+    # count, res = db.get_all_records(
+    #     ges_comp_mc,
+    #     ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
+    # )
+
     # import pdb;pdb.set_trace()
     # res = ['GESComponent%s' % x for x in range(0, 10)]
     return vocab_from_values(res)
@@ -993,6 +1029,11 @@ def a2018_feature_ind(context):
         'Feature',
         features_mc.IdGESComponent.in_(ids_ges_comp)
     )
+
+    # count, res = db.get_all_records(
+    #     features_mc,
+    #     features_mc.IdGESComponent.in_(ids_ges_comp)
+    # )
 
     # import pdb;pdb.set_trace()
     # res = ['Feature%s' % x for x in range(0, 10)]
@@ -1047,6 +1088,7 @@ def a2018_mru_ind(context):
         marine_mc,
         mapper_class.Id.in_(ids_indicator),
     )
+    # res = marine_units
     res = [x.MarineReportingUnit for x in marine_units]
     res = tuple(set(res))
 

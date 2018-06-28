@@ -18,6 +18,43 @@ class Art9Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     show_extra_data = True
 
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        determination_mc = sql2018.ART9GESGESDetermination
+
+        count, ges_component = db.get_all_records(
+            mapper_class,
+            self.condition_ges_component
+        )
+        id_ges_comp = [x.Id for x in ges_component]
+
+        count, ges_determination = db.get_all_records(
+            determination_mc,
+            determination_mc.IdGESComponent.in_(id_ges_comp)
+        )
+        id_ges_deter = [x.Id for x in id_ges_comp]
+
+        count, ges_deter_feature = db.get_all_records(
+            features_mc,
+            features_mc.IdGESDetermination.in_(id_ges_deter)
+        )
+
+        count, ges_marine_unit = db.get_all_records(
+            sql2018.ART9GESMarineUnit,
+            sql2018.ART9GESMarineUnit.IdGESDetermination.in_(id_ges_deter)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART9GESGESComponent', ges_component),
+            ('ART9GESGESDetermination', ges_determination),
+            ('ART9GESGESDeterminationFeature', ges_deter_feature),
+            ('ART9GESMarineUnit', ges_marine_unit),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
         mapper_class = self.context.context.mapper_class
@@ -36,16 +73,20 @@ class Art9Display(ItemDisplayForm):
         id_ges_components = [x.IdGESComponent for x in id_ges_components]
         id_ges_components = tuple(set(id_ges_components))
 
+        self.condition_ges_component = and_(
+            sql2018.ReportedInformation.CountryCode.in_(country_codes),
+            mapper_class.GESComponent.in_(ges_components),
+            or_(mapper_class.Id.in_(id_ges_components),
+                mapper_class.JustificationDelay.is_(None),
+                mapper_class.JustificationNonUse.is_(None)
+                )
+        )
+
         count, res = db.get_item_by_conditions_joined(
             mapper_class,
             sql2018.ReportedInformation,
             'Id',
-            and_(sql2018.ReportedInformation.CountryCode.in_(country_codes),
-                 mapper_class.GESComponent.in_(ges_components),
-                 or_(mapper_class.Id.in_(id_ges_components),
-                     mapper_class.JustificationDelay.is_(None),
-                     mapper_class.JustificationNonUse.is_(None))
-                 ),
+            self.condition_ges_component,
             page=page
         )
         if not res:
@@ -124,6 +165,48 @@ class A2018FeaturesForm(EmbededForm):
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
+    target_ids = tuple()
+
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        target_mc = self.context.context.target_mc
+
+        count, target = db.get_all_records(
+            target_mc,
+            target_mc.Id.in_(self.target_ids)
+        )
+        id_marine_units = [x.IdMarineUnit for x in target]
+
+        count, marine_unit = db.get_all_records(
+            sql2018.ART10TargetsMarineUnit,
+            sql2018.ART10TargetsMarineUnit.Id.in_(id_marine_units)
+        )
+
+        count, target_feature = db.get_all_records(
+            sql2018.ART10TargetsTargetFeature,
+            sql2018.ART10TargetsTargetFeature.IdTarget.in_(self.target_ids)
+        )
+
+        count, target_ges = db.get_all_records(
+            sql2018.ART10TargetsTargetGESComponent,
+            sql2018.ART10TargetsTargetGESComponent.IdTarget.in_(self.target_ids)
+        )
+
+        count, target_progress = db.get_all_records(
+            sql2018.ART10TargetsProgressAssessment,
+            sql2018.ART10TargetsProgressAssessment.IdTarget.in_(self.target_ids)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART10TargetsMarineUnit', marine_unit),
+            ('ART10TargetsTarget', target),
+            ('ART10TargetsTargetFeature', target_feature),
+            ('ART10TargetsTargetGESComponent', target_ges),
+            ('ART10TargetsProgressAssessment', target_progress),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
@@ -155,6 +238,7 @@ class A2018Art10Display(ItemDisplayForm):
         )
 
         target_ids = tuple(set(target_ids) & set(features_ids) & set(ges_components_ids))
+        self.target_ids = target_ids
 
         mc = sql2018.ART10TargetsTarget
         res = db.get_item_by_conditions(
@@ -232,9 +316,220 @@ class A2018FeaturesGESComponentsForm(EmbededForm):
 
 class A2018Art81abDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
+    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        overall_status_mc = self.context.context.features_mc
+
+        count, overall_status = db.get_all_records(
+            overall_status_mc,
+            self.conditions_overall_status
+        )
+        id_marine_unit = [x.IdMarineUnit for x in overall_status]
+        id_overall_status = [x.Id for x in overall_status]
+
+        count, marine_unit = db.get_all_records(
+            sql2018.ART8GESMarineUnit,
+            sql2018.ART8GESMarineUnit.Id.in_(id_marine_unit)
+        )
+
+        mc = sql2018.ART8GESOverallStatusPressure
+        count, overall_status_pressure = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+
+        mc = sql2018.ART8GESOverallStatusTarget
+        count, overall_status_target = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+
+        mc = sql2018.ART8GESElementStatu
+        count, element_status = db.get_all_records(
+            mc,
+            mc.IdOverallStatus.in_(id_overall_status)
+        )
+        id_element_status = [x.Id for x in element_status]
+
+        mc = sql2018.ART8GESCriteriaStatu
+        count, criteria_status = db.get_all_records(
+            mc,
+            and_(mc.IdOverallStatus.in_(id_overall_status),
+                 mc.IdElementStatus.in_(id_element_status))
+        )
+        id_criteria_status = [x.Id for x in criteria_status]
+
+        mc = sql2018.ART8GESCriteriaValue
+        count, criteria_value = db.get_all_records(
+            mc,
+            mc.IdCriteriaStatus.in_(id_criteria_status)
+        )
+        id_criteria_value = [x.Id for x in criteria_value]
+
+        mc = sql2018.ART8GESCriteriaValuesIndicator
+        count, criteria_value_ind = db.get_all_records(
+            mc,
+            mc.IdCriteriaValues.in_(id_criteria_value)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART8GESMarineUnit', marine_unit),
+            ('ART8GESOverallStatu', overall_status),
+            ('ART8GESOverallStatusPressure', overall_status_pressure),
+            ('ART8GESOverallStatusTarget', overall_status_target),
+            ('ART8GESElementStatu', element_status),
+            ('ART8GESCriteriaStatu', criteria_status),
+            ('ART8GESCriteriaValue', criteria_value),
+            ('ART8GESCriteriaValuesIndicator', criteria_value_ind),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
-        return 0, []
+        page = self.get_page()
+        countries = self.context.context.data.get('country_code', [])
+        mrus = self.context.context.data.get('marine_reporting_unit', [])
+        features = self.context.data.get('feature', [])
+        ges_components = self.context.data.get('ges_component', [])
+        mapper_class = self.context.context.mapper_class
+        overall_status_mc = self.context.context.features_mc
+        mc_countries = sql2018.ReportedInformation
+
+        conditions = list()
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_marine_units = [int(x.Id) for x in id_marine_units]
+
+        self.conditions_overall_status = and_(
+            overall_status_mc.Feature.in_(features),
+            overall_status_mc.GESComponent.in_(ges_components),
+            overall_status_mc.IdMarineUnit.in_(id_marine_units)
+        )
+
+        res = db.get_item_by_conditions(
+            overall_status_mc,
+            'Id',
+            self.conditions_overall_status,
+            page=page
+        )
+
+        return res
+
+    def get_extra_data(self):
+        if not self.item:
+            return {}
+
+        id_overall = self.item.get('Id', 0)
+        excluded_columns = ('Id', 'IdOverallStatus')
+
+        pressure_codes = db.get_unique_from_mapper(
+            sql2018.ART8GESOverallStatusPressure,
+            'PressureCode',
+            sql2018.ART8GESOverallStatusPressure.IdOverallStatus == id_overall
+        )
+
+        target_codes = db.get_unique_from_mapper(
+            sql2018.ART8GESOverallStatusTarget,
+            'TargetCode',
+            sql2018.ART8GESOverallStatusTarget.IdOverallStatus == id_overall
+        )
+
+        element_status = db.get_all_columns_from_mapper(
+            sql2018.ART8GESElementStatu,
+            'Id',
+            sql2018.ART8GESElementStatu.IdOverallStatus == id_overall
+        )
+        element_status = db_objects_to_dict(element_status,
+                                            excluded_columns)
+        element_status_pivot = list()
+        for x in element_status:
+            element = x.pop('Element', None)
+            element2 = x.pop('Element2', None)
+            x['Element / Element2'] = ' / '.join((element, element2))
+            element_status_pivot.append(x)
+
+        element_status_pivot = pivot_data(element_status_pivot,
+                                          'Element / Element2')
+        # TODO get the Id for the selected element status
+        id_elem_status = [x.Id for x in element_status_pivot]
+
+        conditions = list()
+        conditions.append(sql2018.ART8GESCriteriaStatu.IdOverallStatus == id_overall)
+        if element_status_pivot:
+            conditions.append(
+                sql2018.ART8GESCriteriaStatu.IdElementStatus.in_(id_elem_status)
+            )
+
+        criteria_status = db.get_all_columns_from_mapper(
+            sql2018.ART8GESCriteriaStatu,
+            'Id',
+            *conditions
+        )
+        criteria_status = db_objects_to_dict(criteria_status,
+                                             excluded_columns)
+        criteria_status = pivot_data(criteria_status, 'Criteria')
+
+        # TODO get the Id for the selected criteria status
+        id_criteria_status = [x.Id for x in criteria_status]
+        criteria_value = db.get_all_columns_from_mapper(
+            sql2018.ART8GESCriteriaValue,
+            'Id',
+            sql2018.ART8GESCriteriaValue.IdCriteriaStatus.in_(id_criteria_status)
+        )
+        criteria_value = db_objects_to_dict(criteria_value,
+                                            excluded_columns)
+        criteria_value = pivot_data(criteria_value, 'Parameter')
+
+        # TODO get the Id for the selected criteria value
+        id_criteria_value = [x.Id for x in criteria_value]
+
+        criteria_value_ind = db.get_unique_from_mapper(
+            sql2018.ART8GESCriteriaValuesIndicator,
+            'IndicatorCode',
+            sql2018.ART8GESCriteriaValuesIndicator.IdCriteriaValues.in_(id_criteria_value)
+        )
+
+        res = list()
+        if pressure_codes:
+            res.append(
+                ('Pressure code(s)', {
+                    '': [{'PressureCode': x} for x in pressure_codes]
+                }))
+        if target_codes:
+            res.append(
+                ('Target code(s)', {
+                    '': [{'TargetCode': x} for x in target_codes]
+                }))
+        if element_status_pivot:
+            res.append(
+                ('Element Status', element_status_pivot)
+            )
+        if criteria_status:
+            res.append(
+                ('Criteria Status', criteria_status)
+            )
+        if criteria_value:
+            res.append(
+                ('Criteria Value', criteria_value)
+            )
+        if criteria_value_ind:
+            res.append(
+                ('Criteria Value Indicator', {
+                    '': [{'IndicatorCode': x} for x in criteria_value_ind]
+                }))
+
+        return res
 
 
 @register_form_2018
@@ -265,6 +560,91 @@ class A2018Article81ab(EmbededForm):
 class A2018Art81cDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    id_marine_units = list()
+
+    def download_results(self):
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        features = self.context.data.get('feature', ())
+
+        conditions = list()
+        conditions.append(features_mc.IdMarineUnit.in_(self.id_marine_units))
+        if features:
+            conditions.append(features_mc.Feature.in_(features))
+
+        count, feature = db.get_all_records(
+            features_mc,
+            *conditions
+        )
+        id_marine_units = [x.IdMarineUnit for x in feature]
+        id_feature = [x.Id for x in feature]
+
+        count, marine_unit = db.get_all_records(
+            mapper_class,
+            mapper_class.Id.in_(id_marine_units)
+        )
+
+        count, feature_nace = db.get_all_records(
+            sql2018.ART8ESAFeatureNACE,
+            sql2018.ART8ESAFeatureNACE.IdFeature.in_(id_feature)
+        )
+
+        count, feature_ges_comp = db.get_all_records(
+            sql2018.ART8ESAFeatureGESComponent,
+            sql2018.ART8ESAFeatureGESComponent.IdFeature.in_(id_feature)
+        )
+
+        count, cost_degradation = db.get_all_records(
+            sql2018.ART8ESACostDegradation,
+            sql2018.ART8ESACostDegradation.IdFeature.in_(id_feature)
+        )
+        id_cost_degrad = [x.Id for x in cost_degradation]
+
+        mc = sql2018.ART8ESACostDegradationIndicator
+        count, cost_degradation_ind = db.get_all_records(
+            mc,
+            mc.IdCostDegradation.in_(id_cost_degrad)
+        )
+
+        count, uses_activity = db.get_all_records(
+            sql2018.ART8ESAUsesActivity,
+            sql2018.ART8ESAUsesActivity.IdFeature.in_(id_feature)
+        )
+        id_uses_act = [x.Id for x in uses_activity]
+
+        mc = sql2018.ART8ESAUsesActivitiesIndicator
+        count, uses_activity_ind = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        mc = sql2018.ART8ESAUsesActivitiesEcosystemService
+        count, uses_activity_eco = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        mc = sql2018.ART8ESAUsesActivitiesPressure
+        count, uses_activity_pres = db.get_all_records(
+            mc,
+            mc.IdUsesActivities.in_(id_uses_act)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('ART8ESAMarineUnit', marine_unit),
+            ('ART8ESAFeature', feature),
+            ('ART8ESAFeatureNACE', feature_nace),
+            ('ART8ESAFeatureGESComponent', feature_ges_comp),
+            ('ART8ESACostDegradation', cost_degradation),
+            ('ART8ESACostDegradationIndicator', cost_degradation_ind),
+            ('ART8ESAUsesActivity', uses_activity),
+            ('ART8ESAUsesActivitiesIndicator', uses_activity_ind),
+            ('ART8ESAUsesActEcosystemService', uses_activity_eco),
+            ('ART8ESAUsesActivitiesPressure', uses_activity_pres),
+        ]
+
+        return data_to_xls(xlsdata)
 
     def get_db_results(self):
         page = self.get_page()
@@ -287,6 +667,7 @@ class A2018Art81cDisplay(ItemDisplayForm):
             *conditions
         )
         id_marine_units = [int(x.Id) for x in id_marine_units]
+        self.id_marine_units = id_marine_units
 
         res = db.get_item_by_conditions(
             features_mc,
@@ -461,6 +842,55 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
 
+    conditions_ind_assess = list()
+
+    def download_results(self):
+        if not self.conditions_ind_assess:
+            return []
+        mapper_class = self.context.context.mapper_class
+        features_mc = self.context.context.features_mc
+        ges_components_mc = self.context.context.ges_components_mc
+        marine_mc = self.context.context.marine_mc
+
+        count, indicator_assessment = db.get_all_records(
+            mapper_class,
+            *self.conditions_ind_assess
+        )
+
+        ids_indicator = [x.Id for x in indicator_assessment]
+
+        count, indicator_dataset = db.get_all_records(
+            sql2018.IndicatorsDataset,
+            sql2018.IndicatorsDataset.IdIndicatorAssessment.in_(ids_indicator)
+        )
+
+        count, feature_ges_comp = db.get_all_records(
+            ges_components_mc,
+            ges_components_mc.IdIndicatorAssessment.in_(ids_indicator)
+        )
+        id_ges_components = [x.Id for x in feature_ges_comp]
+
+        count, feature_feature = db.get_all_records(
+            features_mc,
+            features_mc.IdGESComponent.in_(id_ges_components)
+        )
+
+        count, marine_unit = db.get_all_records(
+            marine_mc,
+            marine_mc.IdIndicatorAssessment.in_(ids_indicator)
+        )
+
+        xlsdata = [
+            # worksheet title, row data
+            ('IndicatorsIndicatorAssessment', indicator_assessment),
+            ('IndicatorsDataset', indicator_dataset),
+            ('IndicatorsFeatureFeature', feature_feature),
+            ('IndicatorsFeatureGESComponent', feature_ges_comp),
+            ('IndicatorsMarineUnit', marine_unit),
+        ]
+
+        return data_to_xls(xlsdata)
+
     def get_db_results(self):
         page = self.get_page()
         countries = self.context.context.data.get('country_code', ())
@@ -510,6 +940,8 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             conditions.append(mapper_class.Id.in_(ids_indicator_main))
         if ids_ind_ass_ges:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_ges))
+
+        self.conditions_ind_assess = conditions
 
         res = db.get_item_by_conditions(
             mapper_class,
