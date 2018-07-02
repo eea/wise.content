@@ -13,7 +13,7 @@ DSN = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
 
 DBS = {
     'session': 'MarineDB',
-    'session_2018': 'MSFD2018_test'
+    'session_2018': 'MSFD2018_production'
 }
 
 USE_DB = 'USE {}'
@@ -31,6 +31,7 @@ def session():
     session.execute(USE_DB.format(DBS[session_name]))
 
     setattr(threadlocals, session_name, session)
+
     return session
 
 
