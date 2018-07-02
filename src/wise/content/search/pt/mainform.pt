@@ -1,4 +1,4 @@
-<div id="wise-search-form">
+<div id="wise-search-form" tal:define="subform_content view/subform | nothing">
   <div id="wise-search-form-top">
     <ul class="nav nav-pills topnav hidden-xs">
       <tal:rep tal:repeat="info view/main_forms">
@@ -38,7 +38,7 @@
         </select>
     </div>
     <!-- <h2 tal:content="view/title">Title here</h2> -->
-    <div tal:condition="not: view/subform_content">
+    <div tal:condition="not: subform_content">
       Please refine your search.
     </div>
   </div>
@@ -51,7 +51,7 @@
         </div>
       </metal:slot>
       <metal:slot fill-slot="actions">
-        <div tal:content="structure view/subform_content | nothing">subform here</div>
+        <div tal:content="structure subform_content | nothing">subform here</div>
         <div class="form-right-side">
           <metal:block use-macro="context/@@ploneform-macros/actions" />
         </div>
