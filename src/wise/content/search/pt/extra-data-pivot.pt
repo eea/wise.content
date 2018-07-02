@@ -14,7 +14,7 @@
           <select class="notselect extra-details-select">
             <tal:block tal:repeat="tab_title section">
               <tal:block tal:define="utitle python: tab_title or section_title">
-                <option tal:attributes="title utitle; value python:view.title_as_id(tab_title);"
+                <option tal:attributes="title utitle; value python:view.title_as_id(utitle);"
                         tal:content="structure python: view.print_value(utitle)">Section title here</option>
               </tal:block>
             </tal:block>
