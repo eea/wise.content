@@ -179,8 +179,8 @@ class MainForm(Form):
                 # we need to update and "execute" the subforms to be able to
                 # discover them, because the decision process regarding
                 # discovery is done in the update() method of subforms
-                self.subform.update()
-                # self.subform_content = self.subform()
+                self.subform_content = self.subform()
+                # self.subform.update()
 
     @cache(request_cache_key)
     def render(self):
