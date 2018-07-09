@@ -180,6 +180,7 @@ class MainForm(Form):
                 # discover them, because the decision process regarding
                 # discovery is done in the update() method of subforms
                 self.subform_content = self.subform()
+                # self.subform.update()
 
     @cache(request_cache_key)
     def render(self):
