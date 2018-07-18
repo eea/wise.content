@@ -9,11 +9,12 @@ from zope.sqlalchemy import register
 from wise.content.search import sql
 from wise.content.search.utils import pivot_query
 
-DSN = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
+env = os.environ.get
+DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
 
 DBS = {
-    'session': 'MarineDB',
-    'session_2018': 'MSFD2018_production'
+    'session': env('MSFD_db_default', 'MarineDB'),
+    'session_2018': env('MSFD_db_2018', 'MSFD2018_production')
 }
 
 USE_DB = 'USE {}'
