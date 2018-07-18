@@ -1,16 +1,13 @@
-from z3c.form.field import Fields
-from z3c.form.browser.checkbox import CheckBoxFieldWidget
-from wise.content.search import db, interfaces, sql2018
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-
-from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
-                    default_value_from_field, pivot_data, register_form_art11,
-                    register_form_section, register_form_2018)
-
-from .base import (EmbededForm, ItemDisplay,
-                   ItemDisplayForm, MultiItemDisplayForm)
-
 from sqlalchemy import and_, or_
+
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from wise.content.search import db, interfaces, sql2018
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
+from z3c.form.field import Fields
+
+from .base import EmbededForm, ItemDisplayForm
+from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
+                    pivot_data, register_form_2018)
 
 
 class Art9Display(ItemDisplayForm):
@@ -89,12 +86,14 @@ class Art9Display(ItemDisplayForm):
             self.condition_ges_component,
             page=page
         )
+
         if not res:
             return 0, []
-        
+
         if getattr(res, 'JustificationDelay', 0) \
                 or getattr(res, 'JustificationNonUse', 0):
             self.show_extra_data = False
+
             return count, res
 
         self.show_extra_data = True
@@ -104,6 +103,7 @@ class Art9Display(ItemDisplayForm):
             'IdGESComponent',
             id_ges_comp
         )
+
         return res
 
     def get_extra_data(self):
@@ -120,6 +120,7 @@ class Art9Display(ItemDisplayForm):
         )
 
         res = list()
+
         if marine_units:
             res.append(
                 ('Indicators Dataset', {'': marine_units})
@@ -156,6 +157,7 @@ class A2018FeaturesForm(EmbededForm):
 
     def get_subform(self):
         klass = self.context.display_klass
+
         return klass(self, self.request)
 
     def default_feature(self):
@@ -168,7 +170,7 @@ class A2018Art10Display(ItemDisplayForm):
     target_ids = tuple()
 
     def download_results(self):
-        mapper_class = self.context.context.mapper_class
+        # mapper_class = self.context.context.mapper_class
         target_mc = self.context.context.target_mc
 
         count, target = db.get_all_records(
@@ -187,14 +189,16 @@ class A2018Art10Display(ItemDisplayForm):
             sql2018.ART10TargetsTargetFeature.IdTarget.in_(self.target_ids)
         )
 
+        s = sql2018.ART10TargetsTargetGESComponent
         count, target_ges = db.get_all_records(
-            sql2018.ART10TargetsTargetGESComponent,
-            sql2018.ART10TargetsTargetGESComponent.IdTarget.in_(self.target_ids)
+            s,
+            s.IdTarget.in_(self.target_ids)
         )
 
+        s = sql2018.ART10TargetsProgressAssessment
         count, target_progress = db.get_all_records(
-            sql2018.ART10TargetsProgressAssessment,
-            sql2018.ART10TargetsProgressAssessment.IdTarget.in_(self.target_ids)
+            s,
+            s.IdTarget.in_(self.target_ids)
         )
 
         xlsdata = [
@@ -211,7 +215,8 @@ class A2018Art10Display(ItemDisplayForm):
     def get_db_results(self):
         page = self.get_page()
         country_codes = self.context.context.data.get('country_code', [])
-        marine_units = self.context.context.data.get('marine_reporting_unit', [])
+        marine_units = self.context.context.data.get('marine_reporting_unit',
+                                                     [])
         features = self.context.data.get('feature', [])
         ges_components = self.context.data.get('ges_component', [])
 
@@ -231,13 +236,16 @@ class A2018Art10Display(ItemDisplayForm):
             sql2018.ART10TargetsTargetFeature.Feature.in_(features)
         )
 
+        s = sql2018.ART10TargetsTargetGESComponent
         ges_components_ids = db.get_unique_from_mapper(
-            sql2018.ART10TargetsTargetGESComponent,
+            s,
             'IdTarget',
-            sql2018.ART10TargetsTargetGESComponent.GESComponent.in_(ges_components)
+            s.GESComponent.in_(ges_components)
         )
 
-        target_ids = tuple(set(target_ids) & set(features_ids) & set(ges_components_ids))
+        target_ids = tuple(set(target_ids)
+                           & set(features_ids)
+                           & set(ges_components_ids))
         self.target_ids = target_ids
 
         mc = sql2018.ART10TargetsTarget
@@ -295,7 +303,8 @@ class A2018Article10(EmbededForm):
         return all_values_from_field(self, self.fields['country_code'])
 
     def default_marine_reporting_unit(self):
-        return all_values_from_field(self, self.fields['marine_reporting_unit'])
+        return all_values_from_field(self,
+                                     self.fields['marine_reporting_unit'])
 
 
 class A2018FeaturesGESComponentsForm(EmbededForm):
@@ -305,6 +314,7 @@ class A2018FeaturesGESComponentsForm(EmbededForm):
 
     def get_subform(self):
         klass = self.context.display_klass
+
         return klass(self, self.request)
 
     def default_feature(self):
@@ -319,7 +329,7 @@ class A2018Art81abDisplay(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     def download_results(self):
-        mapper_class = self.context.context.mapper_class
+        # mapper_class = self.context.context.mapper_class
         overall_status_mc = self.context.context.features_mc
 
         count, overall_status = db.get_all_records(
@@ -399,8 +409,10 @@ class A2018Art81abDisplay(ItemDisplayForm):
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
+
         if mrus:
             conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
@@ -453,6 +465,7 @@ class A2018Art81abDisplay(ItemDisplayForm):
         element_status = db_objects_to_dict(element_status,
                                             excluded_columns)
         element_status_pivot = list()
+
         for x in element_status:
             element = x.pop('Element', None)
             element2 = x.pop('Element2', None)
@@ -464,11 +477,13 @@ class A2018Art81abDisplay(ItemDisplayForm):
         # TODO get the Id for the selected element status
         id_elem_status = [x.Id for x in element_status_pivot]
 
+        s = sql2018.ART8GESCriteriaStatu
         conditions = list()
-        conditions.append(sql2018.ART8GESCriteriaStatu.IdOverallStatus == id_overall)
+        conditions.append(s.IdOverallStatus == id_overall)
+
         if element_status_pivot:
             conditions.append(
-                sql2018.ART8GESCriteriaStatu.IdElementStatus.in_(id_elem_status)
+                s.IdElementStatus.in_(id_elem_status)
             )
 
         criteria_status = db.get_all_columns_from_mapper(
@@ -482,10 +497,11 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         # TODO get the Id for the selected criteria status
         id_criteria_status = [x.Id for x in criteria_status]
+        s = sql2018.ART8GESCriteriaValue
         criteria_value = db.get_all_columns_from_mapper(
-            sql2018.ART8GESCriteriaValue,
+            s,
             'Id',
-            sql2018.ART8GESCriteriaValue.IdCriteriaStatus.in_(id_criteria_status)
+            s.IdCriteriaStatus.in_(id_criteria_status)
         )
         criteria_value = db_objects_to_dict(criteria_value,
                                             excluded_columns)
@@ -494,35 +510,42 @@ class A2018Art81abDisplay(ItemDisplayForm):
         # TODO get the Id for the selected criteria value
         id_criteria_value = [x.Id for x in criteria_value]
 
+        s = sql2018.ART8GESCriteriaValuesIndicator
         criteria_value_ind = db.get_unique_from_mapper(
-            sql2018.ART8GESCriteriaValuesIndicator,
+            s,
             'IndicatorCode',
-            sql2018.ART8GESCriteriaValuesIndicator.IdCriteriaValues.in_(id_criteria_value)
+            s.IdCriteriaValues.in_(id_criteria_value)
         )
 
         res = list()
+
         if pressure_codes:
             res.append(
                 ('Pressure code(s)', {
                     '': [{'PressureCode': x} for x in pressure_codes]
                 }))
+
         if target_codes:
             res.append(
                 ('Target code(s)', {
                     '': [{'TargetCode': x} for x in target_codes]
                 }))
+
         if element_status_pivot:
             res.append(
                 ('Element Status', element_status_pivot)
             )
+
         if criteria_status:
             res.append(
                 ('Criteria Status', criteria_status)
             )
+
         if criteria_value:
             res.append(
                 ('Criteria Value', criteria_value)
             )
+
         if criteria_value_ind:
             res.append(
                 ('Criteria Value Indicator', {
@@ -554,7 +577,8 @@ class A2018Article81ab(EmbededForm):
         return all_values_from_field(self, self.fields['country_code'])
 
     def default_marine_reporting_unit(self):
-        return all_values_from_field(self, self.fields['marine_reporting_unit'])
+        return all_values_from_field(self,
+                                     self.fields['marine_reporting_unit'])
 
 
 class A2018Art81cDisplay(ItemDisplayForm):
@@ -569,6 +593,7 @@ class A2018Art81cDisplay(ItemDisplayForm):
 
         conditions = list()
         conditions.append(features_mc.IdMarineUnit.in_(self.id_marine_units))
+
         if features:
             conditions.append(features_mc.Feature.in_(features))
 
@@ -656,8 +681,10 @@ class A2018Art81cDisplay(ItemDisplayForm):
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
+
         if mrus:
             conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
@@ -723,58 +750,70 @@ class A2018Art81cDisplay(ItemDisplayForm):
                                              excluded_columns)
 
         ids_uses_act = [x.Id for x in uses_activities]
+        s = sql2018.ART8ESAUsesActivitiesIndicator
         uses_act_indicators = db.get_unique_from_mapper(
-            sql2018.ART8ESAUsesActivitiesIndicator,
+            s,
             'IndicatorCode',
-            sql2018.ART8ESAUsesActivitiesIndicator.IdUsesActivities.in_(ids_uses_act)
+            s.IdUsesActivities.in_(ids_uses_act)
         )
 
+        s = sql2018.ART8ESAUsesActivitiesEcosystemService
         uses_act_eco = db.get_unique_from_mapper(
-            sql2018.ART8ESAUsesActivitiesEcosystemService,
+            s,
             'EcosystemServiceCode',
-            sql2018.ART8ESAUsesActivitiesEcosystemService.IdUsesActivities.in_(ids_uses_act)
+            s.IdUsesActivities.in_(ids_uses_act)
         )
 
+        s = sql2018.ART8ESAUsesActivitiesPressure
         uses_act_pres = db.get_unique_from_mapper(
-            sql2018.ART8ESAUsesActivitiesPressure,
+            s,
             'PressureCode',
-            sql2018.ART8ESAUsesActivitiesPressure.IdUsesActivities.in_(ids_uses_act)
+            s.IdUsesActivities.in_(ids_uses_act)
         )
 
         res = list()
+
         if nace_codes:
             res.append(
                 ('NACEcode(s)', {
                     '': [{'NACECode': x} for x in nace_codes]
                 }))
+
         if ges_components:
             res.append(
                 ('GEScomponent(s)', {
                     '': [{'GESComponent': x} for x in ges_components]
                 }))
+
         if cost_degradation:
             res.append(
                 ('Cost Degradation', {'': cost_degradation})
             )
+
         if cost_degradation_indicators:
             res.append(
                 ('Cost Degradation Indicator(s)', {
-                    '': [{'IndicatorCode': x} for x in cost_degradation_indicators]
+                    '': [{'IndicatorCode': x}
+                         for x in cost_degradation_indicators]
                 }))
+
         if uses_activities:
             res.append(
                 ('Uses Activities', {'': uses_activities})
             )
+
         if uses_act_indicators:
             res.append(
                 ('Uses Activities Indicator(s)', {
                     '': [{'IndicatorCode': x} for x in uses_act_indicators]
                 }))
+
         if uses_act_eco:
             res.append(
                 ('Uses Activities Ecosystem Service(s)', {
                     '': [{'EcosystemServiceCode': x} for x in uses_act_eco]
                 }))
+
         if uses_act_pres:
             res.append(
                 ('Uses Activities Pressure(s)', {
@@ -791,6 +830,7 @@ class A2018Features81cForm(EmbededForm):
 
     def get_subform(self):
         klass = self.context.display_klass
+
         return klass(self, self.request)
 
     def default_feature(self):
@@ -815,7 +855,8 @@ class A2018Article81c(EmbededForm):
         return all_values_from_field(self, self.fields['country_code'])
 
     def default_marine_reporting_unit(self):
-        return all_values_from_field(self, self.fields['marine_reporting_unit'])
+        return all_values_from_field(self,
+                                     self.fields['marine_reporting_unit'])
 
 
 class A2018IndicatorsGESFeatureMRUForm(EmbededForm):
@@ -834,7 +875,8 @@ class A2018IndicatorsGESFeatureMRUForm(EmbededForm):
         return all_values_from_field(self, self.fields['feature'])
 
     def default_marine_reporting_unit(self):
-        return all_values_from_field(self, self.fields['marine_reporting_unit'])
+        return all_values_from_field(self,
+                                     self.fields['marine_reporting_unit'])
 
 
 class A2018IndicatorsDisplay(ItemDisplayForm):
@@ -904,6 +946,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -915,10 +958,13 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
         ids_indicator_main = [int(x.Id) for x in ids_indicator]
 
         conditions = list()
+
         if features:
             conditions.append(features_mc.Feature.in_(features))
+
         if ges_components:
-            conditions.append(ges_components_mc.GESComponent.in_(ges_components))
+            conditions.append(
+                ges_components_mc.GESComponent.in_(ges_components))
         count, ids_ind_ass = db.get_all_records_outerjoin(
             ges_components_mc,
             features_mc,
@@ -934,10 +980,13 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
         ids_ind_ass_marine = [int(x) for x in ids_ind_ass_marine]
 
         conditions = list()
+
         if ids_ind_ass_marine:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_marine))
+
         if ids_indicator_main:
             conditions.append(mapper_class.Id.in_(ids_indicator_main))
+
         if ids_ind_ass_ges:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_ges))
 
@@ -970,6 +1019,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
                                                 excluded_columns)
 
         res = list()
+
         if indicators_dataset:
             res.append(
                 ('Indicators Dataset', {'': indicators_dataset})
@@ -995,4 +1045,3 @@ class A2018ArticleIndicators(EmbededForm):
 
     def default_country_code(self):
         return all_values_from_field(self, self.fields['country_code'])
-
