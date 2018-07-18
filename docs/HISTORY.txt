@@ -3,6 +3,9 @@ Changelog
 
 1.0dev (unreleased)
 ------------------
+* Task: Prepare wise for harvesting and remove shortname behavior from
+  RichImage content type
+  [iulianpetchesi #97050]
 * Task: Added login_form override, override the password change page so that
   it links to eionet
   [iulianpetchesi #92502]
