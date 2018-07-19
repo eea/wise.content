@@ -35,4 +35,9 @@
     permission="cmf.ModifyPortalContent"
     />
 
+  <browser:resourceDirectory
+    name="eea.wise"
+    directory="static"
+    layer="wise.content.interfaces.IWiseContentLayer"
+    />
 </configure>
