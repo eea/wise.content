@@ -1,19 +1,19 @@
 import csv
-import logging
 import json
+import logging
 
 from lxml.etree import parse
 from pkg_resources import resource_filename
-from sqlalchemy.sql.schema import Table
 from sqlalchemy import and_, or_
+from sqlalchemy.sql.schema import Table
 from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from wise.content.search import db, sql, sql2018
 
-from .utils import FORMS, FORMS_2018, FORMS_ART11, LABELS, SUBFORMS
 from .a11 import ART11_GlOBALS
+from .utils import FORMS, FORMS_2018, FORMS_ART11, LABELS, SUBFORMS
 
 
 def populate_labels():
@@ -152,8 +152,10 @@ def vocab_from_values(values):
 
 def vocab_from_values_with_count(values, column):
     dict_count = dict()
+
     for x in values:
         col = getattr(x, column)
+
         if col in dict_count:
             dict_count[col] += 1
         else:
@@ -161,6 +163,7 @@ def vocab_from_values_with_count(values, column):
 
     terms = [
         SimpleTerm(x, x, "{} [{}]".format(LABELS.get(x, x), dict_count[x]))
+
         for x in dict_count.keys()
     ]
     # TODO fix UnicodeDecodeError
@@ -206,14 +209,19 @@ def db_vocab(table, column):
 def get_json_subform_data(json_str, field_title):
     _form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == field_title
     ]
     data = [
         x['value']
+
         for x in _form_data[0]
+
         if x['checked']
     ]
+
     return data
 
 
@@ -296,12 +304,14 @@ def art11_country_ms(context):
         mp_type_ids = context.get_mp_type_ids()
 
     submonprog_ids = []
+
     for x in mp_type_ids:
         submonprog_ids.append(mptypes_subprog[int(x)])
 
-    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+    submonprog_ids = tuple([item
+                            for sublist in submonprog_ids
 
-    # import pdb;pdb.set_trace()
+                            for item in sublist])
 
     res = db.get_unique_from_mapper(
         sql.MSFD11MONSub,
@@ -327,12 +337,16 @@ def art11_region(context):
         mp_type_ids = context.get_mp_type_ids()
     countries_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Country'
     ]
     countries = [
         country['value']
+
         for country in countries_form_data[0]
+
         if country['checked']
     ]
 
@@ -381,20 +395,28 @@ def art11_region_ms(context):
 
     countries_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Country'
     ]
     countries = [
         country['value']
+
         for country in countries_form_data[0]
+
         if country['checked']
     ]
 
     submonprog_ids = []
+
     for x in mp_type_ids:
         submonprog_ids.append(mptypes_subprog[int(x)])
 
-    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+    submonprog_ids = tuple([item
+                            for sublist in submonprog_ids
+
+                            for item in sublist])
 
     if countries:
         condition = and_(
@@ -428,22 +450,30 @@ def art11_marine_unit_id(context):
         # mp_type_ids = context.get_mp_type_ids()
     countries_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Country'
     ]
     countries = [
         country['value']
+
         for country in countries_form_data[0]
+
         if country['checked']
     ]
     regions_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Region'
     ]
     regions = [
         region['value']
+
         for region in regions_form_data[0]
+
         if region['checked']
     ]
 
@@ -478,13 +508,15 @@ def art11_marine_unit_id(context):
     )
     mon_prog_ids = [x.strip() for x in mon_prog_ids]
 
+    s = sql.MSFD11MonitoringProgrammeMarineUnitID
     count, marine_units = db.get_all_records_outerjoin(
         sql.MSFD11MarineUnitID,
-        sql.MSFD11MonitoringProgrammeMarineUnitID,
-        sql.MSFD11MonitoringProgrammeMarineUnitID.MonitoringProgramme.in_(mon_prog_ids)
+        s,
+        s.MonitoringProgramme.in_(mon_prog_ids)
     )
 
-    terms = [SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID) for x in marine_units]
+    terms = [SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID)
+             for x in marine_units]
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
@@ -508,30 +540,42 @@ def art11_marine_unit_id_ms(context):
 
     countries_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Country'
     ]
     countries = [
         country['value']
+
         for country in countries_form_data[0]
+
         if country['checked']
     ]
     regions_form_data = [
         field['options']
+
         for field in json_str['fields']
+
         if field['label'] == 'Region'
     ]
     regions = [
         region['value']
+
         for region in regions_form_data[0]
+
         if region['checked']
     ]
 
     submonprog_ids = []
+
     for x in mp_type_ids:
         submonprog_ids.append(mptypes_subprog[int(x)])
 
-    submonprog_ids = tuple([item for sublist in submonprog_ids for item in sublist])
+    submonprog_ids = tuple([item
+                            for sublist in submonprog_ids
+
+                            for item in sublist])
 
     if countries and regions:
         subprogramme_ids = db.get_unique_from_mapper(
@@ -594,12 +638,11 @@ def art11_marine_unit_id_ms(context):
 
     terms = [
         SimpleTerm(x.MarineUnitID, x.MarineUnitID, x.MarineUnitID)
+
         for x in marine_units
     ]
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
-
-    # import pdb; pdb.set_trace()
 
     return vocab
 
@@ -680,21 +723,13 @@ def articles_vocabulary_factory_2018(context):
 
 @provider(IVocabularyFactory)
 def a2018_country(context):
-    # import pdb;pdb.set_trace()
+    # import pdb; pdb.set_trace()
+
     if hasattr(context, 'subform'):
-        context_orig = context
+        # context_orig = context
         context = context.subform
 
     mapper_class = context.mapper_class
-    # mapper_class = getattr(context, 'mapper_class', context.subform.mapper_class)
-
-    # count, res = db.get_all_records_join(
-    #     [
-    #         mapper_class.Id,
-    #         sql2018.ReportedInformation.CountryCode
-    #     ],
-    #     sql2018.ReportedInformation
-    # )
     count, res = db.get_all_records_outerjoin(
         sql2018.ReportedInformation,
         mapper_class
@@ -709,16 +744,17 @@ def a2018_country(context):
 @provider(IVocabularyFactory)
 def a2018_marine_reporting_unit(context):
     if hasattr(context, 'subform'):
-        context_orig = context
+        # context_orig = context
         context = context.subform
 
-    json_str = json.loads(context.json())
     mapper_class = context.mapper_class
 
+    json_str = json.loads(context.json())
     countries = get_json_subform_data(json_str, 'Country Code')
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -727,18 +763,16 @@ def a2018_marine_reporting_unit(context):
         mc_countries,
         *conditions
     )
-    # res = [x.MarineReportingUnit for x in res]
-    # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
+    res = set([x.MarineReportingUnit for x in res])
+    vocab = vocab_from_values(res)
 
-    # import pdb;pdb.set_trace()
-
-    return vocab_from_values(res)
+    return vocab
 
 
 @provider(IVocabularyFactory)
 def a2018_ges_component_art9(context):
     if hasattr(context, 'subform'):
-        context_orig = context
+        # context_orig = context
         context = context.subform
 
     json_str = json.loads(context.json())
@@ -748,6 +782,7 @@ def a2018_ges_component_art9(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -765,7 +800,7 @@ def a2018_ges_component_art9(context):
 @provider(IVocabularyFactory)
 def a2018_feature_art9(context):
     if not hasattr(context, 'features_mc'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -777,8 +812,10 @@ def a2018_feature_art9(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = list()
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
+
     if ges_components:
         conditions.append(mapper_class.GESComponent.in_(ges_components))
 
@@ -799,13 +836,14 @@ def a2018_feature_art9(context):
     res = tuple(set(res))
 
     # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_feature_art81c(context):
     if not hasattr(context, 'features_mc'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -817,8 +855,10 @@ def a2018_feature_art81c(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = list()
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
+
     if mrus:
         conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
@@ -836,14 +876,14 @@ def a2018_feature_art81c(context):
     )
 
     # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_feature(context):
-    # import pdb;pdb.set_trace()
     if not hasattr(context, 'features_mc'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -857,8 +897,10 @@ def a2018_feature(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
+
     if mrus:
         conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
@@ -882,14 +924,14 @@ def a2018_feature(context):
     )
 
     # res = ['Feature%s' % x for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_ges_component(context):
-    # import pdb;pdb.set_trace()
     if not hasattr(context, 'ges_components_mc'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -907,8 +949,10 @@ def a2018_ges_component(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
+
     if mrus:
         conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
@@ -921,6 +965,7 @@ def a2018_ges_component(context):
 
     conditions = []
     conditions.append(target_mc.IdMarineUnit.in_(id_marine_units))
+
     if features:
         id_features = db.get_unique_from_mapper(
             features_mc,
@@ -942,13 +987,14 @@ def a2018_ges_component(context):
     )
 
     # res = ['GesComponent%s' % x for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_ges_component_ind(context):
     if not hasattr(context, 'mapper_class'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -959,6 +1005,7 @@ def a2018_ges_component_ind(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -980,15 +1027,15 @@ def a2018_ges_component_ind(context):
     #     ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
     # )
 
-    # import pdb;pdb.set_trace()
     # res = ['GESComponent%s' % x for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_feature_ind(context):
     if not hasattr(context, 'mapper_class'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -1002,6 +1049,7 @@ def a2018_feature_ind(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1014,6 +1062,7 @@ def a2018_feature_ind(context):
 
     conditions = list()
     conditions.append(ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator))
+
     if ges_components:
         conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
 
@@ -1035,15 +1084,15 @@ def a2018_feature_ind(context):
     #     features_mc.IdGESComponent.in_(ids_ges_comp)
     # )
 
-    # import pdb;pdb.set_trace()
     # res = ['Feature%s' % x for x in range(0, 10)]
+
     return vocab_from_values(res)
 
 
 @provider(IVocabularyFactory)
 def a2018_mru_ind(context):
     if not hasattr(context, 'mapper_class'):
-        context_orig = context
+        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -1059,6 +1108,7 @@ def a2018_mru_ind(context):
 
     mc_countries = sql2018.ReportedInformation
     conditions = []
+
     if countries:
         conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1070,8 +1120,10 @@ def a2018_mru_ind(context):
     ids_indicator = [int(x.Id) for x in ids_indicator]
 
     conditions = list()
+
     if features:
         conditions.append(features_mc.Feature.in_(features))
+
     if ges_components:
         conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
     count, ids_ind_ass = db.get_all_records_outerjoin(
@@ -1099,4 +1151,5 @@ def a2018_mru_ind(context):
     # )
 
     # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
+
     return vocab_from_values(res)
