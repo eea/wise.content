@@ -728,7 +728,7 @@ def a2018_marine_reporting_unit(context):
         *conditions
     )
     # res = [x.MarineReportingUnit for x in res]
-    res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
+    # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
 
     # import pdb;pdb.set_trace()
 
@@ -757,7 +757,7 @@ def a2018_ges_component_art9(context):
         *conditions
     )
     # res = [x.GESComponent for x in res]
-    res = ['GesComponent%s' % x for x in range(0, 10)]
+    # res = ['GesComponent%s' % x for x in range(0, 10)]
 
     return vocab_from_values(res)
 
@@ -798,7 +798,7 @@ def a2018_feature_art9(context):
     res = [x.Feature for x in ids_ges_determination]
     res = tuple(set(res))
 
-    res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+    # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
     return vocab_from_values(res)
 
 
@@ -835,7 +835,7 @@ def a2018_feature_art81c(context):
         features_mc.IdMarineUnit.in_(id_marine_units)
     )
 
-    res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+    # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
     return vocab_from_values(res)
 
 
@@ -881,7 +881,7 @@ def a2018_feature(context):
         getattr(features_mc, features_rel_col).in_(id_targets)
     )
 
-    res = ['Feature%s' % x for x in range(0, 10)]
+    # res = ['Feature%s' % x for x in range(0, 10)]
     return vocab_from_values(res)
 
 
@@ -941,7 +941,7 @@ def a2018_ges_component(context):
         getattr(ges_components_mc, ges_comp_rel_col).in_(id_targets)
     )
 
-    res = ['GesComponent%s' % x for x in range(0, 10)]
+    # res = ['GesComponent%s' % x for x in range(0, 10)]
     return vocab_from_values(res)
 
 
