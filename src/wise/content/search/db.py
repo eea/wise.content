@@ -13,7 +13,7 @@ DSN = os.environ.get('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
 
 DBS = {
     'session': 'MarineDB',
-    'session_2018': 'MSFD2018_production'
+    'session_2018': 'MSFD2018_test'
 }
 
 USE_DB = 'USE {}'
@@ -29,14 +29,14 @@ def session():
 
     session = _make_session(DSN)
     session.execute(USE_DB.format(DBS[session_name]))
-
+    session.rollback()
     setattr(threadlocals, session_name, session)
 
     return session
 
 
 def _make_session(dsn):
-    engine = create_engine(dsn)
+    engine = create_engine(dsn, pool_recycle=1800)
     Session = scoped_session(sessionmaker(bind=engine))
     register(Session, keep_session=True)
 
