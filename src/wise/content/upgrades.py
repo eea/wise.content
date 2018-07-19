@@ -55,3 +55,12 @@ def upgrade_to_7(context):
     context.runImportStepFromProfile(default_profile, 'propertiestool')
 
     logger.info("Upgrade finished.")
+
+
+def upgrade_to_8(context):
+    logger.info("Upgrading to 8")
+
+    # need to reimport wise.content, it has updated control panel settings
+    context.runImportStepFromProfile(default_profile, 'typeinfo')
+
+    logger.info("Upgrade finished.")
