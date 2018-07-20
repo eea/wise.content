@@ -444,7 +444,8 @@ class A2018Art81abDisplay(ItemDisplayForm):
         if not self.item:
             return {}
 
-        id_overall = self.item.get('Id', 0)
+        id_overall = self.item.Id
+
         excluded_columns = ('Id', 'IdOverallStatus')
 
         pressure_codes = db.get_unique_from_mapper(
@@ -459,12 +460,12 @@ class A2018Art81abDisplay(ItemDisplayForm):
             sql2018.ART8GESOverallStatusTarget.IdOverallStatus == id_overall
         )
 
-        element_status = db.get_all_columns_from_mapper(
+        element_status_orig = db.get_all_columns_from_mapper(
             sql2018.ART8GESElementStatu,
             'Id',
             sql2018.ART8GESElementStatu.IdOverallStatus == id_overall
         )
-        element_status = db_objects_to_dict(element_status,
+        element_status = db_objects_to_dict(element_status_orig,
                                             excluded_columns)
         element_status_pivot = list()
 
@@ -474,10 +475,13 @@ class A2018Art81abDisplay(ItemDisplayForm):
             x['Element / Element2'] = ' / '.join((element, element2))
             element_status_pivot.append(x)
 
-        element_status_pivot = pivot_data(element_status_pivot,
-                                          'Element / Element2')
-        # TODO get the Id for the selected element status
-        id_elem_status = [x.Id for x in element_status_pivot]
+        id_elem_status = []
+        if element_status:
+            element_status_pivot = pivot_data(element_status_pivot,
+                                              'Element / Element2')
+
+            # TODO get the Id for the selected element status
+            id_elem_status = [x.Id for x in element_status_orig]
 
         s = sql2018.ART8GESCriteriaStatu
         conditions = list()
@@ -712,7 +716,7 @@ class A2018Art81cDisplay(ItemDisplayForm):
         if not self.item:
             return {}
 
-        id_feature = self.item.get('Id', 0)
+        id_feature = self.item.Id
         excluded_columns = ('Id', 'IdFeature')
 
         nace_codes = db.get_unique_from_mapper(
@@ -727,15 +731,15 @@ class A2018Art81cDisplay(ItemDisplayForm):
             sql2018.ART8ESAFeatureGESComponent.IdFeature == id_feature
         )
 
-        cost_degradation = db.get_all_columns_from_mapper(
+        cost_degradation_orig = db.get_all_columns_from_mapper(
             sql2018.ART8ESACostDegradation,
             'Id',
             sql2018.ART8ESACostDegradation.IdFeature == id_feature
         )
-        cost_degradation = db_objects_to_dict(cost_degradation,
+        cost_degradation = db_objects_to_dict(cost_degradation_orig,
                                               excluded_columns)
 
-        ids_cost_degradation = [x.Id for x in cost_degradation]
+        ids_cost_degradation = [x.Id for x in cost_degradation_orig]
         mc = sql2018.ART8ESACostDegradationIndicator
         cost_degradation_indicators = db.get_unique_from_mapper(
             mc,
@@ -743,15 +747,15 @@ class A2018Art81cDisplay(ItemDisplayForm):
             mc.IdCostDegradation.in_(ids_cost_degradation)
         )
 
-        uses_activities = db.get_all_columns_from_mapper(
+        uses_activities_orig = db.get_all_columns_from_mapper(
             sql2018.ART8ESAUsesActivity,
             'Id',
             sql2018.ART8ESAUsesActivity.IdFeature == id_feature
         )
-        uses_activities = db_objects_to_dict(uses_activities,
+        uses_activities = db_objects_to_dict(uses_activities_orig,
                                              excluded_columns)
 
-        ids_uses_act = [x.Id for x in uses_activities]
+        ids_uses_act = [x.Id for x in uses_activities_orig]
         s = sql2018.ART8ESAUsesActivitiesIndicator
         uses_act_indicators = db.get_unique_from_mapper(
             s,

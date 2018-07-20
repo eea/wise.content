@@ -125,6 +125,7 @@ def print_value(value):
     if not value:
         return value
 
+    value = unicode(value)
     if isinstance(value, string_types):
         if value in LABELS:
             tmpl = '<span title="%s">%s</span>'
