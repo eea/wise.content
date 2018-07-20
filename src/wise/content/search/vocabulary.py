@@ -2,6 +2,7 @@ import csv
 import json
 import logging
 
+from eea.cache import cache
 from lxml.etree import parse
 from pkg_resources import resource_filename
 from sqlalchemy import and_, or_
@@ -723,20 +724,25 @@ def articles_vocabulary_factory_2018(context):
 
 @provider(IVocabularyFactory)
 def a2018_country(context):
-    # import pdb; pdb.set_trace()
-
     if hasattr(context, 'subform'):
-        # context_orig = context
         context = context.subform
 
     mapper_class = context.mapper_class
-    count, res = db.get_all_records_outerjoin(
-        sql2018.ReportedInformation,
-        mapper_class
-    )
+    key = mapper_class.__name__
 
-    res = [x.CountryCode for x in res]
-    res = list(set(res))
+    @cache(lambda func: key)
+    def get_res():
+        count, res = db.get_all_records_outerjoin(
+            sql2018.ReportedInformation,
+            mapper_class
+        )
+
+        res = [x.CountryCode for x in res]
+        res = list(set(res))
+
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -744,19 +750,20 @@ def a2018_country(context):
 @provider(IVocabularyFactory)
 def a2018_marine_reporting_unit(context):
     if hasattr(context, 'subform'):
-        # context_orig = context
         context = context.subform
+
+    try:
+        json_str = json.loads(context.json())
+        countries = get_json_subform_data(json_str, 'Country Code')
+    except Exception:
+        countries = []
 
     mapper_class = context.mapper_class
 
-    json_str = json.loads(context.json())
-    countries = get_json_subform_data(json_str, 'Country Code')
+    # key = (mapper_class.__class__.__name__, str(countries))
+    key = (mapper_class.__name__, str(countries))
 
-    key = (mapper_class.__class__.__name__, str(countries))
-
-    from eea.cache import cache
-
-    @cache(lambda func, self: key)
+    @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = []
@@ -770,6 +777,9 @@ def a2018_marine_reporting_unit(context):
             *conditions
         )
         res = set([x.MarineReportingUnit for x in res])
+        # res = ['Marine%s' % x for x in range(0, 10)]
+
+        return res
 
     res = get_res()
     vocab = vocab_from_values(res)
@@ -780,7 +790,6 @@ def a2018_marine_reporting_unit(context):
 @provider(IVocabularyFactory)
 def a2018_ges_component_art9(context):
     if hasattr(context, 'subform'):
-        # context_orig = context
         context = context.subform
 
     json_str = json.loads(context.json())
@@ -788,19 +797,27 @@ def a2018_ges_component_art9(context):
 
     countries = get_json_subform_data(json_str, 'Country Code')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = []
+    key = (mapper_class.__name__, str(countries))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    @cache(lambda func: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
 
-    count, res = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    # res = [x.GESComponent for x in res]
-    # res = ['GesComponent%s' % x for x in range(0, 10)]
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+
+        count, res = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        res = [x.GESComponent for x in res]
+        # res = ['GesComponent%s' % x for x in range(0, 10)]
+
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -808,42 +825,49 @@ def a2018_ges_component_art9(context):
 @provider(IVocabularyFactory)
 def a2018_feature_art9(context):
     if not hasattr(context, 'features_mc'):
-        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
     features_mc = context.features_mc
+    determination_mc = context.determination_mc
     json_str = json.loads(context.json())
 
     countries = get_json_subform_data(json_str, 'Country Code')
     ges_components = get_json_subform_data(json_str, 'GES Component')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = list()
+    key = (mapper_class.__name__, str(countries), str(ges_components))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    @cache(lambda func: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = list()
 
-    if ges_components:
-        conditions.append(mapper_class.GESComponent.in_(ges_components))
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    count, id_marine_units = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    id_ges_components = [int(x.Id) for x in id_marine_units]
+        if ges_components:
+            conditions.append(mapper_class.GESComponent.in_(ges_components))
 
-    count, ids_ges_determination = db.get_all_records_join(
-        [sql2018.ART9GESGESDetermination.IdGESComponent,
-         sql2018.ART9GESGESDeterminationFeature.Feature],
-        sql2018.ART9GESGESDeterminationFeature,
-        sql2018.ART9GESGESDetermination.IdGESComponent.in_(id_ges_components)
-    )
-    res = [x.Feature for x in ids_ges_determination]
-    res = tuple(set(res))
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_ges_components = [int(x.Id) for x in id_marine_units]
 
-    # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+        count, ids_ges_determination = db.get_all_records_join(
+            [determination_mc.IdGESComponent,
+             features_mc.Feature],
+            features_mc,
+            determination_mc.IdGESComponent.in_(id_ges_components)
+        )
+        res = [x.Feature for x in ids_ges_determination]
+        res = tuple(set(res))
+        # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -851,7 +875,6 @@ def a2018_feature_art9(context):
 @provider(IVocabularyFactory)
 def a2018_feature_art81c(context):
     if not hasattr(context, 'features_mc'):
-        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -861,29 +884,36 @@ def a2018_feature_art81c(context):
     countries = get_json_subform_data(json_str, 'Country Code')
     mrus = get_json_subform_data(json_str, 'Marine Reporting Unit')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = list()
+    key = (mapper_class.__name__, str(countries), str(mrus))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    @cache(lambda func: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = list()
 
-    if mrus:
-        conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    count, id_marine_units = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    id_marine_units = [int(x.Id) for x in id_marine_units]
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
-    res = db.get_unique_from_mapper(
-        features_mc,
-        'Feature',
-        features_mc.IdMarineUnit.in_(id_marine_units)
-    )
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_marine_units = [int(x.Id) for x in id_marine_units]
 
-    # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+        res = db.get_unique_from_mapper(
+            features_mc,
+            'Feature',
+            features_mc.IdMarineUnit.in_(id_marine_units)
+        )
+        # res = ['%s%s' % (features_mc.__name__, x) for x in range(0, 10)]
+
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -891,7 +921,6 @@ def a2018_feature_art81c(context):
 @provider(IVocabularyFactory)
 def a2018_feature(context):
     if not hasattr(context, 'features_mc'):
-        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -903,35 +932,41 @@ def a2018_feature(context):
     countries = get_json_subform_data(json_str, 'Country Code')
     mrus = get_json_subform_data(json_str, 'Marine Reporting Unit')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = []
+    key = (mapper_class.__name__, str(countries), str(mrus))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    @cache(lambda func: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
 
-    if mrus:
-        conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    count, id_marine_units = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    id_marine_units = [int(x.Id) for x in id_marine_units]
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
-    id_targets = db.get_unique_from_mapper(
-        target_mc,
-        'Id',
-        target_mc.IdMarineUnit.in_(id_marine_units)
-    )
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        id_marine_units = [int(x.Id) for x in id_marine_units]
 
-    res = db.get_unique_from_mapper(
-        features_mc,
-        'Feature',
-        getattr(features_mc, features_rel_col).in_(id_targets)
-    )
+        id_targets = db.get_unique_from_mapper(
+            target_mc,
+            'Id',
+            target_mc.IdMarineUnit.in_(id_marine_units)
+        )
 
-    # res = ['Feature%s' % x for x in range(0, 10)]
+        res = db.get_unique_from_mapper(
+            features_mc,
+            'Feature',
+            getattr(features_mc, features_rel_col).in_(id_targets)
+        )
+        # res = ['Feature%s' % x for x in range(0, 10)]
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -939,7 +974,6 @@ def a2018_feature(context):
 @provider(IVocabularyFactory)
 def a2018_ges_component(context):
     if not hasattr(context, 'ges_components_mc'):
-        # context_orig = context
         context = context.context
 
     mapper_class = context.mapper_class
@@ -955,46 +989,52 @@ def a2018_ges_component(context):
     mrus = get_json_subform_data(json_str, 'Marine Reporting Unit')
     features = get_json_subform_data(json_str_subform, 'Features')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = []
+    key = (mapper_class.__name__, str(countries), str(mrus), str(features))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    @cache(lambda func: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
 
-    if mrus:
-        conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    count, id_marine_units = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    id_marine_units = [int(x.Id) for x in id_marine_units]
+        if mrus:
+            conditions.append(mapper_class.MarineReportingUnit.in_(mrus))
 
-    conditions = []
-    conditions.append(target_mc.IdMarineUnit.in_(id_marine_units))
-
-    if features:
-        id_features = db.get_unique_from_mapper(
-            features_mc,
-            features_rel_col,
-            features_mc.Feature.in_(features)
+        count, id_marine_units = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
         )
-        conditions.append(target_mc.Id.in_(id_features))
+        id_marine_units = [int(x.Id) for x in id_marine_units]
 
-    id_targets = db.get_unique_from_mapper(
-        target_mc,
-        'Id',
-        *conditions
-    )
+        conditions = []
+        conditions.append(target_mc.IdMarineUnit.in_(id_marine_units))
 
-    res = db.get_unique_from_mapper(
-        ges_components_mc,
-        'GESComponent',
-        getattr(ges_components_mc, ges_comp_rel_col).in_(id_targets)
-    )
+        if features:
+            id_features = db.get_unique_from_mapper(
+                features_mc,
+                features_rel_col,
+                features_mc.Feature.in_(features)
+            )
+            conditions.append(target_mc.Id.in_(id_features))
 
-    # res = ['GesComponent%s' % x for x in range(0, 10)]
+        id_targets = db.get_unique_from_mapper(
+            target_mc,
+            'Id',
+            *conditions
+        )
+
+        res = db.get_unique_from_mapper(
+            ges_components_mc,
+            'GESComponent',
+            getattr(ges_components_mc, ges_comp_rel_col).in_(id_targets)
+        )
+        # res = ['GesComponent%s' % x for x in range(0, 10)]
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -1002,7 +1042,6 @@ def a2018_ges_component(context):
 @provider(IVocabularyFactory)
 def a2018_ges_component_ind(context):
     if not hasattr(context, 'mapper_class'):
-        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -1014,28 +1053,30 @@ def a2018_ges_component_ind(context):
     mc_countries = sql2018.ReportedInformation
     conditions = []
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    key = (mapper_class.__name__, str(countries))
 
-    count, ids_indicator = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    ids_indicator = [int(x.Id) for x in ids_indicator]
+    @cache(lambda func: key)
+    def get_res():
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    res = db.get_unique_from_mapper(
-        ges_comp_mc,
-        'GESComponent',
-        ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
-    )
+        count, ids_indicator = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        ids_indicator = [int(x.Id) for x in ids_indicator]
 
-    # count, res = db.get_all_records(
-    #     ges_comp_mc,
-    #     ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
-    # )
+        res = db.get_unique_from_mapper(
+            ges_comp_mc,
+            'GESComponent',
+            ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator)
+        )
+        # res = ['GESComponent%s' % x for x in range(0, 10)]
 
-    # res = ['GESComponent%s' % x for x in range(0, 10)]
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -1043,7 +1084,6 @@ def a2018_ges_component_ind(context):
 @provider(IVocabularyFactory)
 def a2018_feature_ind(context):
     if not hasattr(context, 'mapper_class'):
-        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -1056,43 +1096,45 @@ def a2018_feature_ind(context):
     ges_components = get_json_subform_data(json_str_subform, 'GES Component')
 
     mc_countries = sql2018.ReportedInformation
-    conditions = []
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    key = (mapper_class.__name__, str(countries), str(ges_components))
 
-    count, ids_indicator = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    ids_indicator = [int(x.Id) for x in ids_indicator]
+    @cache(lambda func: key)
+    def get_res():
+        conditions = []
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    conditions = list()
-    conditions.append(ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator))
+        count, ids_indicator = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        ids_indicator = [int(x.Id) for x in ids_indicator]
 
-    if ges_components:
-        conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
+        conditions = list()
+        conditions.append(ges_comp_mc.IdIndicatorAssessment.in_(ids_indicator))
 
-    ids_ges_comp = db.get_unique_from_mapper(
-        ges_comp_mc,
-        'Id',
-        *conditions
-    )
-    ids_ges_comp = [int(x) for x in ids_ges_comp]
+        if ges_components:
+            conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
 
-    res = db.get_unique_from_mapper(
-        features_mc,
-        'Feature',
-        features_mc.IdGESComponent.in_(ids_ges_comp)
-    )
+        ids_ges_comp = db.get_unique_from_mapper(
+            ges_comp_mc,
+            'Id',
+            *conditions
+        )
+        ids_ges_comp = [int(x) for x in ids_ges_comp]
 
-    # count, res = db.get_all_records(
-    #     features_mc,
-    #     features_mc.IdGESComponent.in_(ids_ges_comp)
-    # )
+        res = db.get_unique_from_mapper(
+            features_mc,
+            'Feature',
+            features_mc.IdGESComponent.in_(ids_ges_comp)
+        )
+        # res = ['Feature%s' % x for x in range(0, 10)]
 
-    # res = ['Feature%s' % x for x in range(0, 10)]
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)
 
@@ -1100,7 +1142,6 @@ def a2018_feature_ind(context):
 @provider(IVocabularyFactory)
 def a2018_mru_ind(context):
     if not hasattr(context, 'mapper_class'):
-        # context_orig = context
         context = context.context
 
     json_str = json.loads(context.json())
@@ -1115,49 +1156,53 @@ def a2018_mru_ind(context):
     features = get_json_subform_data(json_str_subform, 'Features')
 
     mc_countries = sql2018.ReportedInformation
-    conditions = []
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    key = (mapper_class.__name__,
+           str(countries),
+           str(ges_components),
+           str(features)
+           )
 
-    count, ids_indicator = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    ids_indicator = [int(x.Id) for x in ids_indicator]
+    @cache(lambda func: key)
+    def get_res():
+        conditions = []
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
 
-    conditions = list()
+        count, ids_indicator = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        ids_indicator = [int(x.Id) for x in ids_indicator]
 
-    if features:
-        conditions.append(features_mc.Feature.in_(features))
+        conditions = list()
 
-    if ges_components:
-        conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
-    count, ids_ind_ass = db.get_all_records_outerjoin(
-        ges_comp_mc,
-        features_mc,
-        *conditions
-    )
-    ids_ind_ass = [int(x.IdIndicatorAssessment) for x in ids_ind_ass]
+        if features:
+            conditions.append(features_mc.Feature.in_(features))
 
-    ids_indicator = tuple(set(ids_indicator) & set(ids_ind_ass))
+        if ges_components:
+            conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
+        count, ids_ind_ass = db.get_all_records_outerjoin(
+            ges_comp_mc,
+            features_mc,
+            *conditions
+        )
+        ids_ind_ass = [int(x.IdIndicatorAssessment) for x in ids_ind_ass]
 
-    count, marine_units = db.get_all_records_join(
-        [mapper_class.Id, marine_mc.MarineReportingUnit],
-        marine_mc,
-        mapper_class.Id.in_(ids_indicator),
-    )
-    # res = marine_units
-    res = [x.MarineReportingUnit for x in marine_units]
-    res = tuple(set(res))
+        ids_indicator = tuple(set(ids_indicator) & set(ids_ind_ass))
 
-    # res = db.get_unique_from_mapper(
-    #     marine_mc,
-    #     'MarineReportingUnit',
-    #     marine_mc.IdIndicatorAssessment.in_(ids_ges_comp)
-    # )
+        count, marine_units = db.get_all_records_join(
+            [mapper_class.Id, marine_mc.MarineReportingUnit],
+            marine_mc,
+            mapper_class.Id.in_(ids_indicator),
+        )
+        res = [x.MarineReportingUnit for x in marine_units]
+        res = tuple(set(res))
+        # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
 
-    # res = ['MarineReportingUnit%s' % x for x in range(0, 10)]
+        return res
+
+    res = get_res()
 
     return vocab_from_values(res)

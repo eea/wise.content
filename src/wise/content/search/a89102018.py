@@ -56,7 +56,7 @@ class Art9Display(ItemDisplayForm):
         page = self.get_page()
         mapper_class = self.context.context.mapper_class
         features_mc = self.context.context.features_mc
-        determination_mc = sql2018.ART9GESGESDetermination
+        determination_mc = self.context.context.determination_mc
         country_codes = self.context.context.data.get('country_code', ())
         ges_components = self.context.context.data.get('ges_component', ())
         features = self.context.data.get('feature', ())
@@ -135,6 +135,7 @@ class A2018Article9(EmbededForm):
     mapper_class = sql2018.ART9GESGESComponent
     display_klass = Art9Display
     features_mc = sql2018.ART9GESGESDeterminationFeature
+    determination_mc = sql2018.ART9GESGESDetermination
 
     fields = Fields(interfaces.ICountryCodeGESComponents)
     fields['country_code'].widgetFactory = CheckBoxFieldWidget
@@ -235,6 +236,7 @@ class A2018Art10Display(ItemDisplayForm):
             'IdTarget',
             sql2018.ART10TargetsTargetFeature.Feature.in_(features)
         )
+        features_ids = map(int, features_ids)
 
         s = sql2018.ART10TargetsTargetGESComponent
         ges_components_ids = db.get_unique_from_mapper(
@@ -242,17 +244,17 @@ class A2018Art10Display(ItemDisplayForm):
             'IdTarget',
             s.GESComponent.in_(ges_components)
         )
+        ges_components_ids = map(int, ges_components_ids)
 
-        target_ids = tuple(set(target_ids)
+        self.target_ids = tuple(set(target_ids)
                            & set(features_ids)
                            & set(ges_components_ids))
-        self.target_ids = target_ids
 
         mc = sql2018.ART10TargetsTarget
         res = db.get_item_by_conditions(
             mc,
             'Id',
-            mc.Id.in_(target_ids),
+            mc.Id.in_(self.target_ids),
             page=page
         )
 
@@ -263,7 +265,7 @@ class A2018Art10Display(ItemDisplayForm):
             return []
 
         target_id = self.item.Id
-        mc = sql2018.ART10_Targets_ProgressAssessment
+        mc = sql2018.ART10TargetsProgressAssessment
         column = 'IdTarget'
         result = db.get_all_columns_from_mapper(
             mc,
