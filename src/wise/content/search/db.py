@@ -11,11 +11,15 @@ from wise.content.search.utils import pivot_query
 
 env = os.environ.get
 DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
-
 DBS = {
     'session': env('MSFD_db_default', 'MarineDB'),
     'session_2018': env('MSFD_db_2018', 'MSFD2018_production')
 }
+
+# DBS = {
+#     'session': env('MSFD_db_default', 'MarineDB'),
+#     'session_2018': env('MSFD_db_2018', 'MSFD2018_sandbox')
+# }
 
 USE_DB = 'USE {}'
 

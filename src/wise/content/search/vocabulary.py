@@ -752,18 +752,26 @@ def a2018_marine_reporting_unit(context):
     json_str = json.loads(context.json())
     countries = get_json_subform_data(json_str, 'Country Code')
 
-    mc_countries = sql2018.ReportedInformation
-    conditions = []
+    key = (mapper_class.__class__.__name__, str(countries))
 
-    if countries:
-        conditions.append(mc_countries.CountryCode.in_(countries))
+    from eea.cache import cache
 
-    count, res = db.get_all_records_outerjoin(
-        mapper_class,
-        mc_countries,
-        *conditions
-    )
-    res = set([x.MarineReportingUnit for x in res])
+    @cache(lambda func, self: key)
+    def get_res():
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
+
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+
+        count, res = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        res = set([x.MarineReportingUnit for x in res])
+
+    res = get_res()
     vocab = vocab_from_values(res)
 
     return vocab
