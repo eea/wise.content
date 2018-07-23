@@ -125,12 +125,12 @@ def print_value(value):
     if not value:
         return value
 
-    value = unicode(value)
+    value1 = unicode(value)
     if isinstance(value, string_types):
         if value in LABELS:
-            tmpl = '<span title="%s">%s</span>'
+            tmpl = '<span title="{}">{}</span>'
 
-            return tmpl % (value, LABELS[value])
+            return tmpl.format(value, LABELS[value])
 
         return value
 
@@ -295,6 +295,24 @@ def all_values_from_field(context, field):
 def request_cache_key(func, self):
     form = sorted(self.request.form.items())
     bits = self.__class__.__name__ + dumps(form)
+    key = md5(bits).hexdigest()
+
+    return key
+
+
+def db_result_key(func, *argss):
+    keys = [func.__name__]
+    # import pdb; pdb.set_trace()
+
+    for arg in argss:
+        if hasattr(arg, '__name__'):
+            arg_key = arg.__name__
+        else:
+            arg_key = arg.__str__()
+        keys.append(arg_key)
+
+    bits = dumps(keys)
+
     key = md5(bits).hexdigest()
 
     return key

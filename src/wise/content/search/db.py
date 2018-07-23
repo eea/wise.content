@@ -1,13 +1,14 @@
 import os
 import threading
 
+from eea.cache import cache
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
 from wise.content.search import sql
-from wise.content.search.utils import pivot_query
+from wise.content.search.utils import pivot_query, db_result_key
 
 env = os.environ.get
 DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
@@ -48,6 +49,7 @@ def _make_session(dsn):
     return Session()
 
 
+@cache(db_result_key)
 def get_unique_from_table(table, column):
     """ Retrieves unique values for a column table
     """
@@ -59,6 +61,7 @@ def get_unique_from_table(table, column):
     return sorted([x[0] for x in res])
 
 
+@cache(db_result_key)
 def get_unique_from_mapper(mapper_class, column, *conditions):
     """ Retrieves unique values for a mapper class
     """
@@ -96,6 +99,7 @@ def get_unique_from_mapper_join(
     return [total, item]
 
 
+@cache(db_result_key)
 def get_all_columns_from_mapper(mapper_class, column, *conditions):
     """ Retrieves all columns for a mapper class
     """
@@ -243,6 +247,7 @@ def get_table_records(columns, *conditions, **kwargs):
     return total, q
 
 
+@cache(db_result_key)
 def get_available_marine_unit_ids(marine_unit_ids, klass):
     """ Returns a list of which muid is available, of the ones provided
     """
@@ -256,6 +261,7 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
     return [total, q]
 
 
+@cache(db_result_key)
 def get_marine_unit_id_names(marine_unit_ids):
     """ Returns tuples of (id, label) based on the marine_unit_ids
     """
@@ -272,6 +278,7 @@ def get_marine_unit_id_names(marine_unit_ids):
     return [total, q]
 
 
+@cache(db_result_key)
 def get_related_record(klass, column, rel_id):
     sess = session()
     q = sess.query(klass).filter(
@@ -282,6 +289,7 @@ def get_related_record(klass, column, rel_id):
     return [q.count(), item]
 
 
+@cache(db_result_key)
 def get_related_record_join(klass, klass_join, column, rel_id):
     sess = session()
     q = sess.query(klass).join(klass_join).filter(
@@ -292,6 +300,7 @@ def get_related_record_join(klass, klass_join, column, rel_id):
     return [q.count(), item]
 
 
+@cache(db_result_key)
 def get_all_records(mapper_class, *conditions):
     sess = session()
     q = sess.query(mapper_class).filter(*conditions)
@@ -299,13 +308,17 @@ def get_all_records(mapper_class, *conditions):
     return [q.count(), q]
 
 
+@cache(db_result_key)
 def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
     sess = session()
     q = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
+    count = q.count()
 
-    return [q.count(), q]
+    q = [x for x in q]
+    return [count, q]
 
 
+@cache(db_result_key)
 def get_all_records_join(columns, klass_join, *conditions):
     sess = session()
     q = sess.query(*columns).join(klass_join).filter(*conditions)

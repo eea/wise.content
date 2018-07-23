@@ -730,7 +730,7 @@ def a2018_country(context):
     mapper_class = context.mapper_class
     key = mapper_class.__name__
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         count, res = db.get_all_records_outerjoin(
             sql2018.ReportedInformation,
@@ -763,7 +763,7 @@ def a2018_marine_reporting_unit(context):
     # key = (mapper_class.__class__.__name__, str(countries))
     key = (mapper_class.__name__, str(countries))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = []
@@ -799,7 +799,7 @@ def a2018_ges_component_art9(context):
 
     key = (mapper_class.__name__, str(countries))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = []
@@ -837,7 +837,7 @@ def a2018_feature_art9(context):
 
     key = (mapper_class.__name__, str(countries), str(ges_components))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = list()
@@ -886,7 +886,7 @@ def a2018_feature_art81c(context):
 
     key = (mapper_class.__name__, str(countries), str(mrus))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = list()
@@ -934,7 +934,7 @@ def a2018_feature(context):
 
     key = (mapper_class.__name__, str(countries), str(mrus))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = []
@@ -991,7 +991,7 @@ def a2018_ges_component(context):
 
     key = (mapper_class.__name__, str(countries), str(mrus), str(features))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         mc_countries = sql2018.ReportedInformation
         conditions = []
@@ -1055,7 +1055,7 @@ def a2018_ges_component_ind(context):
 
     key = (mapper_class.__name__, str(countries))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
@@ -1099,7 +1099,7 @@ def a2018_feature_ind(context):
 
     key = (mapper_class.__name__, str(countries), str(ges_components))
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         conditions = []
         if countries:
@@ -1163,7 +1163,7 @@ def a2018_mru_ind(context):
            str(features)
            )
 
-    @cache(lambda func: key)
+    # @cache(lambda func: key)
     def get_res():
         conditions = []
         if countries:
