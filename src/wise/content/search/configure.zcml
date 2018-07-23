@@ -35,6 +35,10 @@
     permission="cmf.ModifyPortalContent"
     />
 
+  <browser:resourceDirectory
+    name="static_css"
+    directory="./static/wise/dist/css"
+    />
   <browser:resource
      name="msfd_search.js"
      file="./static/wise/dist/js/msfd_search.js"
