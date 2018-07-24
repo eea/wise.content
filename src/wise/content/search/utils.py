@@ -125,12 +125,20 @@ def print_value(value):
     if not value:
         return value
 
-    value1 = unicode(value)
+    # value = unicode(value)
     if isinstance(value, string_types):
         if value in LABELS:
             tmpl = '<span title="{}">{}</span>'
+            try:
+                ret = tmpl.format(value, LABELS[value])
+            except UnicodeEncodeError as e:
+                # import pdb; pdb.set_trace()
+                ret = tmpl.format(value, LABELS[value].encode('utf-8'))
+            except Exception as e:
+                # import pdb;pdb.set_trace()
+                ret = tmpl.format(value, unicode(LABELS[value]))
 
-            return tmpl.format(value, LABELS[value])
+            return ret
 
         return value
 
@@ -300,16 +308,22 @@ def request_cache_key(func, self):
     return key
 
 
-def db_result_key(func, *argss):
+def db_result_key(func, *argss, **kwargs):
     keys = [func.__name__]
-    # import pdb; pdb.set_trace()
 
     for arg in argss:
         if hasattr(arg, '__name__'):
             arg_key = arg.__name__
+        elif hasattr(arg, 'compile'):
+            arg_key = arg.compile(compile_kwargs={"literal_binds": True}).__str__()
         else:
             arg_key = arg.__str__()
+
         keys.append(arg_key)
+
+    # for k, v in kwargs.iteritems():
+    #     keys.append("{}:{}".format(k, v))
+    #     import pdb; pdb.set_trace()
 
     bits = dumps(keys)
 

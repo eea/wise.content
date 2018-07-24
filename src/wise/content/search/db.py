@@ -76,6 +76,7 @@ def get_unique_from_mapper(mapper_class, column, *conditions):
     return [unicode(x[0]).strip() for x in res]
 
 
+# @cache(db_result_key)
 def get_unique_from_mapper_join(
         mapper_class,
         column,
@@ -140,6 +141,7 @@ def get_marine_unit_ids(**data):
 #     return l
 
 
+# @cache(db_result_key)
 def get_collapsed_item(mapper_class, order_field, collapses, *conditions,
                        **kwargs):
     """ Group items
@@ -197,6 +199,7 @@ def get_collapsed_item(mapper_class, order_field, collapses, *conditions,
     return [total, item, extra_data]
 
 
+# @cache(db_result_key)
 def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
     """Paged retrieval of items based on conditions
     """
@@ -214,6 +217,7 @@ def get_item_by_conditions(mapper_class, order_field, *conditions, **kwargs):
     return [total, item]
 
 
+# @cache(db_result_key)
 def get_item_by_conditions_joined(
         mapper_class,
         klass_join,
@@ -234,6 +238,7 @@ def get_item_by_conditions_joined(
     return [total, item]
 
 
+# @cache(db_result_key)
 def get_table_records(columns, *conditions, **kwargs):
     order_by = kwargs.get('order_by')
     sess = session()
@@ -257,6 +262,7 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
     ).order_by(klass.MarineUnitID).distinct()
 
     total = q.count()
+    q = [x for x in q]
 
     return [total, q]
 
@@ -274,11 +280,12 @@ def get_marine_unit_id_names(marine_unit_ids):
         .distinct()
 
     total = q.count()
+    q = [x for x in q]
 
     return [total, q]
 
 
-@cache(db_result_key)
+# @cache(db_result_key)
 def get_related_record(klass, column, rel_id):
     sess = session()
     q = sess.query(klass).filter(
@@ -289,7 +296,7 @@ def get_related_record(klass, column, rel_id):
     return [q.count(), item]
 
 
-@cache(db_result_key)
+# @cache(db_result_key)
 def get_related_record_join(klass, klass_join, column, rel_id):
     sess = session()
     q = sess.query(klass).join(klass_join).filter(
@@ -304,8 +311,10 @@ def get_related_record_join(klass, klass_join, column, rel_id):
 def get_all_records(mapper_class, *conditions):
     sess = session()
     q = sess.query(mapper_class).filter(*conditions)
+    count = q.count()
+    q = [x for x in q]
 
-    return [q.count(), q]
+    return [count, q]
 
 
 @cache(db_result_key)
@@ -313,8 +322,8 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
     sess = session()
     q = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
     count = q.count()
-
     q = [x for x in q]
+
     return [count, q]
 
 
@@ -322,5 +331,7 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
 def get_all_records_join(columns, klass_join, *conditions):
     sess = session()
     q = sess.query(*columns).join(klass_join).filter(*conditions)
+    count = q.count()
+    q = [x for x in q]
 
-    return [q.count(), q]
+    return [count, q]
