@@ -222,14 +222,23 @@ class A2018Art10Display(ItemDisplayForm):
         ges_components = self.context.data.get('ges_component', [])
 
         mapper_class = self.context.context.mapper_class
-        count, target_ids = db.get_all_records_outerjoin(
+        target_mc = self.context.context.target_mc
+
+        count, marine_unit_ids = db.get_all_records_outerjoin(
             mapper_class,
             sql2018.ReportedInformation,
             and_(mapper_class.MarineReportingUnit.in_(marine_units),
                  sql2018.ReportedInformation.CountryCode.in_(country_codes))
         )
 
-        target_ids = [x.Id for x in target_ids]
+        marine_unit_ids = [x.Id for x in marine_unit_ids]
+
+        target_ids = db.get_unique_from_mapper(
+            target_mc,
+            'Id',
+            target_mc.IdMarineUnit.in_(marine_unit_ids)
+        )
+        target_ids = map(int, target_ids)
 
         features_ids = db.get_unique_from_mapper(
             sql2018.ART10TargetsTargetFeature,
@@ -250,11 +259,10 @@ class A2018Art10Display(ItemDisplayForm):
                            & set(features_ids)
                            & set(ges_components_ids))
 
-        mc = sql2018.ART10TargetsTarget
         res = db.get_item_by_conditions(
-            mc,
+            target_mc,
             'Id',
-            mc.Id.in_(self.target_ids),
+            target_mc.Id.in_(self.target_ids),
             page=page
         )
 
@@ -446,7 +454,8 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         id_overall = self.item.Id
 
-        excluded_columns = ('Id', 'IdOverallStatus')
+        # excluded_columns = ('Id', 'IdOverallStatus')
+        excluded_columns = ()
 
         pressure_codes = db.get_unique_from_mapper(
             sql2018.ART8GESOverallStatusPressure,
@@ -492,29 +501,29 @@ class A2018Art81abDisplay(ItemDisplayForm):
                 s.IdElementStatus.in_(id_elem_status)
             )
 
-        criteria_status = db.get_all_columns_from_mapper(
+        criteria_status_orig = db.get_all_columns_from_mapper(
             sql2018.ART8GESCriteriaStatu,
             'Id',
-            *conditions
+            or_(*conditions)
         )
-        criteria_status = db_objects_to_dict(criteria_status,
+        criteria_status = db_objects_to_dict(criteria_status_orig,
                                              excluded_columns)
         criteria_status = pivot_data(criteria_status, 'Criteria')
 
         # TODO get the Id for the selected criteria status
-        id_criteria_status = [x.Id for x in criteria_status]
+        id_criteria_status = [x.Id for x in criteria_status_orig]
         s = sql2018.ART8GESCriteriaValue
-        criteria_value = db.get_all_columns_from_mapper(
+        criteria_value_orig = db.get_all_columns_from_mapper(
             s,
             'Id',
             s.IdCriteriaStatus.in_(id_criteria_status)
         )
-        criteria_value = db_objects_to_dict(criteria_value,
+        criteria_value = db_objects_to_dict(criteria_value_orig,
                                             excluded_columns)
         criteria_value = pivot_data(criteria_value, 'Parameter')
 
         # TODO get the Id for the selected criteria value
-        id_criteria_value = [x.Id for x in criteria_value]
+        id_criteria_value = [x.Id for x in criteria_value_orig]
 
         s = sql2018.ART8GESCriteriaValuesIndicator
         criteria_value_ind = db.get_unique_from_mapper(

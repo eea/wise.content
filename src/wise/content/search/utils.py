@@ -227,10 +227,10 @@ def get_obj_fields(obj, use_blacklist=True):
 
 def db_objects_to_dict(data, excluded_columns=()):
     """
-    Transform a list of sqlalchemy DB objects into
+    Transform a list of sqlalchemy query objects into
     a list of dictionaries, needed for pivot_data()
 
-    :param data: list of sqlalchemy DB objects
+    :param data: list of sqlalchemy query objects
     :return: list of dictionaries
     """
     out = []
@@ -249,10 +249,11 @@ def db_objects_to_dict(data, excluded_columns=()):
 
 def pivot_data(data, pivot):
     out = defaultdict(list)
+    count_distinct_values = len(set(row.get(pivot, '') for row in data))
 
     for row in data:
         d = dict(row)
-        p = d.pop(pivot)
+        p = d.pop(pivot) if count_distinct_values > 1 else d[pivot]
 
         if any(d.values()):
             out[p].append(d)
