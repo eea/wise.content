@@ -30,6 +30,7 @@ class A10Form(MarineUnitIDSelectForm):
             [mapper_class_features_pres],
             mapper_class_features_pres.c.MSFD10_Target.in_(target_ids)
         )
+        data_fp = [x for x in data_fp]
 
         mapper_class_des_crit = sql.t_MSFD10_DESCrit
         count_dc, data_dc = db.get_all_records(

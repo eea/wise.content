@@ -1013,7 +1013,6 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             *conditions,
             page=page
         )
-        # import pdb; pdb.set_trace()
 
         return res
 

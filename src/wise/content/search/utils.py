@@ -1,5 +1,5 @@
 import datetime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from cPickle import dumps
 from hashlib import md5
 from inspect import isclass
@@ -165,8 +165,14 @@ def data_to_xls(data):
     workbook = xlsxwriter.Workbook(out, {'in_memory': True})
 
     for wtitle, wdata in data:
-        if wdata.count() == 0:
+        # check data length, we do not create empty sheets
+        if isinstance(wdata, list):
+            count_data = len(wdata)
+        else:
+            count_data = wdata.count()
+        if not count_data:
             continue
+
         worksheet = workbook.add_worksheet(wtitle)
 
         row0 = wdata[0]
@@ -177,21 +183,28 @@ def data_to_xls(data):
         else:
             fields = row0._fields
 
-        # write titles
-
+        # write titles, filter fields
+        # exclude relationship type fields
+        fields_needed = list()
         for i, f in enumerate(fields):
-            worksheet.write(0, i, f)
+            field_needed = True
+            for j in range(count_data):
+                field_val = getattr(wdata[j], f)
+                if not isinstance(field_val, 
+                                  string_types + (float, int, type(None))):
+                    field_needed = False
+                    break
+
+            if field_needed:
+                fields_needed.append(f)
+                worksheet.write(0, fields_needed.index(f), f)
 
         for j, row in enumerate(wdata):
-            for i, f in enumerate(fields):
+            for i, f in enumerate(fields_needed):
                 if not is_tuple:
                     value = getattr(row, f)
                 else:
                     value = row[i]
-
-                if not isinstance(value,
-                                  string_types + (float, int, type(None))):
-                    value = 'not exported'
 
                 worksheet.write(j + 1, i, value)
 
@@ -237,7 +250,7 @@ def db_objects_to_dict(data, excluded_columns=()):
 
     for row in data:
         columns = row.__table__.columns.keys()
-        d = dict()
+        d = OrderedDict()
 
         for col in columns:
             if col not in excluded_columns:
@@ -249,6 +262,7 @@ def db_objects_to_dict(data, excluded_columns=()):
 
 def pivot_data(data, pivot):
     out = defaultdict(list)
+
     count_distinct_values = len(set(row.get(pivot, '') for row in data))
 
     for row in data:

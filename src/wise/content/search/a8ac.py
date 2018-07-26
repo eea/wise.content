@@ -197,7 +197,6 @@ class A81aFunctSubForm(MarineUnitIDSelectForm):
         return data_to_xls(xlsdata)
 
 
-
 class A81aFunctItemDisplay(MultiItemDisplayForm):
     """ Group the multiple items together for A8.1a
     """
