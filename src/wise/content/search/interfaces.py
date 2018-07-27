@@ -1,5 +1,5 @@
 from zope.interface import Attribute, Interface
-from zope.schema import Choice, Int, List  # , TextLine
+from zope.schema import Choice, Int, List, Text  # , TextLine
 
 
 class IMainForm(Interface):
@@ -258,4 +258,24 @@ class IIndicatorsGESFeatureMRU(Interface):
         title=u"Marine Reporting Unit",
         required=False,
         value_type=Choice(vocabulary="wise_search_a2018_mru_ind")
+    )
+
+
+class IComplianceModule(Interface):
+    file = Choice(
+        title=u"File",
+        required=False,
+        vocabulary="wise_search_compliance_factory"
+    )
+
+
+class IComplianceAssessment(Interface):
+    com_assessment = Text(
+        title=u"COM assessments",
+        required=False
+    )
+
+    assessment_comment = Text(
+        title=u"Assessments comments",
+        required=False
     )

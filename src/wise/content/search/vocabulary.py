@@ -1206,3 +1206,15 @@ def a2018_mru_ind(context):
     res = get_res()
 
     return vocab_from_values(res)
+
+
+@provider(IVocabularyFactory)
+def wise_search_compliance(context):
+    # import pdb;pdb.set_trace()
+    # country = context.context.context.data.get('country_code')
+    # article = context.context.context.record_title
+
+    # TODO get available files using country and article(reporting obligation)
+    res = ["File%s" % x for x in range(10)]
+
+    return vocab_from_values(res)

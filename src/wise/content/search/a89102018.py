@@ -6,6 +6,7 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm
+from .compliance import ComplianceModule
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     pivot_data, register_form_2018)
 
@@ -131,7 +132,7 @@ class Art9Display(ItemDisplayForm):
 
 @register_form_2018
 class A2018Article9(EmbededForm):
-    title = 'Article 9 (GES determination)'
+    record_title = title = 'Article 9 (GES determination)'
     mapper_class = sql2018.ART9GESGESComponent
     display_klass = Art9Display
     features_mc = sql2018.ART9GESGESDeterminationFeature
@@ -169,6 +170,15 @@ class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
     target_ids = tuple()
+
+    def get_subform(self):
+        # TODO access restriction
+        # only show if the user is allowed to see compliance module
+        return ComplianceModule(self, self.request)
+
+    def update(self):
+        super(A2018Art10Display, self).update()
+        self.subform = self.get_subform()
 
     def download_results(self):
         # mapper_class = self.context.context.mapper_class
@@ -293,6 +303,7 @@ class A2018Art10Display(ItemDisplayForm):
 
 @register_form_2018
 class A2018Article10(EmbededForm):
+    record_title = 'Article 10 (Targets and associated indicators)'
     title = 'Article 10 (Targets)'
     mapper_class = sql2018.ART10TargetsMarineUnit
     display_klass = A2018Art10Display
@@ -572,7 +583,7 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
 @register_form_2018
 class A2018Article81ab(EmbededForm):
-    title = 'Article 8.1ab (GES assessments)'
+    record_title = title = 'Article 8.1ab (GES assessments)'
     mapper_class = sql2018.ART8GESMarineUnit
     display_klass = A2018Art81abDisplay
     target_mc = sql2018.ART8GESOverallStatu
@@ -854,7 +865,8 @@ class A2018Features81cForm(EmbededForm):
 
 @register_form_2018
 class A2018Article81c(EmbededForm):
-    title = 'Article 8.1c (Economic and social analysis)'
+    record_title = 'Article 8.1c (Economic and social analysis assessments)'
+    title = 'Article 8.1c (ESA assessments)'
     mapper_class = sql2018.ART8ESAMarineUnit
     display_klass = A2018Art81cDisplay
     features_mc = sql2018.ART8ESAFeature
@@ -1044,8 +1056,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
 
 @register_form_2018
 class A2018ArticleIndicators(EmbededForm):
-    record_title = 'Article Indicators'
-    title = 'Indicators'
+    record_title = title = 'Indicators'
     mapper_class = sql2018.IndicatorsIndicatorAssessment
     features_mc = sql2018.IndicatorsFeatureFeature
     ges_components_mc = sql2018.IndicatorsFeatureGESComponent
