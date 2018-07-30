@@ -171,14 +171,14 @@ class A2018Art10Display(ItemDisplayForm):
     css_class = 'left-side-form'
     target_ids = tuple()
 
-    def get_subform(self):
-        # TODO access restriction
-        # only show if the user is allowed to see compliance module
-        return ComplianceModule(self, self.request)
-
-    def update(self):
-        super(A2018Art10Display, self).update()
-        self.subform = self.get_subform()
+    # def get_subform(self):
+    #     # TODO access restriction
+    #     # only show if the user is allowed to see compliance module
+    #     return ComplianceModule(self, self.request)
+    #
+    # def update(self):
+    #     super(A2018Art10Display, self).update()
+    #     self.subform = self.get_subform()
 
     def download_results(self):
         # mapper_class = self.context.context.mapper_class

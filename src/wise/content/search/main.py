@@ -7,6 +7,7 @@ from z3c.form.field import Fields
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import EmbededForm, MainForm, MainFormWrapper
+from .compliance import register_compliance_module
 from .utils import (all_values_from_field, default_value_from_field, get_form,
                     scan)
 
@@ -77,7 +78,7 @@ StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
 StartArticle1314View = wrap_form(StartArticle1314Form, MainFormWrapper)
 
 
-# TODO: implement a8910 for 2018
+@register_compliance_module
 class StartArticle89102018Form(MainForm):
     record_title = 'Articles 8, 9, 10'
     name = 'msfd-c4'

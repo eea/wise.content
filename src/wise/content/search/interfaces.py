@@ -1,6 +1,6 @@
 from zope.interface import Attribute, Interface
 from zope.schema import Choice, Int, List, Text  # , TextLine
-
+from plone.app.textfield import RichText
 
 class IMainForm(Interface):
     """ A marker interface to easily identify main forms
@@ -272,7 +272,7 @@ class IComplianceModule(Interface):
 class IComplianceAssessment(Interface):
     com_assessment = Text(
         title=u"COM assessments",
-        required=False
+        required=False,
     )
 
     assessment_comment = Text(

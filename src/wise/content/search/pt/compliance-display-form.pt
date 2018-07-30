@@ -17,4 +17,12 @@
       <div tal:content="structure subform">subform here</div>
     </div>
   </tal:def>
+
+  <!--<tal:def define="compliance view/compliance_module | nothing">-->
+    <!--<div tal:condition="compliance">-->
+      <!--<div tal:content="structure compliance">compliance module here</div>-->
+    <!--</div>-->
+  <!--</tal:def>-->
+
+
 </div>
