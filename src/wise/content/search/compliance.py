@@ -11,12 +11,17 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 def register_compliance_module(klass):
 
     class ComplianceModuleMain(klass):
-        template = ViewPageTemplateFile('pt/compliance.pt')
-        # compliance_content = None
+        # template = ViewPageTemplateFile('pt/compliance.pt')
+
+        def get_subform(self):
+            # TODO access restriction
+            # only show if the user is allowed to see compliance module
+            return ComplianceModule(self, self.request)
 
         def update(self):
             super(klass, self).update()
-            self.compliance_content = ComplianceModule(self, self.request)
+            # self.compliance_content = ComplianceModule(self, self.request)
+            self.subform = self.get_subform()
 
     return ComplianceModuleMain
 
@@ -25,14 +30,14 @@ class ComplianceModule(EmbededForm):
     css_class = 'compliance-module'
     # template = ViewPageTemplateFile('pt/compliance.pt')
     fields = Fields(interfaces.IComplianceModule)
-    # actions = None
+    actions = None
 
     def get_subform(self):
         return ComplianceDisplay(self, self.request)
 
-    def update(self):
-        super(ComplianceModule, self).update()
-        self.subform = self.get_subform()
+    # def update(self):
+    #     super(ComplianceModule, self).update()
+    #     self.subform = self.get_subform()
 
 
 class ComplianceDisplay(ItemDisplayForm):
@@ -43,13 +48,12 @@ class ComplianceDisplay(ItemDisplayForm):
     css_class = 'compliance-display'
 
     def get_subform(self):
-        # TODO access restriction
-        # only show if the user is allowed to see compliance module
         return ComplianceAssessment(self, self.request)
 
     def update(self):
         super(ComplianceDisplay, self).update()
         self.subform = self.get_subform()
+        del self.widgets['page']
 
     def get_db_results(self):
         return 0, {}
@@ -57,8 +61,8 @@ class ComplianceDisplay(ItemDisplayForm):
     def get_extra_data(self):
         res = list()
         res.append(
-            ('Test data(s)', {
-                '': [{'Test': "Test%s" % x} for x in range(2)]
+            ('Some data from file ', {
+                '': [{'Data': "Text here _%s" % x} for x in range(2)]
             }))
 
         return res
@@ -69,15 +73,62 @@ class ComplianceAssessment(EmbededForm):
     fields = Fields(interfaces.IComplianceAssessment)
     # fields['com_assessment'].widgetFactory = TextWidget
 
-    @buttonAndHandler(u'Save assessment', name='save_ass')
+    mc_com_assessments = 'COM_assessments'
+    mc_assessments_comments = 'Assessments_comments'
+
+    @buttonAndHandler(u'Save assessment', name='save_assessment')
     def save_assessment(self, action):
         data, errors = self.extractData()
+        assessment = data.get('com_assessment', '')
         import pdb;pdb.set_trace()
+        if assessment:
+            # TODO save assessment to DB
+            reporting_history_id = self.context.item.get('Id', '')
+            assessment_id = db.get_all_records(
+                self.mc_com_assessments,
+                self.mc_com_assessments.Reporting_historyID == reporting_history_id
+            )
+            values = dict()
+            values['Reporting_historyID'] = reporting_history_id
+            values['Article'] = ''
+            values['GEScomponent'] = ''
+            values['Feature'] = ''
+            values['assessment_criteria'] = assessment
 
-    @buttonAndHandler(u'Save comment', name='save_comm')
+            if assessment_id:
+                conditions = list()
+                conditions.append(
+                    self.mc_com_assessments.Reporting_historyID == reporting_history_id
+                )
+                db.update_record(self.mc_com_assessments, *conditions, **values)
+            else:
+                db.insert_record(self.mc_com_assessments, **values)
+
+    @buttonAndHandler(u'Save comment', name='save_comment')
     def save_comment(self, action):
         data, errors = self.extractData()
-        import pdb; pdb.set_trace()
+        comment = data.get('assessment_comment', '')
+        import pdb;pdb.set_trace()
+        if comment:
+            # TODO save comment to DB
+            com_assessmentsId = self.context.item.get('Id', '')
+            comment_id = db.get_all_records(
+                self.mc_assessments_comments,
+                self.mc_assessments_comments.COM_assessmentsID == com_assessmentsId
+            )
+            values = dict()
+            values['COM_assessmentsID'] = com_assessmentsId
+            values['organisation'] = ''
+            values['Comment'] = comment
+
+            if comment_id:
+                conditions = list()
+                conditions.append(
+                    self.mc_assessments_comments.COM_assessmentsID == com_assessmentsId
+                )
+                db.update_record(self.mc_assessments_comments, **values)
+            else:
+                db.insert_record(self.mc_com_assessments, **values)
 
     def update(self):
         super(ComplianceAssessment, self).update()
@@ -85,6 +136,7 @@ class ComplianceAssessment(EmbededForm):
         # import pdb;pdb.set_trace()
 
     def extractData(self):
+        # data, errors = self.widgets.extract()
+        data, errors = super(ComplianceAssessment, self).extractData()
         # import pdb;pdb.set_trace()
-        return super(ComplianceAssessment, self).extractData()
-
+        return data, errors

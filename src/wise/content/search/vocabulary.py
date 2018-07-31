@@ -1210,11 +1210,20 @@ def a2018_mru_ind(context):
 
 @provider(IVocabularyFactory)
 def wise_search_compliance(context):
-    # import pdb;pdb.set_trace()
-    # country = context.context.context.data.get('country_code')
-    # article = context.context.context.record_title
+    country = context.context.context.data.get('country_code')
+    article = context.context.context.record_title
 
-    # TODO get available files using country and article(reporting obligation)
+    mapper_class = 'Reporting_history'
+    conditions = list()
+
+    # if country:
+    #     conditions.append(mapper_class.CountryCode.in_(country))
+    # if article:
+    #     conditions.append(mapper_class.ReportingObl.in_(country))
+    #
+    # count, result = db.get_all_records(mapper_class, *conditions)
+    # res = [x.FileName for x in result]
+
     res = ["File%s" % x for x in range(10)]
 
     return vocab_from_values(res)

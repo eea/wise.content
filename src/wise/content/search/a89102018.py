@@ -6,7 +6,7 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm
-from .compliance import ComplianceModule
+from .compliance import ComplianceModule, register_compliance_module
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     pivot_data, register_form_2018)
 
@@ -166,19 +166,11 @@ class A2018FeaturesForm(EmbededForm):
         return all_values_from_field(self, self.fields['feature'])
 
 
+@register_compliance_module
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
     target_ids = tuple()
-
-    # def get_subform(self):
-    #     # TODO access restriction
-    #     # only show if the user is allowed to see compliance module
-    #     return ComplianceModule(self, self.request)
-    #
-    # def update(self):
-    #     super(A2018Art10Display, self).update()
-    #     self.subform = self.get_subform()
 
     def download_results(self):
         # mapper_class = self.context.context.mapper_class

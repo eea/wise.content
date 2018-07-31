@@ -335,3 +335,16 @@ def get_all_records_join(columns, klass_join, *conditions):
     q = [x for x in q]
 
     return [count, q]
+
+
+def update_record(mapper_class, *conditions, **values):
+    # TODO check how to update rows
+    sess = session()
+    sess.update(mapper_class).where(*conditions)\
+        .values(**values)
+
+
+def insert_record(mapper_class, **values):
+    # TODO check how to insert rows
+    sess = session()
+    sess.insert(mapper_class).values(**values)
