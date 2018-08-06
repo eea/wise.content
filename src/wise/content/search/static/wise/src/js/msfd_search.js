@@ -8,6 +8,8 @@
        * */
 
     var exceptVal = ["all", "none", "invert", "apply"];
+    var selectorFormContainer = ".wise-search-form-container";
+    var selectorLeftForm = "#wise-search-form";
 
     /*
     * Vars and $ plugins
@@ -62,25 +64,27 @@
 
     var loading = false;
 
-    $("body").append( $("#ajax-spinner").clone(true).attr("id", "ajax-spinner2") );
-    $("#ajax-spinner").remove();
-
     /*
     * Styling and hiding
     *
     */
     function initStyling(){
+        var ajaxSpinner = $("#ajax-spinner");
+        $("body").append( ajaxSpinner.clone(true).attr("id", "ajax-spinner2") );
+        ajaxSpinner.remove();
+
         $(".button-field").addClass("btn");
-        $(".wise-search-form-container #s2id_form-widgets-marine_unit_id").parentsUntil(".field").parent().hide();
+        $(selectorFormContainer + " #s2id_form-widgets-marine_unit_id").parentsUntil(".field").parent().hide();
 
         $("#form-buttons-continue").hide("fast");
 
-        if($("#form-buttons-download").length > 0){
-            var dBtn = $("#form-buttons-download").prop('outerHTML').replace("input","button")
+        var fbDownload = $("#form-buttons-download");
+        if( fbDownload.length > 0){
+            var dBtn = fbDownload.prop('outerHTML').replace("input","button")
                 + ' <span style="margin-left:0.4rem;">Download as XLS</span>';
-            var btnForm = $("#form-buttons-download").parent();
+            var btnForm = fbDownload.parent();
 
-            $("#form-buttons-download").remove();
+            fbDownload.remove();
 
             btnForm.append( $(dBtn) );
             $("#form-buttons-download").val("&#xf019; Download as XLS");
@@ -132,23 +136,13 @@
 
         var toSearch = $(event.target).val().toLowerCase().replace(/\s/g, "_");
 
-        var matcher = new RegExp( "^" +  $.ui.autocomplete.escapeRegex( toSearch ), "i" );
-        var matcher2 = new RegExp( $.ui.autocomplete.escapeRegex( toSearch ), "i" );
+        var matcher = new RegExp( $.ui.autocomplete.escapeRegex( toSearch ), "i" );
 
         var temp = {};
-        var checksLabels = $field.find(".option .label:not(.horizontal) ").map(function (ind, item) {
-            temp[$(item).text().toLowerCase()] = $(item).text().toLowerCase()
-                .replace(/\s/g, "_");
-            //return temp;
-            return $(item).text().toLowerCase()
-            /*.replace(/^\s+|\s+$/g, '')*/
-            /*.replace(/_/g, "")*/
-                .replace(/\s/g, "_");
-        });
 
         var found = [];
         $.each(temp, function (indx, item) {
-            if(!matcher2.test( item )){
+            if(!matcher.test( item )){
                 found.push(indx);
             }
         });
@@ -220,17 +214,20 @@
         label.attr("data-target", "." + fieldId + "-collapse" );
 
         // if already checked than collapse
-        //if(checked.length === 0) {
+        // double collapse fix
         chekspan.collapse({ toggle: true });
         chekspan.collapse({ toggle: true });
+
         $field.find(".accordion-toggle").addClass("accordion-after");
 
+        // hidden-colapse event
         chekspan.on("hidden.bs.collapse", function () {
             chekspan.fadeOut("fast");
             $field.find(".controls").slideUp("fast");
             $field.css({"border-bottom" : "1px solid #ccc;"});
         });
 
+        // show accordion
         chekspan.on("show.bs.collapse", function () {
             // collapsed
             chekspan.fadeIn("fast");
@@ -239,6 +236,7 @@
             $field.find(".accordion-toggle").addClass("accordion-after");
         });
 
+        // hide accordion
         chekspan.on("hide.bs.collapse", function () {
             // not collapsed
             window.setTimeout( function (){
@@ -283,6 +281,23 @@
         });
     }
 
+    // enable autosubmit handler
+    function fieldAutoSubmitSetup(fieldId){
+        $("#" + fieldId).on("click", ".option", function (){
+            var self = this;
+            $("#ajax-spinner2").hide();
+            if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
+                sortCheckboxesByChecked($field);
+            } else {
+                //TODO : check if apply-filters shown
+                // each checkbox does auto submit
+                window.setTimeout( function() {
+                    $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'button': self})
+                }, 300);
+            }
+        });
+    }
+
     function generateCheckboxes($fields){
         var count = $fields.length;
         $fields.each(function(indx, field){
@@ -295,24 +310,10 @@
             if(hasChecks){
                 var fieldId = $field.attr("id");
 
-                // each checkbox does auto submit
-                $("#" + fieldId).on("click", ".option", function (){
-                    var self = this;
-                    $("#ajax-spinner2").hide();
-                    if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
-                        //return false;
-                        sortCheckboxesByChecked($field);
-                    } else {
-                        //TODO : check if apply-filters shown
-                        window.setTimeout( function() {
-                            $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click", {'button': self})
-                        }, 300);
-                    }
-                });
+                fieldAutoSubmitSetup(fieldId);
 
                 // add "controls"
                 var all = generateControlDiv();
-
                 $field.find("> label.horizontal").after(all);
 
                 //tooltips
@@ -334,13 +335,11 @@
                 }
 
                 sortCheckboxesByChecked($field);
-
             }
-            if (!--count) $(".wise-search-form-container, #wise-search-form").animate({"opacity" : 1}, 1000);
+            if (!--count) $(selectorFormContainer + "," + selectorLeftForm).animate({"opacity" : 1}, 1000);
 
         });
     }
-
 
     function checkboxHandlerAll(ev){
         ev.preventDefault();
@@ -356,9 +355,7 @@
             if($(rest[idx]).val() !== "all" && $(rest[idx]).val() !== "none") $(rest[idx]).prop("checked", true);
         });
 
-
-
-        //$(".wise-search-form-container .formControls #form-buttons-continue").trigger("click");
+        //$( selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
     }
 
     function checkboxHandlerNone(ev){
@@ -376,7 +373,7 @@
             //if( $(rest[idx]).val() !== "none")
         });
 
-        //$(".wise-search-form-container .formControls #form-buttons-continue").trigger("click");
+        //$( selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
     }
 
     function checkboxHandlerInvert(ev){
@@ -405,7 +402,7 @@
         $.each(unchecked, function (idx) {
             $(unchecked[idx]).prop("checked", true);
         });
-        //$(".wise-search-form-container .formControls #form-buttons-continue").trigger("click");
+        //$( selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
     }
 
     function addCheckboxHandlers(){
@@ -413,11 +410,11 @@
         $controls.on("click","a[data-value='all']", checkboxHandlerAll);
         $controls.on("click", "a[data-value='none']", checkboxHandlerNone);
         $controls.on("click", "a[data-value='invert']", checkboxHandlerInvert);
-        //$(".controls .apply-filters").on("click", $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click") );
+        //$(".controls .apply-filters").on("click", $( selectorFormContainer + " .formControls #form-buttons-continue").trigger("click") );
 
         $controls.one("click",".apply-filters", function () {
-            $(".wise-search-form-container [name='form.widgets.page']").val(0);
-            $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click", {'button': this});
+            $(selectorFormContainer + " [name='form.widgets.page']").val(0);
+            $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'button': this});
         });
     }
 
@@ -428,7 +425,14 @@
     }
 
     function addCheckboxLabelHandlers(){
-        var allch = $(".wise-search-form-container, #wise-search-form").find("[data-fieldname]");
+        var allch = $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]");
+
+        var triggerClick = function (chV, ev){
+            //reset page
+             $(selectorFormContainer + " [name='form.widgets.page']").val(0);
+             if( exceptVal.indexOf(chV) === -1) $(ev.target).find("input[type='checkbox']").trigger('click');
+        };
+
         // listener for click on the whole span
         allch.on("click", ".option", function(ev){
             $("#ajax-spinner2").hide();
@@ -436,10 +440,8 @@
             if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
                 //return false;
             } else {
-                $(".wise-search-form-container [name='form.widgets.page']").val(0);
-                if( exceptVal.indexOf(checkboxV) === -1) $(ev.target).find("input[type='checkbox']").trigger('click');
+               triggerClick(checkboxV, ev);
             }
-
         });
     }
     /*
@@ -450,9 +452,11 @@
     * SELECT2 functions
     * */
     function setupRightSelects2(){
-        $(".wise-search-form-container select").each(function (ind, selectElement) {
+        $( selectorFormContainer + " select").each(function (ind, selectElement) {
             $(selectElement).addClass("js-example-basic-single");
             var lessOptions = $(selectElement).find("option").length < 10;
+
+            var $wise_search_form = $(selectorFormContainer);
 
             var options = {
                 placeholder: 'Select an option',
@@ -465,7 +469,13 @@
 
             $(selectElement).select2(options);
 
-            $(".wise-search-form-container #s2id_form-widgets-marine_unit_id").hide();
+            $(selectorFormContainer + " #s2id_form-widgets-marine_unit_id").hide();
+
+            var removePaginationButtons = function(){
+                $wise_search_form.find("[name='form.buttons.prev']").remove();
+                $wise_search_form.find("[name='form.buttons.next']").remove();
+                $wise_search_form.find("[name='form.widgets.page']").remove();
+            };
 
             $(selectElement).on("select2-selecting", function(ev) {
                 // remove results following form-widgets-article select element
@@ -474,14 +484,11 @@
                     $(ev.target).closest(".form-right-side").next().remove();
                 }
 
-                var $wise_search_form = $(".wise-search-form-container");
-                $wise_search_form.find("[name='form.buttons.prev']").remove();
-                $wise_search_form.find("[name='form.buttons.next']").remove();
-                $wise_search_form.find("[name='form.widgets.page']").remove();
+                removePaginationButtons()
 
                 var self = this;
                 window.setTimeout( function (){
-                    $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click", {'select': self});
+                    $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': self});
                 }, 300);
 
             });
@@ -489,7 +496,9 @@
     }
 
     function setupLeftSelect2(){
-        $("#wise-search-form select:not(.notselect)").addClass("js-example-basic-single").each(function (ind, selectElement) {
+        var marineUnitTriggerSelector = "#marine-unit-trigger";
+
+        $( selectorLeftForm + " select:not(.notselect)").addClass("js-example-basic-single").each(function (ind, selectElement) {
             var options = {
                 placeholder: 'Select an option',
                 closeOnSelect: true,
@@ -512,50 +521,48 @@
             $(selectElement).parentsUntil(".field").parent().prepend("<h4>Marine Unit ID: </h4>");
 
             $(selectElement).on("select2-open", function() {
-                var trh = $("#marine-unit-trigger").offset().top;
+                var trh = $( marineUnitTriggerSelector ).offset().top;
                 //$(".select2-top-override-dropdown").css("margin-top", $("#marine-unit-trigger").height()/2 + "px" );
-                $("#marine-unit-trigger .arrow").hide();
+                $( marineUnitTriggerSelector + " .arrow").hide();
                 $(".select2-top-override-dropdown").css({
-                    "top": trh + $("#marine-unit-trigger").height() - $("#marine-unit-trigger .arrow").height() + "px",
+                    "top": trh + $( marineUnitTriggerSelector ).height() - $( marineUnitTriggerSelector + " .arrow").height() + "px",
                     "margin-top": "12" + "px !important"
                 });
             });
 
             $(selectElement).on("select2-selecting", function(ev) {
-                $("#wise-search-form #marine-unit-trigger a").text(ev.object.text);
-                $(".wise-search-form-container [name='form.widgets.page']").val(0);
-                $(".wise-search-form-container #form-widgets-marine_unit_id").select2().val(ev.val).trigger("change");
-                $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click", {'select': ev.target});
+                $(selectorLeftForm +  marineUnitTriggerSelector +"  a").text(ev.object.text);
+                $(selectorFormContainer + " [name='form.widgets.page']").val(0);
+                $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(ev.val).trigger("change");
+                $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': ev.target});
             });
 
             $(selectElement).on("select2-close", function () {
-                $("#marine-unit-trigger").css("background", "transparent");
-                $("#marine-unit-trigger a").css("background", "transparent");
-                $("#marine-unit-trigger .arrow").show();
+                $( marineUnitTriggerSelector ).css("background", "transparent");
+                $( marineUnitTriggerSelector + " a").css("background", "transparent");
+                $( marineUnitTriggerSelector + " .arrow").show();
             });
 
             /// Marine Unit id selector
-            if ($('#wise-search-form select').hasClass("js-example-basic-single")) {
+            if ($(selectorLeftForm + ' select').hasClass("js-example-basic-single")) {
 
                 // Select2 has been initialized
-                var text = $('#wise-search-form  select [value="' + jQuery('#wise-search-form .select-article select').val() + '"]').text();
-                $('#wise-search-form select:not(.notselect)').parentsUntil(".field").before('<div id="marine-unit-trigger">' +
+                var text = $(selectorLeftForm + ' select [value="' + jQuery(selectorLeftForm + ' .select-article select').val() + '"]').text();
+                $( selectorLeftForm + ' select:not(.notselect)').parentsUntil(".field").before('<div id="marine-unit-trigger">' +
                     '<div class="text-trigger">'+ text +
                     '<span class="fa fa-caret-down text-trigger-icon"></span>' +
                     '</div>' +
                     '</div>');
 
-                $("#marine-unit-trigger").on("click", function () {
+                $(marineUnitTriggerSelector).on("click", function () {
                     if(loading) return false;
-                    $("#marine-unit-trigger").css("background", "rgb(238, 238, 238)");
-                    $("#marine-unit-trigger a").css("background", "rgb(238, 238, 238)");
+                    $( marineUnitTriggerSelector ).css("background", "rgb(238, 238, 238)");
+                    $( marineUnitTriggerSelector + " a").css("background", "rgb(238, 238, 238)");
 
-                    $('#wise-search-form select:not(.notselect)').select2("open");
+                    $( selectorLeftForm + ' select:not(.notselect)').select2("open");
 
-                    var trH = $("#marine-unit-trigger a").height();
-
+                    var trH = $( marineUnitTriggerSelector + " a").height();
                     $(".select2-top-override-dropdown").css("margin-top", trH/2 + "px" );
-
                 });
 
             }
@@ -584,7 +591,7 @@
             containerCssClass : "extra-details-select"
         };
 
-        $.each( $("#wise-search-form .extra-details-select") , function (idx, elem) {
+        $.each( $( selectorLeftForm + " .extra-details-select") , function (idx, elem) {
             if($(elem).find("option").length > 1){
                 $(elem).select2(options);
             } else {
@@ -620,13 +627,13 @@
             }
         }
 
-        $("#wise-search-form .extra-details .tab-panel").fadeOut('slow', function () {
-            $.each( $("#wise-search-form .extra-details .extra-details-section"), function (indx, item){
+        $( selectorLeftForm + " .extra-details .tab-panel").fadeOut('slow', function () {
+            $.each( $( selectorLeftForm + " .extra-details .extra-details-section"), function (indx, item){
                 $($(item).find(".tab-panel")[0]).show();
             });
         });
 
-        $("#wise-search-form .extra-details-select").on("select2-selecting", function(ev) {
+        $( selectorLeftForm + " .extra-details-select").on("select2-selecting", function(ev) {
             var sect = $(ev.target).parentsUntil(".extra-details-section").parent();
             $.each( $(sect).find(".tab-panel") , function (idx, elem) {
                 if ($(elem).attr("id") !== ev.choice.id) {
@@ -693,12 +700,12 @@
             $("#tabs-wrapper .tab-pane").removeClass("fade");
         }
 
-        var nrTabs = $("#wise-search-form ul.topnav li").length;
+        var nrTabs = $( selectorLeftForm + " ul.topnav li").length;
 
         var wdth = (100/nrTabs) - 1;
 
-        $("#wise-search-form .topnav li").css({"width": wdth + "%", "margin-right": "1%" });
-        /*$.each( $("#wise-search-form .topnav li"), function (indx, itm) {
+        $( selectorLeftForm + " .topnav li").css({"width": wdth + "%", "margin-right": "1%" });
+        /*$.each( $( selectorLeftForm + " .topnav li"), function (indx, itm) {
             $(itm).css({
                 "max-width" : wdth + "%"
             });
@@ -716,7 +723,7 @@
 
     function marineBtnHandler(ev){
         var direction = ev.data.direction;
-        var marinUidSelect = $(".wise-search-form-container #s2id_form-widgets-marine_unit_id");
+        var marinUidSelect = $( selectorFormContainer + " #s2id_form-widgets-marine_unit_id");
         var selectedV =  marinUidSelect.select2('data');
 
         var nextEl  = $(selectedV.element[0]).next();
@@ -730,13 +737,13 @@
         }
 
         // reset paging
-        $(".wise-search-form-container [name='form.widgets.page']").remove();
+        $(selectorFormContainer + " [name='form.widgets.page']").remove();
 
-        $(".wise-search-form-container #form-widgets-marine_unit_id").select2().val(dir).trigger("change");
-        $(".wise-search-form-container #s2id_form-widgets-marine_unit_id").hide();
+        $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(dir).trigger("change");
+        $(selectorFormContainer + " #s2id_form-widgets-marine_unit_id").hide();
 
-        //$(".wise-search-form-container .formControls #form-buttons-continue").trigger("click");
-        $(".wise-search-form-container .formControls #form-buttons-continue").trigger("click");
+        //$(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
+        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
 
     }
 
@@ -747,24 +754,23 @@
 
         prevButton.one("click", function (){
             if(loading) return false;
-            $(".wise-search-form-container").find("form").append("<input type='hidden' name='form.buttons.prev' value='Prev'>");
-            $(".wise-search-form-container").find(".formControls #form-buttons-continue").trigger("click");
+            $( selectorFormContainer).find("form").append("<input type='hidden' name='form.buttons.prev' value='Prev'>");
+            $( selectorFormContainer).find(".formControls #form-buttons-continue").trigger("click");
         });
 
         nextButton.one("click", function(){
             if(loading) return false;
-            $(".wise-search-form-container").find("form").append("<input type='hidden' name='form.buttons.next' value='Next'>");
-            $(".wise-search-form-container").find(".formControls #form-buttons-continue").trigger("click");
+            $( selectorFormContainer ).find("form").append("<input type='hidden' name='form.buttons.next' value='Next'>");
+            $(selectorFormContainer).find(".formControls #form-buttons-continue").trigger("click");
         });
 
-        var selected = $("#wise-search-form select:not(.notselect)").val();
+        var selected = $( selectorLeftForm + " select:not(.notselect)").val();
 
-
-        var opts = $("#wise-search-form select:not(.notselect) option");
+        var opts = $( selectorLeftForm + " select:not(.notselect) option");
 
         $("#marine-unit-nav").hide();
         // ignore 1st option for "prev" button
-        if( $("#wise-search-form select:not(.notselect)").val() !== $(opts[1]).val() ){
+        if( $( selectorLeftForm + " select:not(.notselect)").val() !== $(opts[1]).val() ){
 
             var topPrevBtn = '<button type="submit" id="form-buttons-prev-top" name="marine.buttons.prev"' +
                 ' class="submit-widget button-field btn btn-default pagination-prev fa fa-angle-left" value="" button="">' +
@@ -782,7 +788,7 @@
         }
 
         // ignore last option for "next" button
-        if( $("#wise-search-form select:not(.notselect)").val() !== $(opts[opts.length-1]).val() ){
+        if( $( selectorLeftForm + " select:not(.notselect)").val() !== $(opts[opts.length-1]).val() ){
             var topNextBtn = '<button type="submit" ' +
                 'id="form-buttons-next-top" name="marine.buttons.next" class="submit-widget button-field btn btn-default fa fa-angle-right" value="">' +
                 '            </button>';
@@ -809,9 +815,9 @@
 
         initStyling();
 
-        generateCheckboxes( $(".wise-search-form-container, #wise-search-form").find("[data-fieldname]") );
+        generateCheckboxes( $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]") );
 
-        addCheckboxHandlers( $(".wise-search-form-container") );
+        addCheckboxHandlers( $(selectorFormContainer) );
 
         addCheckboxLabelHandlers();
 
@@ -832,7 +838,7 @@
         window.WISE.blocks = [];
         //$("#ajax-spinner2").hide();
 
-        $("#wise-search-form .no-results").remove();
+        $( selectorLeftForm + " .no-results").remove();
 
         var t = "<div id='wise-search-form-container-preloader' " +
             "></div>";
@@ -843,7 +849,7 @@
             "transform": "translate3d(-50%, -50%,0)"
         }).show();
 
-        $(".wise-search-form-container").append(t);
+        $(selectorFormContainer).append(t);
         $("#wise-search-form-container-preloader").append(sp);
 
 
@@ -864,12 +870,11 @@
 
         cont.prepend("<div id='wise-search-form-preloader' ></div>");
 
-
         $("#wise-search-form-preloader")
             .append("<span style='position: absolute;" +
-                "    display: block;" +
-                "    left: 50%;" +
-                " top: 10%;'></span>");
+                " display: block;" +
+                " left: 50%;" +
+                "top: 10%;'></span>");
         $("#wise-search-form-preloader > span").append( $("#ajax-spinner2").clone().attr("id","ajax-spinner-center" ).show());
 
         $("#ajax-spinner-center").css({
@@ -879,41 +884,41 @@
             // "transform" : "translateX(-50%)"
         });
 
-        //window.WISE.marineUnit = $("#wise-search-form select").val(  );
+        //window.WISE.marineUnit = $(selectorLeftForm + " select").val(  );
 
         loading = true;
     }
 
     function formSuccess(data, status, req) {
-        $("#wise-search-form #wise-search-form-top").siblings().html("");
-        $("#wise-search-form #wise-search-form-top").siblings().fadeOut("fast");
+        $( selectorLeftForm + " #wise-search-form-top").siblings().html("");
+        $( selectorLeftForm + " #wise-search-form-top").siblings().fadeOut("fast");
 
-        $("#wise-search-form .topnav").next().remove();
+        $( selectorLeftForm + " .topnav").next().remove();
 
         var $data = $(data);
 
-        window.WISE.formData = $(data).find(".wise-search-form-container").clone(true);
+        window.WISE.formData = $(data).find(selectorFormContainer).clone(true);
 
-        var chtml = $data.find(".wise-search-form-container");
+        var chtml = $data.find(selectorFormContainer);
 
         var fhtml = chtml.html();
 
-        var centerContentD = $data.find("#wise-search-form #wise-search-form-top").siblings();
+        var centerContentD = $data.find( selectorLeftForm + " #wise-search-form-top").siblings();
 
-        $(".wise-search-form-container").html(fhtml);
+        $(selectorFormContainer).html(fhtml);
 
-        if( $data.find("#wise-search-form .topnav").next().length > 0){
-            $("#wise-search-form .topnav").after($data.find("#wise-search-form .topnav").next());
+        if( $data.find( selectorLeftForm + " .topnav").next().length > 0){
+            $( selectorLeftForm + " .topnav").after($data.find( selectorLeftForm + " .topnav").next());
         }
 
-        $("#wise-search-form #wise-search-form-top").siblings().remove();
-        $("#wise-search-form #wise-search-form-top").after(centerContentD);
+        $( selectorLeftForm + " #wise-search-form-top").siblings().remove();
+        $( selectorLeftForm + " #wise-search-form-top").after(centerContentD);
 
-        /*var res = $data.find("#wise-search-form");
+        /*var res = $data.find( selectorLeftForm );
 
         if(res.children().length === 1){
             if($(res[0]).attr("id") === "wise-search-form-top" ){
-                $("#wise-search-form #wise-search-form-top").after("<span class='no-results'>No results found.</span>");
+                $( selectorLeftForm + " #wise-search-form-top").after("<span class='no-results'>No results found.</span>");
             }
 
         }*/
@@ -929,33 +934,33 @@
 
     function formAjaxComplete(jqXHR, textStatus){
         if(textStatus === "success"){
-            $(".wise-search-form-container").fadeIn("fast", function () {
-                $("#wise-search-form #wise-search-form-top").siblings().fadeIn("fast");
+            $(selectorFormContainer).fadeIn("fast", function () {
+                $( selectorLeftForm + " #wise-search-form-top").siblings().fadeIn("fast");
             });
         }
-        $(".wise-search-form-container").find("[name='form.buttons.prev']").remove();
-        $(".wise-search-form-container").find("[name='form.buttons.next']").remove();
+        $(selectorFormContainer).find("[name='form.buttons.prev']").remove();
+        $(selectorFormContainer).find("[name='form.buttons.next']").remove();
 
         //$("s2id_form-widgets-marine_unit_id").select2().enable(true);
 
-        $("#wise-search-form #loader-placeholder").remove();
+        $( selectorLeftForm + " #loader-placeholder").remove();
 
         $("#form-widgets-marine_unit_id").prop("disabled", false);
 
-        //if($("#wise-search-form select").val() === "--NOVALUE--" ) $("#wise-search-form select").val(window.WISE.marineUnit).trigger("change.select2");
-        if ($('#wise-search-form select').hasClass("js-example-basic-single")) {
+        //if($( selectorLeftForm + " select").val() === "--NOVALUE--" ) $( selectorLeftForm + " select").val(window.WISE.marineUnit).trigger("change.select2");
+        if ( $(selectorLeftForm + ' select').hasClass("js-example-basic-single")) {
             // Select2 has been initialized
 
-            if( ( $("#wise-search-form .select2-choice").width()/2 ) <= $("#wise-search-form #select2-chosen-3").width() ){
-                $("#wise-search-form .select2-choice").css("width", "50%");
-            } else if ( 2*( $("#wise-search-form .select2-choice").width()/3 ) <= $("#wise-search-form #select2-chosen-3").width() ) {
-                $("#wise-search-form .select2-choice").css("width", "70%");
+            if( ( $( selectorLeftForm + " .select2-choice").width()/2 ) <= $( selectorLeftForm + " #select2-chosen-3").width() ){
+                $( selectorLeftForm + " .select2-choice").css("width", "50%");
+            } else if ( 2*( $( selectorLeftForm + " .select2-choice").width()/3 ) <= $( selectorLeftForm + " #select2-chosen-3").width() ) {
+                $( selectorLeftForm + " .select2-choice").css("width", "70%");
             }
 
         }
 
         if($("#wise-search-form-top").next().length === 0){
-            $("#wise-search-form #wise-search-form-top").after("<span class='no-results'>No results found.</span>");
+            $( selectorLeftForm + " #wise-search-form-top").after("<span class='no-results'>No results found.</span>");
         }
 
         loading = false;
@@ -981,8 +986,8 @@
             '  </button>' +
             '</div>');
 
-        $(".wise-search-form-container").find("[name='form.buttons.prev']").remove();
-        $(".wise-search-form-container").find("[name='form.buttons.next']").remove();
+        $( selectorFormContainer ).find("[name='form.buttons.prev']").remove();
+        $( selectorFormContainer ).find("[name='form.buttons.next']").remove();
         $("#form-widgets-marine_unit_id").prop("disabled", false);
 
         $("#wise-search-form-container-preloader").remove();
@@ -999,7 +1004,32 @@
         loading = false;
     }
 
-
+    function resetConfigsbelowFacet(called_from, called_from_button){
+        var empty_next_inputs;
+        if (!called_from || called_from_button) {
+            empty_next_inputs = function(el) {
+                var panel_group, subform_parent, subform_children;
+                panel_group = $(el).closest('.panel-group');
+                subform_parent = panel_group.closest('.subform');
+                subform_children = subform_parent.find('.subform');
+                panel_group.nextAll('.panel-group').find('.panel').empty();
+                if (subform_children.length) {
+                    subform_children.find('.panel').empty();
+                }
+            };
+            if (called_from_button) {
+                empty_next_inputs(called_from_button);
+            }
+            else {
+                $(".ui-autocomplete-input").each(function(idx, el) {
+                    if (el.value) {
+                        empty_next_inputs(el);
+                        return false;
+                    }
+                });
+            }
+        }
+    }
 
     jQuery(document).ready(function($){
         initPageElems();
@@ -1018,11 +1048,11 @@
         var AJAX_MODE = true;
 
         window.WISE = {};
-        window.WISE.formData = $(".wise-search-form-container").clone(true);
+        window.WISE.formData = $( selectorFormContainer ).clone(true);
         window.WISE.blocks = [];
 
         // ajax form submission
-        $(".wise-search-form-container")
+        $( selectorFormContainer )
             .unbind("click")
             .on("click",".formControls #form-buttons-continue", function (ev){
                 if(!AJAX_MODE){
@@ -1030,7 +1060,7 @@
                 }
                 ev.preventDefault();
 
-                var form =  $(".wise-search-form-container").find("form");
+                var form =  $( selectorFormContainer ).find("form");
                 var url = form.attr("action");
 
                 // empty facets below given facet where we had an interaction
@@ -1038,30 +1068,8 @@
                 // with which we interacted with
                 var called_from = arguments[1];
                 var called_from_button = called_from && called_from['button'];
-                var empty_next_inputs;
-                if (!called_from || called_from_button) {
-                    empty_next_inputs = function(el) {
-                        var panel_group, subform_parent, subform_children;
-                        panel_group = $(el).closest('.panel-group');
-                        subform_parent = panel_group.closest('.subform');
-                        subform_children = subform_parent.find('.subform');
-                        panel_group.nextAll('.panel-group').find('.panel').empty();
-                        if (subform_children.length) {
-                            subform_children.find('.panel').empty();
-                        }
-                    };
-                    if (called_from_button) {
-                        empty_next_inputs(called_from_button);
-                    }
-                    else {
-                        $(".ui-autocomplete-input").each(function(idx, el) {
-                            if (el.value) {
-                                empty_next_inputs(el);
-                                return false;
-                            }
-                        });
-                    }
-                }
+
+                resetConfigsbelowFacet(called_from, called_from_button);
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
