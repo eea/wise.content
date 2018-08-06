@@ -5,9 +5,14 @@ module.exports = {
         compress: true,
         sourceMap: false
       },
-      files: {
-        '<%= path.dest %>/css/main.css': '<%= path.src %>/less/*.less'
-      }
+        files: {
+            '<%= path.dest %>/css/msfd_search.css': [
+                '<%= path.src %>/less/search-form.less',
+                '<%= path.src %>/less/select2-override.less',
+                '<%= path.src %>/less/select2-top-override.less',
+                '<%= path.src %>/less/search-style.less'
+            ]
+        }
     }
   },
   uglify: {
@@ -27,7 +32,7 @@ module.exports = {
   },
   postcss: {
     production: {
-      src: '<%= path.static %>/css/*.css',
+      src: '<%= path.dest %>/css/*.css',
       options: {
         map: false,
         processors: [

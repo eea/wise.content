@@ -4,12 +4,18 @@ module.exports = {
       options: {
         compress: false,
         sourceMap: true,
-        sourceMapFilename: '<%= path.static %>/css/source.css.map',
+        sourceMapFilename: '<%= path.dest %>/css/source.css.map',
         sourceMapURL: './source.css.map'
       },
       files: {
-        '<%= path.static %>/css/main.css': '<%= path.src %>/less/*.less'
+          '<%= path.dest %>/css/msfd_search.css': [
+              '<%= path.src %>/less/search-form.less',
+              '<%= path.src %>/less/select2-override.less',
+              '<%= path.src %>/less/select2-top-override.less',
+              '<%= path.src %>/less/search-style.less'
+          ]
       }
+
     }
   },
   // concat: {

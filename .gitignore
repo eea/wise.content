@@ -35,3 +35,5 @@ report.html
 !src/wise
 
 src/wise/content/search/static/node_modules/
+
+src/wise/content/search/static/wise/node_modules/
