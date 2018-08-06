@@ -264,12 +264,32 @@
         }
     }
 
+    function sortCheckboxesByChecked($field) {
+        var arr = [];
+        $.each( $field.find(".option input[type='checkbox']:not(:checked)") , function (ix, ch) {
+            arr.push( $(ch).parent() );
+        });
+        var found = $field.find(".option input[type='checkbox']:checked");
+        var foundArr = [];
+        if(found.length > 0){
+            $.each(found, function (ix, item) {
+                foundArr.push($(item).parent() );
+            });
+        }
+        var all = foundArr.concat(arr);
+
+        $.each( all, function (ix, ch) {
+            $field.find(".panel").append(ch);
+        });
+    }
+
     function generateCheckboxes($fields){
         var count = $fields.length;
         $fields.each(function(indx, field){
             var $field = $(field);
             var cheks = $field.find(".option");
-            var hasChecks = cheks.find("input[type='checkbox']").length > 0;
+            var allcheckboxes = cheks.find("input[type='checkbox']");
+            var hasChecks = allcheckboxes.length > 0;
 
             // has checkboxes
             if(hasChecks){
@@ -281,6 +301,7 @@
                     $("#ajax-spinner2").hide();
                     if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
                         //return false;
+                        sortCheckboxesByChecked($field);
                     } else {
                         //TODO : check if apply-filters shown
                         window.setTimeout( function() {
@@ -311,6 +332,9 @@
                         $(ev.target).parent().find("input").trigger("focus");
                     });
                 }
+
+                sortCheckboxesByChecked($field);
+
             }
             if (!--count) $(".wise-search-form-container, #wise-search-form").animate({"opacity" : 1}, 1000);
 
