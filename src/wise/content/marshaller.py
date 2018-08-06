@@ -29,5 +29,4 @@ class RichImage2Surf(Value2Surf):
     adapts(IRichImage)
 
     def __init__(self, value):
-        import pdb; pdb.set_trace()
         self.value = value.filename
