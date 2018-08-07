@@ -263,7 +263,6 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
 
     total = q.count()
     q = [x for x in q]
-    print "\nNOT CACHED\n"
 
     return [total, q]
 
@@ -282,7 +281,6 @@ def get_marine_unit_id_names(marine_unit_ids):
 
     total = q.count()
     q = [x for x in q]
-    print "\nNOT CACHED\n"
 
     return [total, q]
 
@@ -315,7 +313,6 @@ def get_all_records(mapper_class, *conditions):
     q = sess.query(mapper_class).filter(*conditions)
     count = q.count()
     q = [x for x in q]
-    print "\nNOT CACHED\n"
 
     return [count, q]
 
@@ -326,7 +323,6 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
     q = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
     count = q.count()
     q = [x for x in q]
-    print "\nNOT CACHED\n"
 
     return [count, q]
 
@@ -337,7 +333,6 @@ def get_all_records_join(columns, klass_join, *conditions):
     q = sess.query(*columns).join(klass_join).filter(*conditions)
     count = q.count()
     q = [x for x in q]
-    print "\nNOT CACHED\n"
 
     return [count, q]
 

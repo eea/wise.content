@@ -166,7 +166,7 @@ class A2018FeaturesForm(EmbededForm):
         return all_values_from_field(self, self.fields['feature'])
 
 
-@register_compliance_module
+# @register_compliance_module
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     css_class = 'left-side-form'
