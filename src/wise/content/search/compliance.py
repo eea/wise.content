@@ -1,11 +1,11 @@
 from .base import EmbededForm, ItemDisplayForm
 from plone.app.textfield.widget import RichTextWidget
-from z3c.form.button import buttonAndHandler
-from z3c.form.field import Fields
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from wise.content.search import db, interfaces, sql2018
 from z3c.form.browser.text import TextWidget, TextFieldWidget
 from z3c.form.browser.textarea import TextAreaWidget
-from wise.content.search import db, interfaces, sql2018
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from z3c.form.button import buttonAndHandler
+from z3c.form.field import Fields
 
 
 def register_compliance_module(klass):
@@ -27,10 +27,11 @@ def register_compliance_module(klass):
 
 
 class ComplianceModule(EmbededForm):
-    css_class = 'compliance-module'
+    css_class = 'only-left-side-form'
     # template = ViewPageTemplateFile('pt/compliance.pt')
     fields = Fields(interfaces.IComplianceModule)
     actions = None
+    reset_page = False
 
     def get_subform(self):
         return ComplianceDisplay(self, self.request)
@@ -43,17 +44,10 @@ class ComplianceModule(EmbededForm):
 class ComplianceDisplay(ItemDisplayForm):
 
     template = ViewPageTemplateFile('pt/compliance-display-form.pt')
+    data_template = ViewPageTemplateFile('pt/compliance-item-display.pt')
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     # css_class = 'left-side-form'
-    css_class = 'compliance-display'
-
-    def get_subform(self):
-        return ComplianceAssessment(self, self.request)
-
-    def update(self):
-        super(ComplianceDisplay, self).update()
-        self.subform = self.get_subform()
-        del self.widgets['page']
+    # css_class = 'compliance-display'
 
     def get_db_results(self):
         return 0, {}
@@ -66,6 +60,14 @@ class ComplianceDisplay(ItemDisplayForm):
             }))
 
         return res
+
+    def get_subform(self):
+        return ComplianceAssessment(self, self.request)
+
+    def update(self):
+        super(ComplianceDisplay, self).update()
+        self.subform = self.get_subform()
+        del self.widgets['page']
 
 
 class ComplianceAssessment(EmbededForm):
@@ -133,10 +135,8 @@ class ComplianceAssessment(EmbededForm):
     def update(self):
         super(ComplianceAssessment, self).update()
         self.data, errors = self.extractData()
-        # import pdb;pdb.set_trace()
 
     def extractData(self):
-        # data, errors = self.widgets.extract()
         data, errors = super(ComplianceAssessment, self).extractData()
-        # import pdb;pdb.set_trace()
+
         return data, errors
