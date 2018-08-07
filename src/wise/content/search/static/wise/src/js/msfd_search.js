@@ -87,8 +87,7 @@
             fbDownload.remove();
 
             btnForm.append( $(dBtn) );
-            $("#form-buttons-download").val("&#xf019; Download as XLS");
-            $("#form-buttons-download").addClass("fa").addClass("fa-download");
+            $("#form-buttons-download").val("&#xf019; Download as XLS").addClass("fa").addClass("fa-download");
         }
     }
 
@@ -681,23 +680,24 @@
             }
             //if($("#tabs-wrapper").find("ul li").length === 0) $("#tabs-wrapper").hide();
         } */
+        var tabswrapper = "#tabs-wrapper";
 
-        $.each( $(".tabs-wrapper") , function (indx, item) {
+        $.each( $( ".tabs-wrapper") , function (indx, item) {
             if($(item).find("ul").length ===  0){ return true;}
             //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
         });
 
-        if( $("#tabs-wrapper ul li").length === 1 ){
+        if( $( tabswrapper + " ul li").length === 1 ){
             $("#tabContents").removeClass("tab-content");
-            $("#tabs-wrapper ul").attr("class", "");
-            $("#tabs-wrapper ul li").css({
+            $( tabswrapper + " ul").attr("class", "");
+            $( tabswrapper + " ul li").css({
                 "background-color": "transparent",
                 "float" : "none"
             });
-            var lt = $("#tabs-wrapper ul li a").text();
-            $("#tabs-wrapper ul li").append("<h4>" + lt + "</h4>");
-            $("#tabs-wrapper ul li a").remove();
-            $("#tabs-wrapper .tab-pane").removeClass("fade");
+            var lt = $( tabswrapper + " ul li a").text();
+            $( tabswrapper + " ul li").append("<h4>" + lt + "</h4>");
+            $( tabswrapper + " ul li a").remove();
+            $( tabswrapper + " .tab-pane").removeClass("fade");
         }
 
         var nrTabs = $( selectorLeftForm + " ul.topnav li").length;
@@ -752,21 +752,26 @@
 
         var nextButton = $(".center-section [name='form.buttons.next']");
 
+        var continueBtn = ".formControls #form-buttons-continue";
+
         prevButton.one("click", function (){
             if(loading) return false;
             $( selectorFormContainer).find("form").append("<input type='hidden' name='form.buttons.prev' value='Prev'>");
-            $( selectorFormContainer).find(".formControls #form-buttons-continue").trigger("click");
+            $( selectorFormContainer).find(  continueBtn ).trigger("click");
         });
 
         nextButton.one("click", function(){
             if(loading) return false;
             $( selectorFormContainer ).find("form").append("<input type='hidden' name='form.buttons.next' value='Next'>");
-            $(selectorFormContainer).find(".formControls #form-buttons-continue").trigger("click");
+            $(selectorFormContainer).find( continueBtn ).trigger("click");
         });
 
         var selected = $( selectorLeftForm + " select:not(.notselect)").val();
 
         var opts = $( selectorLeftForm + " select:not(.notselect) option");
+        var formBtnPrevTop = "#form-buttons-prev-top";
+        var formBtnNextTop = "#form-buttons-next-top";
+        var marineUnitTrigger = "#marine-unit-trigger";
 
         $("#marine-unit-nav").hide();
         // ignore 1st option for "prev" button
@@ -775,15 +780,16 @@
             var topPrevBtn = '<button type="submit" id="form-buttons-prev-top" name="marine.buttons.prev"' +
                 ' class="submit-widget button-field btn btn-default pagination-prev fa fa-angle-left" value="" button="">' +
                 '          </button>';
-            $("#form-buttons-prev-top").append(topPrevBtn);
 
-            $("#form-buttons-prev-top").on("click", null, { direction : "prev"} , marineBtnHandler);
-            $("#form-buttons-prev-top").hide();
-            $("#marine-unit-trigger .arrow-left-container").one("click", function(){
-                $("#form-buttons-prev-top").trigger("click");
+            $(formBtnPrevTop).append(topPrevBtn);
+
+            $( formBtnPrevTop ).on("click", null, { direction : "prev"} , marineBtnHandler);
+            $( formBtnPrevTop ).hide();
+            $( marineUnitTrigger + " .arrow-left-container").one("click", function(){
+                $(formBtnPrevTop).trigger("click");
             });
         } else {
-            $("#marine-unit-trigger .arrow-left-container").hide();
+            $( marineUnitTrigger + " .arrow-left-container").hide();
             $(".text-trigger").css("margin-left", 0);
         }
 
@@ -792,16 +798,17 @@
             var topNextBtn = '<button type="submit" ' +
                 'id="form-buttons-next-top" name="marine.buttons.next" class="submit-widget button-field btn btn-default fa fa-angle-right" value="">' +
                 '            </button>';
-            $("#form-buttons-next-top").append(topNextBtn);
 
-            $("#form-buttons-next-top").on("click", null, { direction : "next"} , marineBtnHandler);
-            $("#form-buttons-next-top").hide();
-            $("#marine-unit-trigger .arrow-right-container").one("click",function(){
+            $(formBtnNextTop).append(topNextBtn);
+
+            $(formBtnNextTop).on("click", null, { direction : "next"} , marineBtnHandler);
+            $(formBtnNextTop).hide();
+            $( marineUnitTrigger + " .arrow-right-container").one("click",function(){
                 $("#form-buttons-next-top").trigger("click")
             });
         } else {
 
-            $("#marine-unit-trigger .arrow-right-container").hide();
+            $( marineUnitTrigger + " .arrow-right-container").hide();
         }
     }
 
