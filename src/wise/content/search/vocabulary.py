@@ -2,7 +2,6 @@ import csv
 import json
 import logging
 
-from eea.cache import cache
 from lxml.etree import parse
 from pkg_resources import resource_filename
 from sqlalchemy import and_, or_
@@ -11,6 +10,7 @@ from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
+from eea.cache import cache
 from wise.content.search import db, sql, sql2018
 
 from .a11 import ART11_GlOBALS
@@ -964,6 +964,7 @@ def a2018_feature(context):
             getattr(features_mc, features_rel_col).in_(id_targets)
         )
         # res = ['Feature%s' % x for x in range(0, 10)]
+
         return res
 
     res = get_res()
@@ -1032,6 +1033,7 @@ def a2018_ges_component(context):
             getattr(ges_components_mc, ges_comp_rel_col).in_(id_targets)
         )
         # res = ['GesComponent%s' % x for x in range(0, 10)]
+
         return res
 
     res = get_res()
@@ -1102,6 +1104,7 @@ def a2018_feature_ind(context):
     # @cache(lambda func: key)
     def get_res():
         conditions = []
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1166,6 +1169,7 @@ def a2018_mru_ind(context):
     # @cache(lambda func: key)
     def get_res():
         conditions = []
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1208,22 +1212,22 @@ def a2018_mru_ind(context):
     return vocab_from_values(res)
 
 
-@provider(IVocabularyFactory)
-def wise_search_compliance(context):
-    country = context.context.context.data.get('country_code')
-    article = context.context.context.record_title
-
-    mapper_class = 'Reporting_history'
-    conditions = list()
-
-    # if country:
-    #     conditions.append(mapper_class.CountryCode.in_(country))
-    # if article:
-    #     conditions.append(mapper_class.ReportingObl.in_(country))
-    #
-    # count, result = db.get_all_records(mapper_class, *conditions)
-    # res = [x.FileName for x in result]
-
-    res = ["File%s" % x for x in range(10)]
-
-    return vocab_from_values(res)
+# @provider(IVocabularyFactory)
+# def wise_search_compliance(context):
+#     country = context.context.context.data.get('country_code')
+#     article = context.context.context.record_title
+#
+#     mapper_class = 'Reporting_history'
+#     conditions = list()
+#
+#     # if country:
+#     #     conditions.append(mapper_class.CountryCode.in_(country))
+#     # if article:
+#     #     conditions.append(mapper_class.ReportingObl.in_(country))
+#     #
+#     # count, result = db.get_all_records(mapper_class, *conditions)
+#     # res = [x.FileName for x in result]
+#
+#     res = ["File%s" % x for x in range(10)]
+#
+#     return vocab_from_values(res)

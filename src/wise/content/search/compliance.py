@@ -1,142 +1,241 @@
-from .base import EmbededForm, ItemDisplayForm
-from plone.app.textfield.widget import RichTextWidget
+from collections import defaultdict
+from pprint import pprint
+
+from zope.interface import Interface, implements, provider
+from zope.schema import Choice  # , List
+from zope.schema.interfaces import IVocabularyFactory
+
+from plone.z3cform.layout import FormWrapper, wrap_form
+from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from wise.content.search import db, interfaces, sql2018
-from z3c.form.browser.text import TextWidget, TextFieldWidget
-from z3c.form.browser.textarea import TextAreaWidget
-from z3c.form.button import buttonAndHandler
+from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
+from z3c.form.form import Form
+
+from .db import threadlocals
+from .vocabulary import db_vocab, vocab_from_values
 
 
-def register_compliance_module(klass):
+class MainFormWrapper(FormWrapper):
+    """ Override mainform wrapper to be able to return XLS file
+    """
 
-    class ComplianceModuleMain(klass):
-        # template = ViewPageTemplateFile('pt/compliance.pt')
+    index = ViewPageTemplateFile('pt/layout.pt')
 
-        def get_subform(self):
-            # TODO access restriction
-            # only show if the user is allowed to see compliance module
-            return ComplianceModule(self, self.request)
+    def __init__(self, context, request):
+        FormWrapper.__init__(self, context, request)
+        threadlocals.session_name = self.form.session_name
 
-        def update(self):
-            super(klass, self).update()
-            # self.compliance_content = ComplianceModule(self, self.request)
-            self.subform = self.get_subform()
-
-    return ComplianceModuleMain
+    # def render(self):
+    #    if 'text/html' not in self.request.response.getHeader('Content-Type'):
+    #         return self.contents
+    #
+    #     return super(MainFormWrapper, self).render()
 
 
-class ComplianceModule(EmbededForm):
-    css_class = 'only-left-side-form'
-    # template = ViewPageTemplateFile('pt/compliance.pt')
-    fields = Fields(interfaces.IComplianceModule)
-    actions = None
+class IComplianceForm(Interface):
+    country = Choice(
+        title=u"Country",
+        vocabulary="compliance_countries",
+        required=True
+    )
+    report_type = Choice(
+        title=u"Report Type",
+        vocabulary="compliance_report_types",
+        required=True,
+    )
+
+
+class ComplianceForm(Form):
+    """ The main forms need to inherit from this clas
+    """
+
+    implements(IComplianceForm)
+    template = ViewPageTemplateFile('pt/complianceform.pt')
+    ignoreContext = True
     reset_page = False
+    subform = None
+    fields = Fields(IComplianceForm)
+    session_name = 'session_2018'
 
-    def get_subform(self):
-        return ComplianceDisplay(self, self.request)
-
-    # def update(self):
-    #     super(ComplianceModule, self).update()
-    #     self.subform = self.get_subform()
+    # @buttonAndHandler(u'Apply filters', name='continue')
+    # def handle_continue(self, action):
+    #     self.reset_page = True
 
 
-class ComplianceDisplay(ItemDisplayForm):
+ComplianceFormView = wrap_form(ComplianceForm, MainFormWrapper)
 
-    template = ViewPageTemplateFile('pt/compliance-display-form.pt')
-    data_template = ViewPageTemplateFile('pt/compliance-item-display.pt')
-    extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
-    # css_class = 'left-side-form'
-    # css_class = 'compliance-display'
 
-    def get_db_results(self):
-        return 0, {}
+@provider(IVocabularyFactory)
+def compliance_countries(context):
+    return db_vocab(sql2018.ReportingHistory, 'CountryCode')
 
-    def get_extra_data(self):
-        res = list()
-        res.append(
-            ('Some data from file ', {
-                '': [{'Data': "Text here _%s" % x} for x in range(2)]
-            }))
+
+@provider(IVocabularyFactory)
+def compliance_report_types(context):
+    return vocab_from_values([])
+
+
+def row_to_dict(table, row):
+    cols = table.c.keys()
+    res = {k: v for k, v in zip(cols, row)}
+
+    return res
+
+
+class DeterminationOfGES2012(BrowserView):
+    country = 'LV'
+
+    def get_country_name(self):
+        count, obj = db.get_item_by_conditions(
+            sql.MSFD11CommonLabel,
+            'ID',
+            sql.MSFD11CommonLabel.value == self.country,
+            sql.MSFD11CommonLabel.group == 'list-countries',
+        )
+
+        return obj.Text
+
+    def get_regions(self):
+        t = sql.t_MSFD4_GegraphicalAreasID
+        count, res = db.get_all_records(
+            t,
+            t.c.MemberState == self.country
+        )
+
+        res = [row_to_dict(t, r) for r in res]
+        regions = set([x['RegionSubRegions'] for x in res])
+
+        return regions
+
+    def get_ges_descriptors(self):
+        m = sql.MSFDFeaturesOverview
+        res = db.get_unique_from_mapper(
+            m, 'RFCode',
+            m.FeatureType == 'GES descriptor'
+        )
 
         return res
 
-    def get_subform(self):
-        return ComplianceAssessment(self, self.request)
+    def get_ges_descriptor_label(self, ges):
+        count, obj = db.get_item_by_conditions(
+            sql.MSFD11CommonLabel,
+            'ID',
+            sql.MSFD11CommonLabel.value == ges,
+            sql.MSFD11CommonLabel.group == 'list-MonitoringProgramme',
+        )
 
-    def update(self):
-        super(ComplianceDisplay, self).update()
-        self.subform = self.get_subform()
-        del self.widgets['page']
+        if obj:
+            return obj.Text
 
+    def get_marine_unit_ids(self):
+        t = sql.t_MSFD4_GegraphicalAreasID
+        count, res = db.get_all_records(
+            t,
+            t.c.MemberState == self.country
+        )
 
-class ComplianceAssessment(EmbededForm):
-    # css_class = 'only-left-side-form'
-    fields = Fields(interfaces.IComplianceAssessment)
-    # fields['com_assessment'].widgetFactory = TextWidget
+        res = [row_to_dict(t, r) for r in res]
+        muids = set([x['MarineUnitID'] for x in res])
 
-    mc_com_assessments = 'COM_assessments'
-    mc_assessments_comments = 'Assessments_comments'
+        return sorted(muids)
 
-    @buttonAndHandler(u'Save assessment', name='save_assessment')
-    def save_assessment(self, action):
-        data, errors = self.extractData()
-        assessment = data.get('com_assessment', '')
-        import pdb;pdb.set_trace()
-        if assessment:
-            # TODO save assessment to DB
-            reporting_history_id = self.context.item.get('Id', '')
-            assessment_id = db.get_all_records(
-                self.mc_com_assessments,
-                self.mc_com_assessments.Reporting_historyID == reporting_history_id
-            )
-            values = dict()
-            values['Reporting_historyID'] = reporting_history_id
-            values['Article'] = ''
-            values['GEScomponent'] = ''
-            values['Feature'] = ''
-            values['assessment_criteria'] = assessment
+    def get_ges_criterions(self, descriptor):
+        nr = descriptor[1:]
+        m = sql.MSFDFeaturesOverview
+        res = db.get_unique_from_mapper(
+            m, 'RFCode',
+            m.FeatureType == 'GES criterion',
+            m.RFCode.like('{}.%'.format(nr)),
+            m.FeatureRelevant == 'Y',
+            m.FeatureReported == 'Y',
+        )
 
-            if assessment_id:
-                conditions = list()
-                conditions.append(
-                    self.mc_com_assessments.Reporting_historyID == reporting_history_id
-                )
-                db.update_record(self.mc_com_assessments, *conditions, **values)
-            else:
-                db.insert_record(self.mc_com_assessments, **values)
+        return res
 
-    @buttonAndHandler(u'Save comment', name='save_comment')
-    def save_comment(self, action):
-        data, errors = self.extractData()
-        comment = data.get('assessment_comment', '')
-        import pdb;pdb.set_trace()
-        if comment:
-            # TODO save comment to DB
-            com_assessmentsId = self.context.item.get('Id', '')
-            comment_id = db.get_all_records(
-                self.mc_assessments_comments,
-                self.mc_assessments_comments.COM_assessmentsID == com_assessmentsId
-            )
-            values = dict()
-            values['COM_assessmentsID'] = com_assessmentsId
-            values['organisation'] = ''
-            values['Comment'] = comment
+    def get_grouped_indicators_feature_pressure(self, muids, criterions):
+        # returns a dict key Indicator, value: list of feature pressures
+        t = sql.t_MSFD9_Features
+        count, res = db.get_all_records(
+            t,
+            t.c.MarineUnitID.in_(muids),
+        )
+        res = [row_to_dict(t, r) for r in res]
 
-            if comment_id:
-                conditions = list()
-                conditions.append(
-                    self.mc_assessments_comments.COM_assessmentsID == com_assessmentsId
-                )
-                db.update_record(self.mc_assessments_comments, **values)
-            else:
-                db.insert_record(self.mc_com_assessments, **values)
+        indicators = defaultdict(set)
 
-    def update(self):
-        super(ComplianceAssessment, self).update()
-        self.data, errors = self.extractData()
+        for row in res:
+            rf = row['ReportingFeature']
+            indicators[rf].add(row['FeaturesPressuresImpacts'])
 
-    def extractData(self):
-        data, errors = super(ComplianceAssessment, self).extractData()
+        res = {}
 
-        return data, errors
+        for k, v in indicators.items():
+            flag = False
+
+            for crit in criterions:
+                if k.startswith(crit):
+                    flag = True
+
+            if flag:
+                res[k] = v
+
+        return res
+
+    def get_criterion_labels(self, criterions):
+        count, res = db.get_all_records(
+            sql.MSFD11CommonLabel,
+            sql.MSFD11CommonLabel.value.in_(criterions),
+            sql.MSFD11CommonLabel.group == 'list-GESIndicator',
+        )
+
+        return [(x.value, x.Text) for x in res]
+
+    def get_indicator_descriptors(self, muids):
+        count, res = db.get_all_records(
+            sql.MSFD9Descriptor,
+            sql.MSFD9Descriptor.MarineUnitID.in_(muids),
+            # sql.MSFD9Descriptor.group == 'list-GESIndicator',
+        )
+
+        return res
+
+    def get_ges_descriptions(self, indicators):
+        res = {}
+
+        for indic in indicators:
+            res[indic.ReportingFeature] = indic.DescriptionGES
+
+        return res
+
+    def __call__(self):
+        threadlocals.session_name = 'session'
+        self.country_name = self.get_country_name()
+        self.regions = self.get_regions()
+
+        # TODO: optimize this with a single function and a single query (w/
+        # JOIN)
+        self.descriptors = self.get_ges_descriptors()
+        self.descs = [(d, self.get_ges_descriptor_label(d))
+                      for d in self.descriptors]
+
+        self.muids = self.get_marine_unit_ids()
+
+        desc = 'D5'
+        self.criterions = self.get_ges_criterions(desc)
+
+        self.indics = self.get_grouped_indicators_feature_pressure(
+            self.muids, self.criterions)
+
+        self.criterion_labels = dict(
+            self.get_criterion_labels(self.criterions)
+        )
+
+        self.indicators = self.get_indicator_descriptors(self.muids)
+
+        indicator_ids = self.indics.keys()
+        res = self.get_ges_descriptions(self.indicators)
+        self.ges_descriptions = {k: v
+                                 for k, v in res.items() if k in indicator_ids}
+
+        return self.index()

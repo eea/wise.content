@@ -6,6 +6,7 @@
   i18n_domain="wise.content">
 
   <include file="utility.zcml" />
+  <include file="compliance.zcml" />
 
   <browser:page
     for="*"
