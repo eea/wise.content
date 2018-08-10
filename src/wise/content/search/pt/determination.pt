@@ -22,5 +22,3 @@
 <h5>Indicators (indicators)</h5>
 <div tal:replace="view/indicators"></div>
 
-<h5>GES Descriptions (ges_descriptions)</h5>
-<div tal:replace="view/ges_descriptions"></div>

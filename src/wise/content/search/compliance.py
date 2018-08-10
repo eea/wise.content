@@ -1,5 +1,6 @@
 from collections import defaultdict
 from pprint import pprint
+from sqlalchemy import and_, or_
 
 from zope.interface import Interface, implements, provider
 from zope.schema import Choice  # , List
@@ -84,7 +85,7 @@ def row_to_dict(table, row):
 
 
 class DeterminationOfGES2012(BrowserView):
-    country = 'LV'
+    country = 'DE'
 
     def get_country_name(self):
         count, obj = db.get_item_by_conditions(
@@ -145,8 +146,12 @@ class DeterminationOfGES2012(BrowserView):
         m = sql.MSFDFeaturesOverview
         res = db.get_unique_from_mapper(
             m, 'RFCode',
-            m.FeatureType == 'GES criterion',
-            m.RFCode.like('{}.%'.format(nr)),
+            or_(
+                and_(m.RFCode.like('{}.%'.format(nr)),
+                     m.FeatureType == 'GES criterion',),
+                and_(m.RFCode.like('{}'.format(descriptor)),
+                     m.FeatureType == 'GES descriptor')
+            ),
             m.FeatureRelevant == 'Y',
             m.FeatureReported == 'Y',
         )
@@ -210,18 +215,20 @@ class DeterminationOfGES2012(BrowserView):
 
     def __call__(self):
         threadlocals.session_name = 'session'
+        desc = 'D5'
         self.country_name = self.get_country_name()
         self.regions = self.get_regions()
 
         # TODO: optimize this with a single function and a single query (w/
         # JOIN)
         self.descriptors = self.get_ges_descriptors()
-        self.descs = [(d, self.get_ges_descriptor_label(d))
-                      for d in self.descriptors]
+        self.descs = dict()
+        for d in self.descriptors:
+            self.descs.update({d: self.get_ges_descriptor_label(d)})
+        self.desc_label = self.descs.get(desc, 'Descriptor Not Found')
 
         self.muids = self.get_marine_unit_ids()
 
-        desc = 'D5'
         self.criterions = self.get_ges_criterions(desc)
 
         self.indics = self.get_grouped_indicators_feature_pressure(
@@ -230,10 +237,12 @@ class DeterminationOfGES2012(BrowserView):
         self.criterion_labels = dict(
             self.get_criterion_labels(self.criterions)
         )
+        # add D5 criterion to the criterion lists too
+        self.criterion_labels.update({desc: self.desc_label})
 
         self.indicators = self.get_indicator_descriptors(self.muids)
 
-        indicator_ids = self.indics.keys()
+        # indicator_ids = self.indics.keys()
         # res = self.get_ges_descriptions(self.indicators)
         # self.ges_descriptions = {k: v
         #                          for k, v in res.items() if k in indicator_ids}
