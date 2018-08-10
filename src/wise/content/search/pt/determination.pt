@@ -1,23 +1,26 @@
-<h5>Descriptors</h5>
+<h5>Descriptors (descriptors)</h5>
 <div tal:replace="view/descriptors"></div>
 
-<h5>Descriptor labels</h5>
+<h5>Descriptor labels (descs)</h5>
 <div tal:replace="view/descs"></div>
 
-<h5>MarineUnitIds</h5>
+<h5>MarineUnitIds (muids)</h5>
 <div tal:replace="view/muids"></div>
 
-<h5>Criterions</h5>
+<h5>Criterions (criterions)</h5>
 <div tal:replace="view/criterions"></div>
 
-<h5>Indicator/Feature Pressures</h5>
+<h5>Criterions/Indicators (crit_lab_indics)</h5>
+<div tal:replace="view/crit_lab_indics"></div>
+
+<h5>Indicator/Feature Pressures (indics)</h5>
 <div tal:replace="view/indics"></div>
 
-<h5>Criterion labels</h5>
+<h5>Criterion labels (criterion_labels)</h5>
 <div tal:replace="view/criterion_labels"></div>
 
-<h5>Indicators</h5>
+<h5>Indicators (indicators)</h5>
 <div tal:replace="view/indicators"></div>
 
-<h5>GES Descriptions</h5>
+<h5>GES Descriptions (ges_descriptions)</h5>
 <div tal:replace="view/ges_descriptions"></div>

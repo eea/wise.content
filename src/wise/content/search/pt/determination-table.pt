@@ -1,0 +1,135 @@
+<style>
+    tr, td {
+        border: solid 1px;
+        padding: 5px;
+        font-size: 14px;
+        margin: 0px;
+    }
+</style>
+
+<table tal:define="colspan python:len(view.crit_lab_indics)">
+    <!--<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
+    <tr>
+        <td>Reporting area(s) [MarineUnitID]</td>
+        <td tal:attributes="colspan python:42"
+            tal:content="python: ', '.join(view.muids)"/>
+    </tr>
+
+    <tr>
+        <td>Feature(s) reported [Feature]</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python:', '.join(view.indics[value]) if value else ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td rowspan="2">GES component [Reporting feature]</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:attributes="colspan python: len(view.crit_lab_indics[crit])"
+                tal:content="python: view.criterion_labels[crit]"/>
+        </tal:block>
+    </tr>
+    <!--<tr tal:define="flat_list python:[item for sublist in view.crit_lab_indics.values() for item in sublist]">-->
+        <!--<tal:block tal:repeat="value flat_list">-->
+            <!--<td tal:content="value"/>-->
+        <!--</tal:block>-->
+    <!--</tr>-->
+
+    <tr>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="value"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>GES description [DescriptionGES]</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.DescriptionGES for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Threshold value(s)</td>
+        <td>Implement this</td>
+    </tr>
+
+    <tr>
+        <td>Threshold value unit</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.ThresholdValueUnit for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Reference point type</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.ReferencePointType for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Baseline</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.Baseline for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Proportion</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.Proportion for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Assessment method</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.AssessmentMethod for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Development status</td>
+        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
+            <td tal:repeat="value python:view.crit_lab_indics[crit]"
+                tal:content="python: set([x.DevelopmentStatus for x in view.indicators if x.ReportingFeature == value]) or ''"/>
+        </tal:block>
+    </tr>
+
+    <tr>
+        <td>Physical/chemical features</td>
+        <td>Implement this</td>
+    </tr>
+    <tr>
+        <td>Predominant habitats</td>
+        <td>Implement this</td>
+    </tr>
+    <tr>
+        <td>Functional groups</td>
+        <td>Implement this</td>
+    </tr>
+    <tr>
+        <td>Pressures</td>
+        <td>Implement this</td>
+    </tr>
+
+</table>
+
+
+
+
+
+
+
+
+
+
+

@@ -186,7 +186,7 @@ class DeterminationOfGES2012(BrowserView):
         count, res = db.get_all_records(
             sql.MSFD11CommonLabel,
             sql.MSFD11CommonLabel.value.in_(criterions),
-            sql.MSFD11CommonLabel.group == 'list-GESIndicator',
+            sql.MSFD11CommonLabel.group.in_(('list-GESIndicator', 'list-GESCriteria')),
         )
 
         return [(x.value, x.Text) for x in res]
@@ -234,8 +234,20 @@ class DeterminationOfGES2012(BrowserView):
         self.indicators = self.get_indicator_descriptors(self.muids)
 
         indicator_ids = self.indics.keys()
-        res = self.get_ges_descriptions(self.indicators)
-        self.ges_descriptions = {k: v
-                                 for k, v in res.items() if k in indicator_ids}
+        # res = self.get_ges_descriptions(self.indicators)
+        # self.ges_descriptions = {k: v
+        #                          for k, v in res.items() if k in indicator_ids}
+
+        # TODO create a function for this
+        self.crit_lab_indics = defaultdict(list)
+        for crit_lab in self.criterion_labels.keys():
+            self.crit_lab_indics[crit_lab] = []
+            for ind in self.indics.keys():
+                norm_ind = ind.split('-')[0]
+                if crit_lab == norm_ind:
+                    self.crit_lab_indics[crit_lab].append(ind)
+
+            if not self.crit_lab_indics[crit_lab]:
+                self.crit_lab_indics[crit_lab].append('')
 
         return self.index()
