@@ -112,13 +112,14 @@
         return spAll + spClear + invertSel;
     }
 
-    function searchAutoComplete(event, $field){
+    function searchAutoComplete(evtarget, $field){
         var cheks2 = $field.find(".option .label:not(.horizontal) ");
         var labels = cheks2.parentsUntil(".option").parent();
         var inputs = labels.find('input');
         var options = labels.parent();
         var no_results = options.find(".noresults");
-        if( $(event.target).val() === "" ){
+
+        if( $(evtarget).val() === "" ){
             no_results.addClass('hidden');
             labels.removeClass('hidden');
             var data = $field.find('.panel').data('checked_items');
@@ -131,13 +132,25 @@
             }
             return true;
         }
+
+        $field.find(".apply-filters").show();
+        //$(evtarget).find(".apply-filters").show();
         labels.removeClass('hidden');
 
-        var toSearch = $(event.target).val().toLowerCase().replace(/\s/g, "_");
+        var toSearch = $( evtarget ).val().toLowerCase().replace(/\s/g, "_");
 
         var matcher = new RegExp( $.ui.autocomplete.escapeRegex( toSearch ), "i" );
 
         var temp = {};
+        var checksLabels = $field.find(".option .label:not(.horizontal) ").map(function (ind, item) {
+            temp[$(item).text().toLowerCase()] = $(item).text().toLowerCase()
+                .replace(/\s/g, "_");
+            //return temp;
+            return $(item).text().toLowerCase()
+            /*.replace(/^\s+|\s+$/g, '')*/
+            /*.replace(/_/g, "")*/
+                .replace(/\s/g, "_");
+        });
 
         var found = [];
         $.each(temp, function (indx, item) {
@@ -177,7 +190,7 @@
             minLength: 0,
             source: [],
             search: function(event){
-                return searchAutoComplete(event, $field);
+                searchAutoComplete(event.target, $field);
             },
             create: function (){
                 var that = this;
