@@ -20,14 +20,6 @@
     permission="zope2.View"
     />
 
-  <browser:page
-    for="*"
-    name="deter-table"
-    class=".compliance.DeterminationOfGES2012"
-    template='pt/determination-table.pt'
-    permission="zope2.View"
-    />
-
   <utility
     component=".compliance.compliance_countries"
     name="compliance_countries"
@@ -37,6 +29,5 @@
     component=".compliance.compliance_report_types"
     name="compliance_report_types"
     />
-
 
 </configure>

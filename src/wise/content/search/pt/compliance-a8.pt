@@ -1,0 +1,89 @@
+<div class="row">
+  <div class="col-md-12">
+    <h4>Article 8: Initial assessment - 2012</h4>
+    <table class="table table-bordered">
+      <tr>
+        <td>Article reported</td>
+        <td tal:attributes="colspan view/colspan">
+          Article 8: Determination of GES (and Art. 17 updates)
+        </td>
+      </tr>
+      <tr>
+        <td>Source file of Member State</td>
+        <td tal:attributes="colspan view/colspan"
+           tal:define="source_file string:http://cdr.eionet.europa.eu/lv/eu/msfd8910/ballv/envuxvsq/MSFD9GES_20130430_215711.xml/manage_document">
+          <a tal:attributes="href source_file"
+           tal:content="source_file"/>
+        </td>
+      </tr>
+      <tr>
+        <td>Assessors</td>
+        <td tal:attributes="colspan view/colspan"
+           tal:content="string:SM Body (Consultancy W); AN Other (Consultancy Y)"/>
+      </tr>
+      <tr>
+        <td>Date report due</td>
+        <td tal:attributes="colspan view/colspan"
+           tal:content="string:2012-10-15"/>
+      </tr>
+      <tr>
+        <td>Date reported by Member State</td>
+        <td tal:attributes="colspan view/colspan"
+           tal:content="string:2013-04-30"/>
+      </tr>
+      <tr>
+        <td>Date assessed</td>
+        <td tal:attributes="colspan view/colspan"
+           tal:content="string:2014-02-07"/>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h5>2012 Member State Report</h5>
+    <table tal:repeat="muid view/a8_sections" class="table table-bordered">
+      <tr>
+        <th>MarineUnitID</th>
+        <td tal:content="muid">DE_ANS</td>
+      </tr>
+      <tr>
+        <th>Analysis</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>[Element]</th>
+        <td></td>
+      </tr>
+      <tr>
+        <th>CriteriaType [GESComponent]</th>
+        <td tal:repeat="crit python:view.get_descriptors_for_muid(muid)">
+          <span tal:replace="crit/ReportingFeature"></span>
+        </td>
+      </tr>
+      <tr>
+        <th>[Parameter]</th>
+        <td>Not implemented</td>
+      </tr>
+      <tr>
+        <th>Threshold Value</th>
+        <td tal:repeat="crit python:view.get_descriptors_for_muid(muid)">
+          <span tal:replace="crit/ThresholdValue">0</span>
+        </td>
+      </tr>
+      <tr>
+        <th>SumInfo1Unit/ThresholdValueUnit [ValueUnit]</th>
+        <td tal:repeat="crit python:view.get_descriptors_for_muid(muid)">
+          <span tal:replace="crit/ThresholdValueUnit">0</span>
+        </td>
+      </tr>
+      <tr>
+        <th>[ProportionThresholdValue]</th>
+        <td>
+          Not implemented
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

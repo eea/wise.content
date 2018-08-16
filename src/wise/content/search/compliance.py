@@ -1,7 +1,6 @@
 from collections import defaultdict
-from pprint import pprint
-from sqlalchemy import and_, or_
 
+from sqlalchemy import and_, or_
 from zope.interface import Interface, implements, provider
 from zope.schema import Choice  # , List
 from zope.schema.interfaces import IVocabularyFactory
@@ -15,6 +14,8 @@ from z3c.form.form import Form
 
 from .db import threadlocals
 from .vocabulary import db_vocab, vocab_from_values
+
+# from pprint import pprint
 
 
 class MainFormWrapper(FormWrapper):
@@ -85,7 +86,15 @@ def row_to_dict(table, row):
 
 
 class DeterminationOfGES2012(BrowserView):
-    country = 'DE'
+    """ WIP on compliance tables
+    """
+
+    art_9_tpl = ViewPageTemplateFile('pt/compliance-a9.pt')
+    art_8_tpl = ViewPageTemplateFile('pt/compliance-a8.pt')
+
+    def __init__(self, context, request):
+        self.country = request.form.get('country', 'LV')
+        super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):
         count, obj = db.get_item_by_conditions(
@@ -158,8 +167,9 @@ class DeterminationOfGES2012(BrowserView):
 
         return res
 
-    def get_grouped_indicators_feature_pressure(self, muids, criterions):
+    def get_indicators_with_feature_pressures(self, muids, criterions):
         # returns a dict key Indicator, value: list of feature pressures
+        # {u'5.2.2-indicator 5.2C': set([u'Transparency', u'InputN_Psubst']),
         t = sql.t_MSFD9_Features
         count, res = db.get_all_records(
             t,
@@ -191,16 +201,17 @@ class DeterminationOfGES2012(BrowserView):
         count, res = db.get_all_records(
             sql.MSFD11CommonLabel,
             sql.MSFD11CommonLabel.value.in_(criterions),
-            sql.MSFD11CommonLabel.group.in_(('list-GESIndicator', 'list-GESCriteria')),
+            sql.MSFD11CommonLabel.group.in_(('list-GESIndicator',
+                                             'list-GESCriteria')),
         )
 
         return [(x.value, x.Text) for x in res]
 
-    def get_indicator_descriptors(self, muids):
+    def get_indicator_descriptors(self, muids, available_indicators):
         count, res = db.get_all_records(
             sql.MSFD9Descriptor,
             sql.MSFD9Descriptor.MarineUnitID.in_(muids),
-            # sql.MSFD9Descriptor.group == 'list-GESIndicator',
+            sql.MSFD9Descriptor.ReportingFeature.in_(available_indicators)
         )
 
         return res
@@ -213,9 +224,19 @@ class DeterminationOfGES2012(BrowserView):
 
         return res
 
+    def get_descriptors_for_muid(self, muid):
+        return sorted(
+            [x for x in self.indicator_descriptors if x.MarineUnitID == muid],
+            key=lambda o: o.ReportingFeature
+        )
+
     def __call__(self):
         threadlocals.session_name = 'session'
-        desc = 'D5'
+
+        descriptor = 'D5'
+
+        # descriptor_prefix = descriptor[1:]
+
         self.country_name = self.get_country_name()
         self.regions = self.get_regions()
 
@@ -223,40 +244,59 @@ class DeterminationOfGES2012(BrowserView):
         # JOIN)
         self.descriptors = self.get_ges_descriptors()
         self.descs = dict()
+
         for d in self.descriptors:
             self.descs.update({d: self.get_ges_descriptor_label(d)})
-        self.desc_label = self.descs.get(desc, 'Descriptor Not Found')
+        self.desc_label = self.descs.get(descriptor, 'Descriptor Not Found')
 
         self.muids = self.get_marine_unit_ids()
 
-        self.criterions = self.get_ges_criterions(desc)
+        self.criterions = self.get_ges_criterions(descriptor)
 
-        self.indics = self.get_grouped_indicators_feature_pressure(
-            self.muids, self.criterions)
+        # {u'5.2.2-indicator 5.2C': set([u'Transparency', u'InputN_Psubst']),
+        self.indic_w_p = self.get_indicators_with_feature_pressures(
+            self.muids, self.criterions
+        )
 
         self.criterion_labels = dict(
             self.get_criterion_labels(self.criterions)
         )
         # add D5 criterion to the criterion lists too
-        self.criterion_labels.update({desc: self.desc_label})
+        self.criterion_labels.update({descriptor: self.desc_label})
 
-        self.indicators = self.get_indicator_descriptors(self.muids)
+        self.indicator_descriptors = self.get_indicator_descriptors(
+            self.muids, self.indic_w_p.keys()
+        )
 
         # indicator_ids = self.indics.keys()
         # res = self.get_ges_descriptions(self.indicators)
         # self.ges_descriptions = {k: v
-        #                          for k, v in res.items() if k in indicator_ids}
+        #                          for k, v in res.items()
+        #                          if k in indicator_ids}
 
         # TODO create a function for this
         self.crit_lab_indics = defaultdict(list)
+
         for crit_lab in self.criterion_labels.keys():
             self.crit_lab_indics[crit_lab] = []
-            for ind in self.indics.keys():
+
+            for ind in self.indic_w_p.keys():
                 norm_ind = ind.split('-')[0]
+
                 if crit_lab == norm_ind:
                     self.crit_lab_indics[crit_lab].append(ind)
 
             if not self.crit_lab_indics[crit_lab]:
                 self.crit_lab_indics[crit_lab].append('')
+
+        self.colspan = len([item
+                            for sublist in self.crit_lab_indics.values()
+
+                            for item in sublist])
+
+        self.a8_sections = []
+
+        for muid in self.muids:
+            self.a8_sections.append(muid)
 
         return self.index()
