@@ -667,6 +667,19 @@
     * SELECT2 functions END
     * */
 
+    function MemeberStatesForm(){
+        var appBtn = '<div class="controls"><div class="btn btn-default apply-filters" data-value="apply"><span class="" >Apply filters</span></div></div>';
+        $("#formfield-form-widgets-member_states").append(appBtn);
+        $("#formfield-form-widgets-member_states .apply-filters").show();
+
+        var $controls = $("#formfield-form-widgets-member_states .controls");
+
+        $controls.one("click",".apply-filters", function () {
+            $(selectorFormContainer + " [name='form.widgets.page']").val(0);
+            $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'button': this});
+        });
+    }
+
     /*
     * TABS
     * */
@@ -854,6 +867,8 @@
         clickFirstTab();
 
         setPaginationButtons();
+
+        MemeberStatesForm();
     }
 
 
