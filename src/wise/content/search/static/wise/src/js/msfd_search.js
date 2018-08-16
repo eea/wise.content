@@ -464,7 +464,13 @@
     * SELECT2 functions
     * */
     function setupRightSelects2(){
+        var forbiddenIDs = ["form-widgets-member_states-from", "form-widgets-member_states-to" ];
         $( selectorFormContainer + " select").each(function (ind, selectElement) {
+            var selectedElementID = $(selectElement).attr("id");
+            if( forbiddenIDs.indexOf(selectedElementID) !== -1 ){
+                return false;
+            }
+
             $(selectElement).addClass("js-example-basic-single");
             var lessOptions = $(selectElement).find("option").length < 10;
 
@@ -661,6 +667,19 @@
     * SELECT2 functions END
     * */
 
+    function MemeberStatesForm(){
+        var appBtn = '<div class="controls"><div class="btn btn-default apply-filters" data-value="apply"><span class="" >Apply filters</span></div></div>';
+        $("#formfield-form-widgets-member_states").append(appBtn);
+        $("#formfield-form-widgets-member_states .apply-filters").show();
+
+        var $controls = $("#formfield-form-widgets-member_states .controls");
+
+        $controls.one("click",".apply-filters", function () {
+            $(selectorFormContainer + " [name='form.widgets.page']").val(0);
+            $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'button': this});
+        });
+    }
+
     /*
     * TABS
     * */
@@ -852,6 +871,7 @@
 
         setPaginationButtons();
 
+        MemeberStatesForm();
     }
 
 
