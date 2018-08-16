@@ -1,5 +1,6 @@
 from zope.interface import Attribute, Interface
 from zope.schema import Choice, Int, List, Text  # , TextLine
+
 from plone.app.textfield import RichText
 
 
@@ -57,6 +58,14 @@ class IStartArticles8910(Interface):
     area_types = List(
         title=u"Area Type",
         value_type=Choice(vocabulary="wise_search_area_type"),
+        required=False,
+    )
+
+
+class IMemberStates(Interface):
+    member_states = List(
+        title=u"Member state",
+        value_type=Choice(vocabulary="wise_search_member_states"),
         required=False,
     )
 

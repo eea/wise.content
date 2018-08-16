@@ -20,7 +20,17 @@ class StartArticle1314Form(MainForm):
     session_name = 'session'
 
     def get_subform(self):
-        return MarineUnitIDsForm(self, self.request)
+        return MemberStatesForm(self, self.request)
+
+    def default_report_type(self):
+        return default_value_from_field(self, self.fields['report_type'])
+
+    def default_region(self):
+        return default_value_from_field(self, self.fields['region'])
+
+
+class MemberStatesForm(EmbededForm):
+    fields = Fields(interfaces.IMemberStates)
 
     def get_available_marine_unit_ids(self):
         mc = sql.MSFD13ReportingInfo
@@ -40,11 +50,14 @@ class StartArticle1314Form(MainForm):
 
         return (len(res), res)
 
-    def default_report_type(self):
-        return default_value_from_field(self, self.fields['report_type'])
+    def get_subform(self):
+        return None
 
-    def default_region(self):
-        return default_value_from_field(self, self.fields['region'])
+    def get_subform(self):
+        return MarineUnitIDsForm(self, self.request)
+
+    def default_member_states(self):
+        return all_values_from_field(self, self.fields['member_states'])
 
 
 class MarineUnitIDsForm(EmbededForm):
