@@ -75,6 +75,8 @@ class IStartArticles1314(Interface):
         required=False,
     )
 
+
+class IMemberStates(Interface):
     member_states = List(
         title=u"Countries",
         value_type=Choice(vocabulary="wise_search_member_states"),
