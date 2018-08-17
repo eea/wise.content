@@ -1156,6 +1156,8 @@
                 var nextFieldID = $(el).parent().next().attr("id");
                 if( nextFieldID === "formfield-form-widgets-member_states" ){
                     resetEmptyCheckboxes(nextFieldID);
+                } else {
+                    resetEmptyCheckboxes("memberstatesform");
                 }
             };
             if (called_from_button) {
