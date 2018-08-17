@@ -539,5 +539,5 @@ class A11MPExtraInfo(ItemDisplay):
                     for x in elements_monitored
                 ]
             }),
-            ('Paramenters measured', {'': parameters_measured}),
+            ('Parameters measured', {'': parameters_measured}),
         ]

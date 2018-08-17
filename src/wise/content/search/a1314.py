@@ -15,12 +15,14 @@ class StartArticle1314Form(MainForm):
     """
     """
     fields = Fields(interfaces.IStartArticles1314)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+
     name = 'msfd-c3'
     record_title = 'Articles 13 & 14'
     session_name = 'session'
 
     def get_subform(self):
-        return MemberStatesForm(self, self.request)
+        return MarineUnitIDsForm(self, self.request)
 
     def default_report_type(self):
         return default_value_from_field(self, self.fields['report_type'])
@@ -28,9 +30,8 @@ class StartArticle1314Form(MainForm):
     def default_region(self):
         return default_value_from_field(self, self.fields['region'])
 
-
-class MemberStatesForm(EmbededForm):
-    fields = Fields(interfaces.IMemberStates)
+    def default_member_states(self):
+        return all_values_from_field(self, self.fields['member_states'])
 
     def get_available_marine_unit_ids(self):
         mc = sql.MSFD13ReportingInfo
@@ -49,15 +50,6 @@ class MemberStatesForm(EmbededForm):
         res = db.get_unique_from_mapper(mc, 'MarineUnitID', *conditions)
 
         return (len(res), res)
-
-    def get_subform(self):
-        return None
-
-    def get_subform(self):
-        return MarineUnitIDsForm(self, self.request)
-
-    def default_member_states(self):
-        return all_values_from_field(self, self.fields['member_states'])
 
 
 class MarineUnitIDsForm(EmbededForm):

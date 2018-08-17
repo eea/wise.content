@@ -62,14 +62,6 @@ class IStartArticles8910(Interface):
     )
 
 
-class IMemberStates(Interface):
-    member_states = List(
-        title=u"Member state",
-        value_type=Choice(vocabulary="wise_search_member_states"),
-        required=False,
-    )
-
-
 class IStartArticles1314(Interface):
     report_type = Choice(
         title=u"Report Type",
@@ -80,6 +72,12 @@ class IStartArticles1314(Interface):
     region = Choice(
         title=u"Region",
         vocabulary="wise_search_a1314_regions",
+        required=False,
+    )
+
+    member_states = List(
+        title=u"Countries",
+        value_type=Choice(vocabulary="wise_search_member_states"),
         required=False,
     )
 

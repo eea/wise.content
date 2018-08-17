@@ -332,7 +332,7 @@ def db_result_key(func, *argss, **kwargs):
         if hasattr(arg, '__name__'):
             arg_key = arg.__name__
         elif hasattr(arg, 'compile'):
-            arg_key = str(arg.compile(compile_kwargs={"literal_binds": True}))
+            arg_key = repr(arg.compile(compile_kwargs={"literal_binds": True}))
         else:
             arg_key = arg.__str__()
 
