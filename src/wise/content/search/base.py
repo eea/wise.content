@@ -161,8 +161,17 @@ class MainForm(Form):
                 default = getattr(self, 'default_' + k, None)
 
                 if default:
-                    data[k] = default()
-                    self.widgets[k].value = data[k]
+                    value = data[k] = default()
+
+                    if not value:
+                        continue
+                    widget = self.widgets[k]
+                    widget.value = value
+                    field = widget.field.bind(self.context)
+                    field.default = value
+                    widget.field = field
+                    widget.ignoreRequest = True
+                    widget.update()
 
         return data, errors
 

@@ -15,14 +15,13 @@ class StartArticle1314Form(MainForm):
     """
     """
     fields = Fields(interfaces.IStartArticles1314)
-    fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     name = 'msfd-c3'
     record_title = 'Articles 13 & 14'
     session_name = 'session'
 
     def get_subform(self):
-        return MarineUnitIDsForm(self, self.request)
+        return MemberStatesForm(self, self.request)
 
     def default_report_type(self):
         return default_value_from_field(self, self.fields['report_type'])
@@ -30,7 +29,29 @@ class StartArticle1314Form(MainForm):
     def default_region(self):
         return default_value_from_field(self, self.fields['region'])
 
+
+class MemberStatesForm(EmbededForm):
+    """ Select the member states based on region
+    """
+
+    fields = Fields(interfaces.IMemberStates)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return MarineUnitIDsForm(self, self.request)
+
     def default_member_states(self):
+        region = self.context.data.get('region')
+
+        if region:
+            t = sql.t_MSFD4_GegraphicalAreasID
+            count, rows = db.get_all_records(
+                t,
+                t.c.RegionSubRegions == region
+            )
+
+            return [x[1] for x in rows]
+
         return all_values_from_field(self, self.fields['member_states'])
 
     def get_available_marine_unit_ids(self):
@@ -42,7 +63,7 @@ class StartArticle1314Form(MainForm):
         if report_type:
             conditions.append(mc.ReportType == report_type)
 
-        region = self.data.get('region')
+        region = self.context.data.get('region')
 
         if region:
             conditions.append(mc.Region == region)
