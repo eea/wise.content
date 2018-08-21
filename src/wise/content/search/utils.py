@@ -1,5 +1,5 @@
 import datetime
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from cPickle import dumps
 from hashlib import md5
 from inspect import isclass
@@ -31,6 +31,7 @@ def class_id(obj):
 
 def register_form_2018(klass):
     """ Register form classes for articles 8, 9, 10
+
     for reporting year 2018
     """
 
@@ -114,8 +115,6 @@ def scan(namespace):
     """
 
     import importlib
-    # import pkgutil
-    # import wise.content.search
 
     name = importlib._resolve_name(namespace, 'wise.content.search', 1)
     importlib.import_module(name)
@@ -125,17 +124,14 @@ def print_value(value):
     if not value:
         return value
 
-    # value = unicode(value)
     if isinstance(value, string_types):
         if value in LABELS:
             tmpl = '<span title="{}">{}</span>'
             try:
                 ret = tmpl.format(value, LABELS[value])
             except UnicodeEncodeError as e:
-                # import pdb; pdb.set_trace()
                 ret = tmpl.format(value, LABELS[value].encode('utf-8'))
             except Exception as e:
-                # import pdb;pdb.set_trace()
                 ret = tmpl.format(value, unicode(LABELS[value]))
 
             return ret
@@ -166,10 +162,12 @@ def data_to_xls(data):
 
     for wtitle, wdata in data:
         # check data length, we do not create empty sheets
+
         if isinstance(wdata, list):
             count_data = len(wdata)
         else:
             count_data = wdata.count()
+
         if not count_data:
             continue
 
@@ -186,13 +184,17 @@ def data_to_xls(data):
         # write titles, filter fields
         # exclude relationship type fields
         fields_needed = list()
+
         for i, f in enumerate(fields):
             field_needed = True
+
             for j in range(count_data):
                 field_val = getattr(wdata[j], f)
-                if not isinstance(field_val, 
+
+                if not isinstance(field_val,
                                   string_types + (float, int, type(None))):
                     field_needed = False
+
                     break
 
             if field_needed:
@@ -218,7 +220,7 @@ def get_obj_fields(obj, use_blacklist=True):
     mapper = inspect(obj)
 
     res = []
-    keys = sorted([c.key for c in mapper.attrs])
+    keys = [c.key for c in mapper.attrs]        # forgo sorted use
 
     BLACKLIST = ['ID', 'Import', 'Id']
 
@@ -330,15 +332,11 @@ def db_result_key(func, *argss, **kwargs):
         if hasattr(arg, '__name__'):
             arg_key = arg.__name__
         elif hasattr(arg, 'compile'):
-            arg_key = arg.compile(compile_kwargs={"literal_binds": True}).__str__()
+            arg_key = repr(arg.compile(compile_kwargs={"literal_binds": True}))
         else:
             arg_key = arg.__str__()
 
         keys.append(arg_key)
-
-    # for k, v in kwargs.iteritems():
-    #     keys.append("{}:{}".format(k, v))
-    #     import pdb; pdb.set_trace()
 
     bits = dumps(keys)
 

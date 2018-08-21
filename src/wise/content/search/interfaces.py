@@ -1,6 +1,7 @@
 from zope.interface import Attribute, Interface
 from zope.schema import Choice, Int, List, Text  # , TextLine
-from plone.app.textfield import RichText
+
+# from plone.app.textfield import RichText
 
 
 class IMainForm(Interface):
@@ -34,6 +35,13 @@ class IItemDisplayForm(IEmbededForm):
         """
 
 
+class IArticleSelect(Interface):
+    article = Choice(title=u"Article",
+                     required=False,
+                     default='',
+                     vocabulary="wise_search_articles")
+
+
 class IRecordSelect(Interface):
     """ We use a pagination based record selection
     """
@@ -41,24 +49,42 @@ class IRecordSelect(Interface):
     page = Int(title=u'Record page', required=False, default=0)
 
 
-class IStartArticles8910(Interface):
-    member_states = List(
-        title=u"Member state",
-        value_type=Choice(vocabulary="wise_search_member_states"),
-        required=False,
-    )
-
+class IRegionSubregions(Interface):
     region_subregions = List(
         title=u"Region and Subregions",
         value_type=Choice(vocabulary="wise_search_region_subregions"),
         required=False,
     )
 
+
+class IMemberStates(Interface):
+    member_states = List(
+        title=u"Countries",
+        value_type=Choice(vocabulary="wise_search_member_states"),
+        required=False,
+    )
+
+
+class IAreaTypes(Interface):
     area_types = List(
         title=u"Area Type",
         value_type=Choice(vocabulary="wise_search_area_type"),
         required=False,
     )
+
+
+class IMarineUnitIDSelect(Interface):
+    marine_unit_id = Choice(
+        title=u"MarineUnitID",
+        # description=u"Select one or more MarineUnitIDs that you're
+        # interested",
+        required=False,
+        vocabulary="wise_search_marine_unit_id"
+    )
+
+
+class IStartArticles8910(IRegionSubregions):
+    pass
 
 
 class IStartArticles1314(Interface):
@@ -83,7 +109,7 @@ class IStartArticle11(Interface):
         required=False
     )
 
-    monitoring_programme_info_types = Choice(
+    monitoring_programme_info_type = Choice(
         title=u"Information Type",
         vocabulary="wise_search_monitoring_programme_info_types",
         required=False
@@ -91,19 +117,19 @@ class IStartArticle11(Interface):
 
 
 class IMonitoringProgramme(Interface):
-    country = List(
-        title=u"Country",
-        value_type=Choice(vocabulary="wise_search_art11_country"),
-        required=False
-    )
-
-    region = List(
+    regions = List(
         title=u"Region",
         value_type=Choice(vocabulary="wise_search_art11_region"),
         required=False
     )
 
-    marine_unit_id = List(
+    countries = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country"),
+        required=False
+    )
+
+    marine_unit_ids = List(
         title=u"Marine Unit IDs",
         value_type=Choice(vocabulary="wise_search_art11_marine_unit_id"),
         required=False
@@ -111,19 +137,19 @@ class IMonitoringProgramme(Interface):
 
 
 class IMonitoringSubprogramme(Interface):
-    country = List(
-        title=u"Country",
-        value_type=Choice(vocabulary="wise_search_art11_country_ms"),
-        required=False
-    )
-
-    region = List(
+    regions = List(
         title=u"Region",
         value_type=Choice(vocabulary="wise_search_art11_region_ms"),
         required=False
     )
 
-    marine_unit_id = List(
+    countries = List(
+        title=u"Country",
+        value_type=Choice(vocabulary="wise_search_art11_country_ms"),
+        required=False
+    )
+
+    marine_unit_ids = List(
         title=u"Marine Unit IDs",
         value_type=Choice(vocabulary="wise_search_art11_marine_unit_id_ms"),
         required=False
@@ -137,23 +163,6 @@ class IMarineUnitIDsSelect(Interface):
         # interested",
         value_type=Choice(vocabulary="wise_search_marine_unit_ids"),
         required=False
-    )
-
-
-class IArticleSelect(Interface):
-    article = Choice(title=u"Article",
-                     required=False,
-                     default='',
-                     vocabulary="wise_search_articles")
-
-
-class IMarineUnitIDSelect(Interface):
-    marine_unit_id = Choice(
-        title=u"MarineUnitID",
-        # description=u"Select one or more MarineUnitIDs that you're
-        # interested",
-        required=False,
-        vocabulary="wise_search_marine_unit_id"
     )
 
 

@@ -161,8 +161,17 @@ class MainForm(Form):
                 default = getattr(self, 'default_' + k, None)
 
                 if default:
-                    data[k] = default()
-                    self.widgets[k].value = data[k]
+                    value = data[k] = default()
+
+                    if not value:
+                        continue
+                    widget = self.widgets[k]
+                    widget.value = value
+                    field = widget.field.bind(self.context)
+                    field.default = value
+                    widget.field = field
+                    widget.ignoreRequest = True
+                    widget.update()
 
         return data, errors
 
@@ -274,14 +283,17 @@ class EmbededForm(Form, BaseUtil):
         value
         """
         data, errors = super(EmbededForm, self).extractData()
+        self.data = data
 
-        for k, v in data.items():
+        for k in list(self.fields):
+            v = data[k]
+
             if not v:
                 default = getattr(self, 'default_' + k, None)
 
                 if default:
                     value = data[k] = default()
-                    # import pdb;pdb.set_trace()
+                    self.data[k] = data[k]
 
                     if not value:
                         continue

@@ -1,14 +1,14 @@
 import os
 import threading
 
-from eea.cache import cache
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
+from eea.cache import cache
 from wise.content.search import sql
-from wise.content.search.utils import pivot_query, db_result_key
+from wise.content.search.utils import db_result_key, pivot_query
 
 env = os.environ.get
 DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')

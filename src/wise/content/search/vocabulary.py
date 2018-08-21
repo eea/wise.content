@@ -2,7 +2,6 @@ import csv
 import json
 import logging
 
-from eea.cache import cache
 from lxml.etree import parse
 from pkg_resources import resource_filename
 from sqlalchemy import and_, or_
@@ -11,9 +10,10 @@ from zope.interface import provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
+from eea.cache import cache
 from wise.content.search import db, sql, sql2018
 
-from .a11 import ART11_GlOBALS
+# from .a11 import ART11_GlOBALS
 from .utils import FORMS, FORMS_2018, FORMS_ART11, LABELS, SUBFORMS
 
 
@@ -266,15 +266,13 @@ def monitoring_programme_info_types(context):
 
 @provider(IVocabularyFactory)
 def art11_country(context):
-    if not hasattr(context, 'subform'):
-        mp_type_ids = context.context.get_mp_type_ids()
-    else:
-        mp_type_ids = context.get_mp_type_ids()
+    # vocab w/ filtered countries based on monitoring programs
+    monitoring_programs = context.get_mp_type_ids()
 
     mon_ids = db.get_unique_from_mapper(
         sql.MSFD11MP,
         'MON',
-        sql.MSFD11MP.MPType.in_(mp_type_ids)
+        sql.MSFD11MP.MPType.in_(monitoring_programs)
     )
 
     res = db.get_unique_from_mapper(
@@ -293,26 +291,19 @@ def art11_country(context):
 
 @provider(IVocabularyFactory)
 def art11_country_ms(context):
+    # vocab w/ filtered countries based on monitoring subprograms
+
+    ctx = context
+
     if not hasattr(context, 'subform'):
-        mp_type_ids = context.context.get_mp_type_ids()
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.context.subform.get_mptypes_subprog)
-    else:
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.subform.get_mptypes_subprog)
-        mp_type_ids = context.get_mp_type_ids()
+        ctx = context.context
 
     submonprog_ids = []
+    mptypes_subprog = ctx.subform.get_mptypes_subprog()
+    mp_type_ids = context.get_mp_type_ids()
 
-    for x in mp_type_ids:
-        submonprog_ids.append(mptypes_subprog[int(x)])
-
-    submonprog_ids = tuple([item
-                            for sublist in submonprog_ids
-
-                            for item in sublist])
+    for mid in mp_type_ids:
+        submonprog_ids.extend(mptypes_subprog[int(mid)])
 
     res = db.get_unique_from_mapper(
         sql.MSFD11MONSub,
@@ -331,25 +322,9 @@ def art11_country_ms(context):
 @provider(IVocabularyFactory)
 def art11_region(context):
     if not hasattr(context, 'subform'):
-        json_str = json.loads(context.json())
         mp_type_ids = context.context.get_mp_type_ids()
     else:
-        json_str = json.loads(context.subform.json())
         mp_type_ids = context.get_mp_type_ids()
-    countries_form_data = [
-        field['options']
-
-        for field in json_str['fields']
-
-        if field['label'] == 'Country'
-    ]
-    countries = [
-        country['value']
-
-        for country in countries_form_data[0]
-
-        if country['checked']
-    ]
 
     mon_ids = db.get_unique_from_mapper(
         sql.MSFD11MP,
@@ -357,18 +332,10 @@ def art11_region(context):
         sql.MSFD11MP.MPType.in_(mp_type_ids)
     )
 
-    if countries:
-        condition = and_(
-            sql.MSFD11MON.MemberState.in_(countries),
-            sql.MSFD11MON.ID.in_(mon_ids)
-        )
-    else:
-        condition = sql.MSFD11MON.ID.in_(mon_ids)
-
     res = db.get_unique_from_mapper(
         sql.MSFD11MON,
         'Region',
-        condition
+        sql.MSFD11MON.ID.in_(mon_ids)
     )
     res = [x.strip() for x in res]
 
@@ -381,56 +348,23 @@ def art11_region(context):
 
 @provider(IVocabularyFactory)
 def art11_region_ms(context):
+    ctx = context
+
     if not hasattr(context, 'subform'):
-        json_str = json.loads(context.json())
-        mp_type_ids = context.context.get_mp_type_ids()
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.context.subform.get_mptypes_subprog)
-    else:
-        json_str = json.loads(context.subform.json())
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.subform.get_mptypes_subprog)
-        mp_type_ids = context.get_mp_type_ids()
-
-    countries_form_data = [
-        field['options']
-
-        for field in json_str['fields']
-
-        if field['label'] == 'Country'
-    ]
-    countries = [
-        country['value']
-
-        for country in countries_form_data[0]
-
-        if country['checked']
-    ]
+        # json_str = json.loads(context.json())
+        ctx = context.context
+    mp_type_ids = ctx.get_mp_type_ids()
+    mptypes_subprog = ctx.subform.get_mptypes_subprog()
 
     submonprog_ids = []
 
     for x in mp_type_ids:
-        submonprog_ids.append(mptypes_subprog[int(x)])
-
-    submonprog_ids = tuple([item
-                            for sublist in submonprog_ids
-
-                            for item in sublist])
-
-    if countries:
-        condition = and_(
-            sql.MSFD11MONSub.MemberState.in_(countries),
-            sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
-        )
-    else:
-        condition = sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+        submonprog_ids.extend(mptypes_subprog[int(x)])
 
     res = db.get_unique_from_mapper(
         sql.MSFD11MONSub,
         'Region',
-        condition
+        sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
     )
     res = [x.strip() for x in res]
 
@@ -526,80 +460,24 @@ def art11_marine_unit_id(context):
 
 @provider(IVocabularyFactory)
 def art11_marine_unit_id_ms(context):
+    ctx = context
+
     if not hasattr(context, 'subform'):
-        json_str = json.loads(context.json())
-        mp_type_ids = context.context.get_mp_type_ids()
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.context.subform.get_mptypes_subprog)
-    else:
-        json_str = json.loads(context.subform.json())
-        mptypes_subprog = ART11_GlOBALS.get(
-            'get_mptypes_subprog',
-            context.subform.get_mptypes_subprog)
-        mp_type_ids = context.get_mp_type_ids()
+        ctx = context.context
 
-    countries_form_data = [
-        field['options']
-
-        for field in json_str['fields']
-
-        if field['label'] == 'Country'
-    ]
-    countries = [
-        country['value']
-
-        for country in countries_form_data[0]
-
-        if country['checked']
-    ]
-    regions_form_data = [
-        field['options']
-
-        for field in json_str['fields']
-
-        if field['label'] == 'Region'
-    ]
-    regions = [
-        region['value']
-
-        for region in regions_form_data[0]
-
-        if region['checked']
-    ]
+    mp_type_ids = ctx.get_mp_type_ids()
+    mptypes_subprog = ctx.subform.get_mptypes_subprog()
 
     submonprog_ids = []
 
     for x in mp_type_ids:
-        submonprog_ids.append(mptypes_subprog[int(x)])
+        submonprog_ids.extend(mptypes_subprog[int(x)])
 
-    submonprog_ids = tuple([item
-                            for sublist in submonprog_ids
-
-                            for item in sublist])
-
-    if countries and regions:
-        subprogramme_ids = db.get_unique_from_mapper(
-            sql.MSFD11MONSub,
-            'SubProgramme',
-            and_(sql.MSFD11MONSub.MemberState.in_(countries),
-                 sql.MSFD11MONSub.Region.in_(regions),
-                 sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids))
-
-        )
-    elif countries:
-        subprogramme_ids = db.get_unique_from_mapper(
-            sql.MSFD11MONSub,
-            'SubProgramme',
-            and_(sql.MSFD11MONSub.MemberState.in_(countries),
-                 sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids))
-        )
-    else:
-        subprogramme_ids = db.get_unique_from_mapper(
-            sql.MSFD11MONSub,
-            'SubProgramme',
-            sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
-        )
+    subprogramme_ids = db.get_unique_from_mapper(
+        sql.MSFD11MONSub,
+        'SubProgramme',
+        sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids)
+    )
 
     subprogramme_ids = [int(x) for x in subprogramme_ids]
 
@@ -728,7 +606,7 @@ def a2018_country(context):
         context = context.subform
 
     mapper_class = context.mapper_class
-    key = mapper_class.__name__
+    # key = mapper_class.__name__
 
     # @cache(lambda func: key)
     def get_res():
@@ -964,6 +842,7 @@ def a2018_feature(context):
             getattr(features_mc, features_rel_col).in_(id_targets)
         )
         # res = ['Feature%s' % x for x in range(0, 10)]
+
         return res
 
     res = get_res()
@@ -1032,6 +911,7 @@ def a2018_ges_component(context):
             getattr(ges_components_mc, ges_comp_rel_col).in_(id_targets)
         )
         # res = ['GesComponent%s' % x for x in range(0, 10)]
+
         return res
 
     res = get_res()
@@ -1102,6 +982,7 @@ def a2018_feature_ind(context):
     # @cache(lambda func: key)
     def get_res():
         conditions = []
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1166,6 +1047,7 @@ def a2018_mru_ind(context):
     # @cache(lambda func: key)
     def get_res():
         conditions = []
+
         if countries:
             conditions.append(mc_countries.CountryCode.in_(countries))
 
@@ -1208,22 +1090,22 @@ def a2018_mru_ind(context):
     return vocab_from_values(res)
 
 
-@provider(IVocabularyFactory)
-def wise_search_compliance(context):
-    country = context.context.context.data.get('country_code')
-    article = context.context.context.record_title
-
-    mapper_class = 'Reporting_history'
-    conditions = list()
-
-    # if country:
-    #     conditions.append(mapper_class.CountryCode.in_(country))
-    # if article:
-    #     conditions.append(mapper_class.ReportingObl.in_(country))
-    #
-    # count, result = db.get_all_records(mapper_class, *conditions)
-    # res = [x.FileName for x in result]
-
-    res = ["File%s" % x for x in range(10)]
-
-    return vocab_from_values(res)
+# @provider(IVocabularyFactory)
+# def wise_search_compliance(context):
+#     country = context.context.context.data.get('country_code')
+#     article = context.context.context.record_title
+#
+#     mapper_class = 'Reporting_history'
+#     conditions = list()
+#
+#     # if country:
+#     #     conditions.append(mapper_class.CountryCode.in_(country))
+#     # if article:
+#     #     conditions.append(mapper_class.ReportingObl.in_(country))
+#     #
+#     # count, result = db.get_all_records(mapper_class, *conditions)
+#     # res = [x.FileName for x in result]
+#
+#     res = ["File%s" % x for x in range(10)]
+#
+#     return vocab_from_values(res)

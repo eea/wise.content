@@ -6,7 +6,7 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm
-from .compliance import ComplianceModule, register_compliance_module
+# from .compliance import ComplianceModule, register_compliance_module
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     pivot_data, register_form_2018)
 
@@ -488,6 +488,7 @@ class A2018Art81abDisplay(ItemDisplayForm):
             element_status_pivot.append(x)
 
         id_elem_status = []
+
         if element_status:
             element_status_pivot = pivot_data(element_status_pivot,
                                               'Element / Element2')

@@ -11,7 +11,8 @@ from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     default_value_from_field, pivot_data, register_form_art11,
                     register_form_section)
 
-ART11_GlOBALS = dict()
+# TODO: cache in klass
+# ART11_GlOBALS = dict()
 
 
 class StartArticle11Form(MainForm):
@@ -20,49 +21,30 @@ class StartArticle11Form(MainForm):
 
     record_title = 'Article 11'
     name = 'msfd-c2'
-    fields = Fields(interfaces.IStartArticle11)
-    fields['monitoring_programme_types'].widgetFactory = CheckBoxFieldWidget
     session_name = 'session'
 
+    fields = Fields(interfaces.IStartArticle11)
+    fields['monitoring_programme_types'].widgetFactory = CheckBoxFieldWidget
+
     def get_subform(self):
-        klass = self.data.get('monitoring_programme_info_types')
+        klass = self.data.get('monitoring_programme_info_type')
 
         return klass(self, self.request)
-
-    def extractData(self):
-        """ Override to be able to provide defaults
-        """
-        data, errors = super(MainForm, self).extractData()
-
-        for k, v in data.items():
-            if not v:
-                default = getattr(self, 'default_' + k, None)
-
-                if default:
-                    values = default()
-
-                    if isinstance(values, tuple):
-                        value, token = values
-                    else:
-                        value = token = values
-                    data[k] = value
-                    widget = self.widgets[k]
-                    widget.value = token
-                    widget.update()
-
-        return data, errors
 
     def get_mp_type_ids(self):
         return self.data.get('monitoring_programme_types', [])
 
     def default_monitoring_programme_types(self):
-        return all_values_from_field(self,
-                                     self.fields['monitoring_programme_types'])
+        field = self.fields['monitoring_programme_types']
 
-    def default_monitoring_programme_info_types(self):
-        return default_value_from_field(
-            self, self.fields['monitoring_programme_info_types']
+        return [int(x) for x in all_values_from_field(self, field)]
+
+    def default_monitoring_programme_info_type(self):
+        klass, token = default_value_from_field(
+            self, self.fields['monitoring_programme_info_type']
         )
+
+        return klass
 
 
 @register_form_art11
@@ -70,27 +52,45 @@ class A11MonitoringProgrammeForm(EmbededForm):
     title = "Monitoring Programmes"
 
     fields = Fields(interfaces.IMonitoringProgramme)
-    fields['country'].widgetFactory = CheckBoxFieldWidget
-    fields['region'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_unit_id'].widgetFactory = CheckBoxFieldWidget
+
+    fields['regions'].widgetFactory = CheckBoxFieldWidget
+    fields['countries'].widgetFactory = CheckBoxFieldWidget
+    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
         return A11MonProgDisplay(self, self.request)
 
-    def default_country(self):
-        return all_values_from_field(self, self.fields['country'])
+    def default_regions(self):
+        return all_values_from_field(self, self.fields['regions'])
 
-    def default_region(self):
-        return all_values_from_field(self, self.fields['region'])
+    def default_countries(self):
+        regions = self.data.get('regions')
 
-    def default_marine_unit_id(self):
-        return all_values_from_field(self, self.fields['marine_unit_id'])
+        if regions:
+            mp_type_ids = self.context.get_mp_type_ids()
+            mon_ids = db.get_unique_from_mapper(
+                sql.MSFD11MP,
+                'MON',
+                sql.MSFD11MP.MPType.in_(mp_type_ids)
+            )
+            res = db.get_unique_from_mapper(
+                sql.MSFD11MON,
+                'MemberState',
+                sql.MSFD11MON.ID.in_(mon_ids),
+                sql.MSFD11MON.Region.in_(regions)
+            )
+
+            return [x.strip() for x in res]
+
+        return all_values_from_field(self, self.fields['countries'])
+
+    def default_marine_unit_ids(self):
+        return all_values_from_field(self, self.fields['marine_unit_ids'])
 
     def get_monitoring_programme_ids(self):
-        # import pdb;pdb.set_trace()
-        countries = self.data.get('country', [])
-        regions = self.data.get('region', [])
-        marine_unit_id = self.data.get('marine_unit_id', [])
+        countries = self.data.get('countries', [])
+        regions = self.data.get('regions', [])
+        marine_unit_id = self.data.get('marine_unit_ids', [])
         mp_type_ids = self.context.get_mp_type_ids()
 
         mon_ids = db.get_unique_from_mapper(
@@ -121,6 +121,11 @@ class A11MonitoringProgrammeForm(EmbededForm):
             result = tuple(mon_prog_ids_from_MP + mon_prog_ids)
 
         return result
+
+    def get_mp_type_ids(self):
+        # used by vocabularies, easier to pass from context
+
+        return self.context.get_mp_type_ids()
 
 
 class A11MonProgDisplay(ItemDisplayForm):
@@ -184,8 +189,6 @@ class A11MonProgDisplay(ItemDisplayForm):
         klass_join = sql.MSFD11MP
         needed_ID = self.context.context.get_mp_type_ids()
         mon_prog_ids = self.context.get_monitoring_programme_ids()
-
-        # import pdb;pdb.set_trace()
 
         if needed_ID:
             return db.get_item_by_conditions_joined(
@@ -256,40 +259,53 @@ class A11MonitorSubprogrammeForm(EmbededForm):
     title = "Monitoring Subprogrammes"
 
     fields = Fields(interfaces.IMonitoringSubprogramme)
-    fields['country'].widgetFactory = CheckBoxFieldWidget
-    fields['region'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_unit_id'].widgetFactory = CheckBoxFieldWidget
 
-    # create a mapping between
-    # MPTypes - SubProgramme
-    @property
+    fields['countries'].widgetFactory = CheckBoxFieldWidget
+    fields['regions'].widgetFactory = CheckBoxFieldWidget
+    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
+
+    def __init__(self, context, request):
+        EmbededForm.__init__(self, context, request)
+        self.__mptypes_subprog = None
+
+    def get_mp_type_ids(self):
+        # used by vocabularies, easier to pass from context
+
+        return self.context.get_mp_type_ids()
+
+    # creates a mapping between <Monitoring Program Type ID>: SubProgrammes
     def get_mptypes_subprog(self):
-        mapping = ART11_GlOBALS.get('get_mptypes_subprog', None)
+        mapping = self.__mptypes_subprog
 
         if mapping:
             return mapping
 
+        res = {}
         mptypes = db.get_all_columns_from_mapper(sql.MSFD11MPType, 'ID')
-        mapper_dict = dict()
 
         for row in mptypes:
-            mpid = row.ID
-            value = row.Value  # MP_D8, MP_D1_4_6_SeabedHabitats
+            mpid, value = row.ID, row.Value   # MP_D8, MP_D1_4_6_SeabedHabitats
             mp_ids = db.get_unique_from_mapper(
                 sql.MSFD11MP,
                 'ID',
                 sql.MSFD11MP.MPType == mpid
             )
+
+            # subprogrammes based on monitoring programme
             sub_mon_prog_ids_1 = db.get_unique_from_mapper(
                 sql.MSFD11ReferenceSubProgramme,
                 'SubMonitoringProgrammeID',
                 sql.MSFD11ReferenceSubProgramme.MP.in_(mp_ids)
             )
+
+            # programmes based on Q4g ?
             sub_mon_prog_ids_2 = db.get_unique_from_mapper(
                 sql.MSFD11SubProgrammeIDMatch,
                 'Q4g_SubProgrammeID',
                 sql.MSFD11SubProgrammeIDMatch.MP_Type == value
             )
+
+            # subprogrammes based on Q4g
             sub_mon_prog_ids_3 = db.get_unique_from_mapper(
                 sql.MSFD11SubProgrammeIDMatch,
                 'Q4g_SubProgrammeID',
@@ -297,33 +313,56 @@ class A11MonitorSubprogrammeForm(EmbededForm):
                     sub_mon_prog_ids_1
                 )
             )
-            sub_mon_prog_ids_all = (sub_mon_prog_ids_1 + sub_mon_prog_ids_2
-                                    + sub_mon_prog_ids_3)
+            sub_mon_prog_ids_all = (sub_mon_prog_ids_1 +
+                                    sub_mon_prog_ids_2 +
+                                    sub_mon_prog_ids_3)
 
             subprogramme_ids = db.get_unique_from_mapper(
                 sql.MSFD11SubProgramme,
                 'ID',
                 sql.MSFD11SubProgramme.Q4g_SubProgrammeID.in_(
-                    sub_mon_prog_ids_all)
+                    sub_mon_prog_ids_all
+                )
             )
             subprogramme_ids = [int(x) for x in subprogramme_ids]
-            mapper_dict.update({mpid: subprogramme_ids})
+            res[mpid] = subprogramme_ids
 
-        ART11_GlOBALS.update({'get_mptypes_subprog': mapper_dict})
+        self.__mptypes_subprog = res
 
-        return mapper_dict
+        return res
 
     def get_subform(self):
         return A11MonSubDisplay(self, self.request)
 
-    def default_country(self):
-        return all_values_from_field(self, self.fields['country'])
+    def default_countries(self):
+        # TODO: this needs to be adjusted for subprogrammes
 
-    def default_region(self):
-        return all_values_from_field(self, self.fields['region'])
+        regions = self.data.get('regions')
 
-    def default_marine_unit_id(self):
-        return all_values_from_field(self, self.fields['marine_unit_id'])
+        if regions:
+            submonprog_ids = []
+            mptypes_subprog = self.get_mptypes_subprog()
+            mp_type_ids = self.get_mp_type_ids()
+
+            for mid in mp_type_ids:
+                submonprog_ids.extend(mptypes_subprog[int(mid)])
+
+            res = db.get_unique_from_mapper(
+                sql.MSFD11MONSub,
+                'MemberState',
+                sql.MSFD11MONSub.SubProgramme.in_(submonprog_ids),
+                sql.MSFD11MONSub.Region.in_(regions),
+            )
+
+            return res
+
+        return all_values_from_field(self, self.fields['countries'])
+
+    def default_regions(self):
+        return all_values_from_field(self, self.fields['regions'])
+
+    def default_marine_unit_ids(self):
+        return all_values_from_field(self, self.fields['marine_unit_ids'])
 
 
 class A11MonSubDisplay(MultiItemDisplayForm):
@@ -340,14 +379,14 @@ class A11MonSubDisplay(MultiItemDisplayForm):
 
     def download_results(self):
         mp_type_ids = self.context.context.get_mp_type_ids()
-        countries = self.context.data.get('country', [])
-        regions = self.context.data.get('region', [])
-        marine_unit_id = self.context.data.get('marine_unit_id', [])
+        countries = self.context.data.get('countries', [])
+        regions = self.context.data.get('regions', [])
+        marine_unit_ids = self.context.data.get('marine_unit_ids', [])
 
         count, mon_prog_ids = db.get_all_records_outerjoin(
             sql.MSFD11MonitoringProgrammeMarineUnitID,
             sql.MSFD11MarineUnitID,
-            sql.MSFD11MarineUnitID.MarineUnitID.in_(marine_unit_id)
+            sql.MSFD11MarineUnitID.MarineUnitID.in_(marine_unit_ids)
         )
         mon_prog_ids = [row.MonitoringProgramme for row in mon_prog_ids]
         mp_ids = db.get_unique_from_mapper(
@@ -372,7 +411,9 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         q4g_subprogids_2 = db.get_unique_from_mapper(
             sql.MSFD11SubProgrammeIDMatch,
             'MP_ReferenceSubProgramme',
-            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(
+                q4g_subprogids_1
+            )
         )
 
         klass_join_mp = sql.MSFD11MP
@@ -381,8 +422,10 @@ class A11MonSubDisplay(MultiItemDisplayForm):
             klass_join_mp,
             and_(klass_join_mp.MPType.in_(mp_type_ids),
                  self.mapper_class.MP.in_(mp_ids),
-                 or_(self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_1),
-                     self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_2))
+                 or_(self.mapper_class.SubMonitoringProgrammeID.in_(
+                     q4g_subprogids_1),
+                     self.mapper_class.SubMonitoringProgrammeID.in_(
+                         q4g_subprogids_2))
                  ),
         )
 
@@ -425,9 +468,9 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         needed_ids = self.context.context.get_mp_type_ids()
         klass_join = sql.MSFD11MP
 
-        countries = self.context.data.get('country', [])
-        regions = self.context.data.get('region', [])
-        marine_unit_id = self.context.data.get('marine_unit_id', [])
+        countries = self.context.data.get('countries', [])
+        regions = self.context.data.get('regions', [])
+        marine_unit_id = self.context.data.get('marine_unit_ids', [])
 
         count, mon_prog_ids = db.get_all_records_outerjoin(
             sql.MSFD11MonitoringProgrammeMarineUnitID,
@@ -440,8 +483,6 @@ class A11MonSubDisplay(MultiItemDisplayForm):
             'ID',
             sql.MSFD11MP.MonitoringProgramme.in_(mon_prog_ids)
         )
-
-        # import pdb;pdb.set_trace()
 
         subprogramme_ids = db.get_unique_from_mapper(
             sql.MSFD11MONSub,
@@ -459,7 +500,9 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         q4g_subprogids_2 = db.get_unique_from_mapper(
             sql.MSFD11SubProgrammeIDMatch,
             'MP_ReferenceSubProgramme',
-            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(
+                q4g_subprogids_1
+            )
         )
 
         if needed_ids:
@@ -469,9 +512,14 @@ class A11MonSubDisplay(MultiItemDisplayForm):
                 self.order_field,
                 and_(klass_join.MPType.in_(needed_ids),
                      self.mapper_class.MP.in_(mp_ids),
-                     or_(self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_1),
-                         self.mapper_class.SubMonitoringProgrammeID.in_(q4g_subprogids_2))
-                     ),
+                     or_(
+                         self.mapper_class.SubMonitoringProgrammeID.in_(
+                             q4g_subprogids_1
+                         ),
+                         self.mapper_class.SubMonitoringProgrammeID.in_(
+                             q4g_subprogids_2
+                         )
+                     )),
                 page=page
             )
 
@@ -494,11 +542,13 @@ class A11MPExtraInfo(ItemDisplay):
         count, item = db.get_related_record(
             mc, 'Q4g_SubProgrammeID', subprogramme_id)
 
+        mps = sql.MSFD11SubProgrammeIDMatch.MP_ReferenceSubProgramme
+
         if not item:
             subprogramme_id = db.get_unique_from_mapper(
                 sql.MSFD11SubProgrammeIDMatch,
                 'Q4g_SubProgrammeID',
-                sql.MSFD11SubProgrammeIDMatch.MP_ReferenceSubProgramme == subprogramme_id
+                mps == subprogramme_id
             )
             count, item = db.get_related_record(
                 mc, 'Q4g_SubProgrammeID', subprogramme_id)
@@ -539,5 +589,5 @@ class A11MPExtraInfo(ItemDisplay):
                     for x in elements_monitored
                 ]
             }),
-            ('Paramenters measured', {'': parameters_measured}),
+            ('Parameters measured', {'': parameters_measured}),
         ]

@@ -857,6 +857,7 @@
         clickFirstTab();
 
         setPaginationButtons();
+
     }
 
 
