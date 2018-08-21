@@ -1,6 +1,6 @@
 
 from plone.z3cform.layout import wrap_form
-from wise.content.search import interfaces
+from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
@@ -21,34 +21,75 @@ class StartArticle8910Form(MainForm):
     session_name = 'session'
 
     def get_subform(self):
-
         if self.data['article']:
-            return MemberRegionAreaForm(self, self.request)
+            return RegionForm(self, self.request)
 
     def default_article(self):
         return default_value_from_field(self, self.fields['article'])
 
 
-class MemberRegionAreaForm(EmbededForm):
+class RegionForm(EmbededForm):
     """ Select the memberstate, region, area form
     """
 
     fields = Fields(interfaces.IStartArticles8910)
-
-    fields['member_states'].widgetFactory = CheckBoxFieldWidget
     fields['region_subregions'].widgetFactory = CheckBoxFieldWidget
-    fields['area_types'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return MarineUnitIDsForm(self, self.request)
-
-    def default_member_states(self):
-        return all_values_from_field(self, self.fields['member_states'])
+        return MemberStatesForm(self, self.request)
 
     def default_region_subregions(self):
         return all_values_from_field(self, self.fields['region_subregions'])
 
+
+class MemberStatesForm(EmbededForm):
+    fields = Fields(interfaces.IMemberStates)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return AreaTypesForm(self, self.request)
+
+    def default_member_states(self):
+        # return all_values_from_field(self, self.fields['member_states'])
+        regions = self.context.data.get('region_subregions')
+
+        if regions:
+            t = sql.t_MSFD4_GegraphicalAreasID
+            count, rows = db.get_all_records(
+                t,
+                t.c.RegionSubRegions.in_(regions)
+            )
+
+            return [x[1] for x in rows]
+
+        return all_values_from_field(self, self.fields['member_states'])
+
+
+class AreaTypesForm(EmbededForm):
+
+    fields = Fields(interfaces.IAreaTypes)
+    fields['area_types'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        # needed for marine unit ids vocabulary
+        self.data['member_states'] = self.context.data['member_states']
+        self.data['region_subregions'] = \
+            self.context.context.data['region_subregions']
+
+        return MarineUnitIDsForm(self, self.request)
+
     def default_area_types(self):
+        member_states = self.context.data.get('member_states')
+
+        if member_states:
+            t = sql.t_MSFD4_GegraphicalAreasID
+            count, rows = db.get_all_records(
+                t,
+                t.c.MemberState.in_(member_states)
+            )
+
+            return [x[2] for x in rows]
+
         return all_values_from_field(self, self.fields['area_types'])
 
 
@@ -86,11 +127,13 @@ class StartArticle89102018Form(MainForm):
 
     def get_subform(self):
         article = self.data['article']
+
         if article:
             if isinstance(article, tuple):
                 klass = article[0]
             else:
                 klass = article
+
             return klass(self, self.request)
 
     def default_article(self):

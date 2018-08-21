@@ -55,6 +55,7 @@ class MemberStatesForm(EmbededForm):
         return all_values_from_field(self, self.fields['member_states'])
 
     def get_available_marine_unit_ids(self):
+        # TODO: use available marine unit ids from t_MSFD4_GegraphicalAreasID
         mc = sql.MSFD13ReportingInfo
         conditions = []
 
@@ -165,7 +166,6 @@ class A1314ItemDisplay(ItemDisplayForm):
             mc.UniqueCode.in_(self.context.data.get('unique_codes', [])),
             page=page,
         )
-        # print(extra_data)
         self.extra_data = extra_data.items()
 
         return [count, item]

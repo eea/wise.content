@@ -283,14 +283,17 @@ class EmbededForm(Form, BaseUtil):
         value
         """
         data, errors = super(EmbededForm, self).extractData()
+        self.data = data
 
-        for k, v in data.items():
+        for k in list(self.fields):
+            v = data[k]
+
             if not v:
                 default = getattr(self, 'default_' + k, None)
 
                 if default:
                     value = data[k] = default()
-                    # import pdb;pdb.set_trace()
+                    self.data[k] = data[k]
 
                     if not value:
                         continue
