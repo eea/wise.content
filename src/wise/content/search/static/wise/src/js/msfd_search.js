@@ -911,6 +911,7 @@
             // "transform" : "translateX(-50%)"
         });
 
+         $("#wise-search-form-top").find(".alert").remove();
         //window.WISE.marineUnit = $(selectorLeftForm + " select").val(  );
 
         loading = true;
@@ -957,6 +958,7 @@
 
         $("[name='marine.buttons.prev']").prop("disabled" , false);
         $("[name='marine.buttons.next']").prop("disabled" , false);
+         $("#wise-search-form-top").find(".alert").remove();
     }
 
 
@@ -1132,9 +1134,16 @@
         loading = false;
     }
 
-    function resetConfigsbelowFacet(called_from, called_from_button){
+    function resetEmptyCheckboxes(fieldID){
+        $.each( $("#" + fieldID ).find('.option'), function (idx, item){
+            $(item).find("[type='checkbox']").prop("checked", true);
+        });
+    }
+
+    function resetConfigsbelowFacet(called_from, called_from_button, called_from_select){
         var empty_next_inputs;
-        if (!called_from || called_from_button) {
+        var empty_sibling_input;
+        if (!called_from || called_from_button || called_from_select) {
             empty_next_inputs = function(el) {
                 var panel_group, subform_parent, subform_children;
                 panel_group = $(el).closest('.panel-group');
@@ -1145,8 +1154,18 @@
                     subform_children.find('.panel').empty();
                 }
             };
+            empty_sibling_input = function (el) {
+                var nextFieldID = $(el).parent().next().attr("id");
+                if( nextFieldID === "formfield-form-widgets-member_states" ){
+                    resetEmptyCheckboxes(nextFieldID);
+                } else {
+                    resetEmptyCheckboxes("memberstatesform");
+                }
+            };
             if (called_from_button) {
                 empty_next_inputs(called_from_button);
+            } else if(called_from_select){
+                empty_sibling_input(called_from_select);
             }
             else {
                 $(".ui-autocomplete-input").each(function(idx, el) {
@@ -1196,8 +1215,9 @@
                 // with which we interacted with
                 var called_from = arguments[1];
                 var called_from_button = called_from && called_from['button'];
+                var called_from_select = called_from && called_from['select'];
 
-                resetConfigsbelowFacet(called_from, called_from_button);
+                resetConfigsbelowFacet(called_from, called_from_button, called_from_select);
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
