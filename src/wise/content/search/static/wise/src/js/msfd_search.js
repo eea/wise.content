@@ -911,6 +911,7 @@
             // "transform" : "translateX(-50%)"
         });
 
+         $("#wise-search-form-top").find(".alert").remove();
         //window.WISE.marineUnit = $(selectorLeftForm + " select").val(  );
 
         loading = true;
@@ -957,6 +958,7 @@
 
         $("[name='marine.buttons.prev']").prop("disabled" , false);
         $("[name='marine.buttons.next']").prop("disabled" , false);
+         $("#wise-search-form-top").find(".alert").remove();
     }
 
 
