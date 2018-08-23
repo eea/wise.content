@@ -294,7 +294,7 @@
     }
 
     // enable autosubmit handler
-    function fieldAutoSubmitSetup(fieldId){
+    function fieldAutoSubmitSetup(fieldId, $field){
         $("#" + fieldId).on("click", ".option", function (){
             var self = this;
             $("#ajax-spinner2").hide();
@@ -322,7 +322,7 @@
             if(hasChecks){
                 var fieldId = $field.attr("id");
 
-                fieldAutoSubmitSetup(fieldId);
+                fieldAutoSubmitSetup(fieldId, $field);
 
                 // add "controls"
                 var all = generateControlDiv();
