@@ -121,10 +121,29 @@ def get_marine_unit_ids(**data):
     col = table.c.MarineUnitID
 
     sess = session()
+
+    conditions = []
+
+    if 'member_states' in data:
+        conditions.append(table.c.MemberState.in_(data['member_states']))
+
+    if 'marine_unit_ids' in data:
+        return len(data['marine_unit_ids']), data['marine_unit_ids']
+
+    # import pdb; pdb.set_trace()
+
+    # if 'region_subregions' in data:
+    #     conditions.append(table.c.RegionSubRegions.in_(
+    #         data['region_subregions']))
+    #
+    # if 'region_subregions' in data:
+    #     conditions.append(table.c.RegionSubRegions.in_(
+    #         data['region_subregions']))
+
     query = sess.query(col).filter(
-        table.c.MemberState.in_(data['member_states']),
-        table.c.RegionSubRegions.in_(data['region_subregions']),
-        table.c.AreaType.in_(data['area_types']),
+        *conditions
+        # table.c.RegionSubRegions.in_(data['region_subregions']),
+        # table.c.AreaType.in_(data['area_types']),
     )
 
     l = sorted([x[0] for x in query])

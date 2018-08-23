@@ -15,8 +15,8 @@ from z3c.form.form import Form
 from .db import (get_available_marine_unit_ids, get_item_by_conditions,
                  threadlocals)
 from .interfaces import IMainForm
-from .utils import (default_value_from_field, get_obj_fields,
-                    get_registered_form_sections, print_value,
+from .utils import (all_values_from_field, default_value_from_field,
+                    get_obj_fields, get_registered_form_sections, print_value,
                     request_cache_key)
 from .widget import MarineUnitIDSelectFieldWidget
 
@@ -157,6 +157,8 @@ class MainForm(Form):
         data, errors = super(MainForm, self).extractData()
 
         for k, v in data.items():
+            print "Extracting value for:", k
+
             if not v:
                 default = getattr(self, 'default_' + k, None)
 
@@ -257,6 +259,25 @@ class EmbededForm(Form, BaseUtil):
     template = ViewPageTemplateFile('pt/subform.pt')
     subform_class = None
 
+    def __new__(cls, context, request):
+        # introspect the class to automatically set
+        # default_X and get_selected_X methods
+
+        inst = object.__new__(cls)
+        print "New obj from:", cls, inst
+
+        for name in inst.fields:
+            def default():
+                return all_values_from_field(inst, inst.fields[name])
+
+            def selected():
+                return inst.data[name]
+
+            setattr(inst, 'default_' + name, default)
+            setattr(inst, 'get_selected_' + name, selected)
+
+        return inst
+
     def __init__(self, context, request):
         super(EmbededForm, self).__init__(context, request)
         self.__parent__ = self.context = context
@@ -286,6 +307,7 @@ class EmbededForm(Form, BaseUtil):
         self.data = data
 
         for k in list(self.fields):
+            print "Extracting data from subform for: ", k
             v = data[k]
 
             if not v:
@@ -334,13 +356,9 @@ class MarineUnitIDSelectForm(EmbededForm):
 
     css_class = "left-side-form"
 
-    def default_marine_unit_id(self):
-        return default_value_from_field(self.context,
-                                        self.fields['marine_unit_id'])
-
     def update(self):
         # Override the default to be able to have a default marine unit id
-        super(MarineUnitIDSelectForm, self).update()        # EmbededForm
+        super(MarineUnitIDSelectForm, self).update()
 
         self.data, errors = self.extractData()
 
@@ -359,13 +377,20 @@ class MarineUnitIDSelectForm(EmbededForm):
         widget.template = Z3ViewPageTemplateFile("pt/marine-widget.pt")
 
     def get_available_marine_unit_ids(self):
+        # filter available records based on the parent selected MUIDs
         assert self.mapper_class
+
+        # Get selected marineunitids. Method from base class
+        # import pdb; pdb.set_trace()
         ids = self.get_marine_unit_ids()
+
+        print "Parent available MUIDS", ids
+
         count, res = get_available_marine_unit_ids(
             ids, self.mapper_class
         )
 
-        return [x[0] for x in res]
+        return (count, [x[0] for x in res])
 
 
 class ItemDisplayForm(EmbededForm):
@@ -386,8 +411,6 @@ class ItemDisplayForm(EmbededForm):
 
     def update(self):
         super(ItemDisplayForm, self).update()
-
-        # import pdb; pdb.set_trace()
 
         if not self.get_main_form().reset_page:
             self.data['page'] = self.widgets['page'].value

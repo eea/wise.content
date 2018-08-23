@@ -8,6 +8,7 @@ from io import BytesIO
 from six import string_types
 from sqlalchemy import inspect
 from zope.component import getUtility
+from zope.schema import Choice, List
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
@@ -329,6 +330,12 @@ def default_value_from_field(context, field):
 
 
 def all_values_from_field(context, field):
+    if isinstance(field.field, Choice):
+        return default_value_from_field(context, field)
+
+    if not isinstance(field.field, List):
+        return None
+
     name = field.field.value_type.vocabularyName
     vocab = getUtility(IVocabularyFactory, name=name)(context)
 

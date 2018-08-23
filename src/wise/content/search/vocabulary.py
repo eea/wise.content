@@ -226,9 +226,12 @@ def get_json_subform_data(json_str, field_title):
     return data
 
 
-@provider(IVocabularyFactory)
-def get_member_states_vb_factory(context):
-    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'MemberState')
+def values_to_vocab(values):
+    terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in values]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
 
 
 @provider(IVocabularyFactory)
@@ -237,8 +240,39 @@ def get_region_subregions_vb_factory(context):
 
 
 @provider(IVocabularyFactory)
+def get_member_states_vb_factory(context):
+    # try to get selected region from current form or its parent
+
+    regions = context.get_selected_regions_subregions()
+
+    if regions:
+        t = sql.t_MSFD4_GegraphicalAreasID
+        count, rows = db.get_all_records(
+            t,
+            t.c.RegionSubRegions.in_(regions)
+        )
+
+        return values_to_vocab(set(x[1] for x in rows))
+
+    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'MemberState')
+
+
+@provider(IVocabularyFactory)
 def get_area_type_vb_factory(context):
-    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'AreaType')
+
+    t = sql.t_MSFD4_GegraphicalAreasID
+
+    member_states = context.get_selected_member_states()
+
+    if member_states:
+        count, rows = db.get_all_records(
+            t,
+            t.c.MemberState.in_(member_states)
+        )
+
+        return values_to_vocab(set(x[2] for x in rows))
+
+    return db_vocab(t, 'AreaType')
 
 
 @provider(IVocabularyFactory)
@@ -547,12 +581,7 @@ def marine_unit_ids_vocab_factory(context):
     """ A list of MarineUnitIds based on geodata selected
     """
 
-    if hasattr(context, 'get_available_marine_unit_ids'):
-        count, ids = context.get_available_marine_unit_ids()
-
-    else:
-        data = context.data
-        count, ids = db.get_marine_unit_ids(**data)
+    count, ids = context.get_available_marine_unit_ids()
 
     return marine_unit_id_vocab(sorted(ids))
 
@@ -561,7 +590,8 @@ def marine_unit_ids_vocab_factory(context):
 def marine_unit_id_vocab_factory(context):
     """ A list of MarineUnitIds taken from parent form selection
     """
-    ids = context.subform.get_available_marine_unit_ids()
+
+    count, ids = context.get_available_marine_unit_ids()
 
     return marine_unit_id_vocab(sorted(ids))
 

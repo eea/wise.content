@@ -38,8 +38,11 @@ class RegionForm(EmbededForm):
     def get_subform(self):
         return MemberStatesForm(self, self.request)
 
-    def default_region_subregions(self):
-        return all_values_from_field(self, self.fields['region_subregions'])
+    # def default_region_subregions(self):
+    #     return all_values_from_field(self, self.fields['region_subregions'])
+
+    def get_selected_regions_subregions(self):
+        return self.data.get('region_subregions')
 
 
 class MemberStatesForm(EmbededForm):
@@ -49,20 +52,14 @@ class MemberStatesForm(EmbededForm):
     def get_subform(self):
         return AreaTypesForm(self, self.request)
 
+    def get_selected_member_states(self):
+        return self.context.data.get('member_states')
+
     def default_member_states(self):
-        # return all_values_from_field(self, self.fields['member_states'])
-        regions = self.context.data.get('region_subregions')
-
-        if regions:
-            t = sql.t_MSFD4_GegraphicalAreasID
-            count, rows = db.get_all_records(
-                t,
-                t.c.RegionSubRegions.in_(regions)
-            )
-
-            return [x[1] for x in rows]
-
         return all_values_from_field(self, self.fields['member_states'])
+
+    def get_selected_regions_subregions(self):
+        return self.context.data.get('region_subregions')
 
 
 class AreaTypesForm(EmbededForm):
@@ -78,19 +75,25 @@ class AreaTypesForm(EmbededForm):
 
         return MarineUnitIDsForm(self, self.request)
 
+    def get_selected_member_states(self):
+        return self.context.data.get('member_states')
+
     def default_area_types(self):
-        member_states = self.context.data.get('member_states')
-
-        if member_states:
-            t = sql.t_MSFD4_GegraphicalAreasID
-            count, rows = db.get_all_records(
-                t,
-                t.c.MemberState.in_(member_states)
-            )
-
-            return [x[2] for x in rows]
+        # member_states = self.context.data.get('member_states')
+        #
+        # if member_states:
+        #     t = sql.t_MSFD4_GegraphicalAreasID
+        #     count, rows = db.get_all_records(
+        #         t,
+        #         t.c.MemberState.in_(member_states)
+        #     )
+        #
+        #     return [x[2] for x in rows]
 
         return all_values_from_field(self, self.fields['area_types'])
+
+    def get_available_marine_unit_ids(self):
+        return self.subform.get_available_marine_unit_ids()
 
 
 StartArticle8910View = wrap_form(StartArticle8910Form, MainFormWrapper)
@@ -112,6 +115,23 @@ class MarineUnitIDsForm(EmbededForm):
     def default_marine_unit_ids(self):
         return all_values_from_field(self.context,
                                      self.fields['marine_unit_ids'])
+
+    def get_available_marine_unit_ids(self):
+        marine_unit_ids = self.data.get('marine_unit_ids')
+
+        if marine_unit_ids:
+            data = self.data
+        else:
+            data = {}
+            parent = self.context
+
+            # lookup values in the inheritance tree
+
+            for crit in ['area_types', 'member_states', 'region_subregions']:
+                data[crit] = getattr(parent, 'get_selected_' + crit)()
+                parent = parent.context
+
+        return db.get_marine_unit_ids(**data)
 
 
 StartArticle11View = wrap_form(StartArticle11Form, MainFormWrapper)
