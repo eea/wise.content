@@ -2,7 +2,7 @@ import datetime
 from collections import OrderedDict, defaultdict
 from cPickle import dumps
 from hashlib import md5
-from inspect import isclass
+from inspect import getsource, isclass
 from io import BytesIO
 
 from six import string_types
@@ -219,7 +219,7 @@ def data_to_xls(data):
 def get_obj_fields(obj, use_blacklist=True):
     mapper = inspect(obj)
 
-    res = []
+    fields = []
     keys = [c.key for c in mapper.attrs]        # forgo sorted use
 
     BLACKLIST = ['ID', 'Import', 'Id']
@@ -235,7 +235,25 @@ def get_obj_fields(obj, use_blacklist=True):
                 flag = True
 
         if not flag:
-            res.append(key)
+            fields.append(key)
+
+    # this is a hack to return a sorted list of fields, according to the order
+    # of their definition. this is default behaviour in python 3.6+, but not in
+    # python 2.7. there's no easy way to achieve this without a metaclass, so
+    # we'll just hack it.
+
+    res = []
+    source = getsource(obj.__class__)
+
+    for line in source.split('\n'):
+        split = line.split(' = ')
+
+        if len(split) == 2:
+            name, value = split
+            name = name.strip()
+
+            if name in fields:
+                res.append(name)
 
     return res
 
