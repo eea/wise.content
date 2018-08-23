@@ -275,6 +275,9 @@
     }
 
     function sortCheckboxesByChecked($field) {
+        if ( window.WISE !== undefined && window.WISE.blocks !== undefined && window.WISE.blocks.indexOf( $field.attr("id") ) !== -1 ){
+            return;
+        }
         var arr = [];
         $.each( $field.find(".option input[type='checkbox']:not(:checked)") , function (ix, ch) {
             arr.push( $(ch).parent() );
@@ -298,6 +301,8 @@
         $("#" + fieldId).on("click", ".option", function (){
             var self = this;
             $("#ajax-spinner2").hide();
+            //window.WISE.blocks = window.WISE.blocks.sort().filter((x, i, a) => !i || x != a[i-1]);
+
             if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
                 sortCheckboxesByChecked($field);
             } else {
