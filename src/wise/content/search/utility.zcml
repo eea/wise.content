@@ -25,10 +25,10 @@
     name="wise_search_articles"
     />
 
-  <utility
-    component=".vocabulary.marine_unit_id_vocab_factory"
-    name="wise_search_marine_unit_id"
-    />
+  <!-- <utility -->
+  <!--   component=".vocabulary.marine_unit_id_vocab_factory" -->
+  <!--   name="wise_search_marine_unit_id" -->
+  <!--   /> -->
 
   <utility
     component=".vocabulary.marine_unit_ids_vocab_factory"

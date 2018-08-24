@@ -273,8 +273,16 @@ class EmbededForm(Form, BaseUtil):
             def selected():
                 return inst.data[name]
 
-            setattr(inst, 'default_' + name, default)
-            setattr(inst, 'get_selected_' + name, selected)
+            mn = 'default_' + name
+
+            if not hasattr(inst, mn):
+                setattr(inst, mn, default)
+
+            mn = 'get_selected_' + name
+
+            if not hasattr(inst, mn):
+                print "Set selected", inst, mn, selected
+                setattr(inst, mn, selected)
 
         return inst
 

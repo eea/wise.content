@@ -337,7 +337,10 @@ def all_values_from_field(context, field):
         return None
 
     name = field.field.value_type.vocabularyName
-    vocab = getUtility(IVocabularyFactory, name=name)(context)
+
+    # we use the parent for the vocabulary because parents usually have the
+    # values that we want to filter in the current vocabulary
+    vocab = getUtility(IVocabularyFactory, name=name)(context.context)
 
     return [term.token for term in vocab._terms]
 

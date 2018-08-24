@@ -79,7 +79,7 @@ class IMarineUnitIDSelect(Interface):
         # description=u"Select one or more MarineUnitIDs that you're
         # interested",
         required=False,
-        vocabulary="wise_search_marine_unit_id"
+        vocabulary="wise_search_marine_unit_ids"
     )
 
 

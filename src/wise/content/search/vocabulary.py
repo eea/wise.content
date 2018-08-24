@@ -241,9 +241,7 @@ def get_region_subregions_vb_factory(context):
 
 @provider(IVocabularyFactory)
 def get_member_states_vb_factory(context):
-    # try to get selected region from current form or its parent
-
-    regions = context.get_selected_regions_subregions()
+    regions = context.get_selected_region_subregions()
 
     if regions:
         t = sql.t_MSFD4_GegraphicalAreasID
@@ -586,14 +584,14 @@ def marine_unit_ids_vocab_factory(context):
     return marine_unit_id_vocab(sorted(ids))
 
 
-@provider(IVocabularyFactory)
-def marine_unit_id_vocab_factory(context):
-    """ A list of MarineUnitIds taken from parent form selection
-    """
-
-    count, ids = context.get_available_marine_unit_ids()
-
-    return marine_unit_id_vocab(sorted(ids))
+# @provider(IVocabularyFactory)
+# def marine_unit_id_vocab_factory(context):
+#     """ A list of MarineUnitIds taken from parent form selection
+#     """
+#
+#     count, ids = context.get_available_marine_unit_ids()
+#
+#     return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)
