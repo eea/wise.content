@@ -836,9 +836,6 @@
         }
     }
 
-
-
-
     function initPageElems(){
         // move marine unit id below form title and pagination as seen on the
         // other article tabs
@@ -864,7 +861,6 @@
         setPaginationButtons();
 
     }
-
 
     /*
     * Form handlers
@@ -943,6 +939,7 @@
 
         $(selectorFormContainer).html(fhtml);
 
+
         if( $data.find( selectorLeftForm + " .topnav").next().length > 0){
             $( selectorLeftForm + " .topnav").after($data.find( selectorLeftForm + " .topnav").next());
         }
@@ -968,7 +965,6 @@
         $("[name='marine.buttons.next']").prop("disabled" , false);
          $("#wise-search-form-top").find(".alert").remove();
     }
-
 
      /* - table_sorter.js - */
     /********* Table sorter script *************/
@@ -1157,18 +1153,35 @@
                 panel_group = $(el).closest('.panel-group');
                 subform_parent = panel_group.closest('.subform');
                 subform_children = subform_parent.find('.subform');
+
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
                     subform_children.find('.panel').empty();
+                    subform_children.find(".subform").empty();
                 }
+
             };
             empty_sibling_input = function (el) {
                 var nextFieldID = $(el).parent().next().attr("id");
+
+                var panel_group, subform_parent, subform_children;
+                panel_group = $(el).closest('.panel-group');
+                subform_parent = panel_group.closest('.subform');
+                subform_children = subform_parent.find('.subform');
+
                 if( nextFieldID === "formfield-form-widgets-member_states" ){
+                    subform_children = $(el).parent().parent().next();
                     resetEmptyCheckboxes(nextFieldID);
                 } else {
+                    subform_children = $(el).parent().parent().next();
                     resetEmptyCheckboxes("memberstatesform");
                 }
+
+                panel_group.nextAll('.panel-group').find('.panel').empty();
+                if (subform_children.length) {
+                    subform_children.find(".subform").empty();
+                }
+
             };
             if (called_from_button) {
                 empty_next_inputs(called_from_button);
@@ -1185,6 +1198,8 @@
             }
         }
     }
+
+
 
     jQuery(document).ready(function($){
         initPageElems();
@@ -1215,9 +1230,6 @@
                 }
                 ev.preventDefault();
 
-                var form =  $( selectorFormContainer ).find("form");
-                var url = form.attr("action");
-
                 // empty facets below given facet where we had an interaction
                 // this way we reset the configurations below the given facet
                 // with which we interacted with
@@ -1225,7 +1237,13 @@
                 var called_from_button = called_from && called_from['button'];
                 var called_from_select = called_from && called_from['select'];
 
-                resetConfigsbelowFacet(called_from, called_from_button, called_from_select);
+                var resetFacets = true;
+                if(resetFacets){
+                    resetConfigsbelowFacet(called_from, called_from_button, called_from_select);
+                }
+
+                var form =  $( selectorFormContainer ).find("form");
+                var url = form.attr("action");
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
