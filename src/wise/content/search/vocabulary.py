@@ -584,14 +584,19 @@ def marine_unit_ids_vocab_factory(context):
     return marine_unit_id_vocab(sorted(ids))
 
 
-# @provider(IVocabularyFactory)
-# def marine_unit_id_vocab_factory(context):
-#     """ A list of MarineUnitIds taken from parent form selection
-#     """
-#
-#     count, ids = context.get_available_marine_unit_ids()
-#
-#     return marine_unit_id_vocab(sorted(ids))
+@provider(IVocabularyFactory)
+def marine_unit_id_vocab_factory(context):
+    """ A list of MarineUnitIds based on availability in target results
+    """
+
+    # TODO: explain why this (calling from subform) is needed
+
+    if hasattr(context, 'subform'):
+        count, ids = context.subform.get_available_marine_unit_ids()
+    else:
+        count, ids = context.get_available_marine_unit_ids()
+
+    return marine_unit_id_vocab(sorted(ids))
 
 
 @provider(IVocabularyFactory)

@@ -312,11 +312,12 @@ def pivot_query(query, pivot):
 def default_value_from_field(context, field):
     """ Get the defaulf value for a choice field
     """
+    parent = context.context
     vocab = field.field.vocabulary
 
     if not vocab:
         name = field.field.vocabularyName
-        vocab = getUtility(IVocabularyFactory, name=name)(context)
+        vocab = getUtility(IVocabularyFactory, name=name)(parent)
 
     if not vocab._terms:
         return
@@ -340,7 +341,8 @@ def all_values_from_field(context, field):
 
     # we use the parent for the vocabulary because parents usually have the
     # values that we want to filter in the current vocabulary
-    vocab = getUtility(IVocabularyFactory, name=name)(context.context)
+    parent = context.context
+    vocab = getUtility(IVocabularyFactory, name=name)(parent)
 
     return [term.token for term in vocab._terms]
 

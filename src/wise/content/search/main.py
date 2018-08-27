@@ -24,8 +24,8 @@ class StartArticle8910Form(MainForm):
         if self.data['article']:
             return RegionForm(self, self.request)
 
-    def default_article(self):
-        return default_value_from_field(self, self.fields['article'])
+    # def default_article(self):
+    #     return default_value_from_field(self, self.fields['article'])
 
 
 class RegionForm(EmbededForm):
@@ -121,8 +121,8 @@ class StartArticle89102018Form(MainForm):
 
             return klass(self, self.request)
 
-    def default_article(self):
-        return default_value_from_field(self, self.fields['article'])
+    # def default_article(self):
+    #     return default_value_from_field(self, self.fields['article'])
 
 
 StartArticle89102018View = wrap_form(StartArticle89102018Form, MainFormWrapper)

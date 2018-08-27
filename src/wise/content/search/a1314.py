@@ -15,6 +15,7 @@ class StartArticle1314Form(MainForm):
     """
     """
     fields = Fields(interfaces.IStartArticles1314)
+    fields['region_subregions'].widgetFactory = CheckBoxFieldWidget
 
     name = 'msfd-c3'
     record_title = 'Articles 13 & 14'
@@ -23,11 +24,10 @@ class StartArticle1314Form(MainForm):
     def get_subform(self):
         return MemberStatesForm(self, self.request)
 
+    # This is needed because of metatype weirdness. Would be nice to have an
+    # explanation of why this happens, only for this MainForm
     def default_report_type(self):
         return default_value_from_field(self, self.fields['report_type'])
-
-    def default_region(self):
-        return default_value_from_field(self, self.fields['region'])
 
 
 class MemberStatesForm(EmbededForm):
@@ -40,38 +40,19 @@ class MemberStatesForm(EmbededForm):
     def get_subform(self):
         return MarineUnitIDsForm(self, self.request)
 
-    def default_member_states(self):
-        region = self.context.data.get('region')
-
-        if region:
-            t = sql.t_MSFD4_GegraphicalAreasID
-            count, rows = db.get_all_records(
-                t,
-                t.c.RegionSubRegions == region
-            )
-
-            return [x[1] for x in rows]
-
-        return all_values_from_field(self, self.fields['member_states'])
-
     def get_available_marine_unit_ids(self):
         # TODO: use available marine unit ids from t_MSFD4_GegraphicalAreasID
         mc = sql.MSFD13ReportingInfo
-        conditions = []
 
-        report_type = self.data.get('report_type')
+        ms = self.get_selected_member_states()
 
-        if report_type:
-            conditions.append(mc.ReportType == report_type)
+        count, res = db.get_all_records_join(
+            [mc.MarineUnitID],
+            sql.MSFD13ReportingInfoMemberState,
+            sql.MSFD13ReportingInfoMemberState.MemberState.in_(ms),
+        )
 
-        region = self.context.data.get('region')
-
-        if region:
-            conditions.append(mc.Region == region)
-
-        res = db.get_unique_from_mapper(mc, 'MarineUnitID', *conditions)
-
-        return (len(res), res)
+        return [count, [x[0] for x in res]]
 
 
 class MarineUnitIDsForm(EmbededForm):
@@ -102,10 +83,6 @@ class MarineUnitIDsForm(EmbededForm):
 
         return UniqueCodesForm(self, self.request)
 
-    def default_marine_unit_ids(self):
-        return all_values_from_field(self.context,
-                                     self.fields['marine_unit_ids'])
-
 
 class UniqueCodesForm(EmbededForm):
     """ Select the unique codes
@@ -117,10 +94,6 @@ class UniqueCodesForm(EmbededForm):
 
     def get_subform(self):
         return A1314ItemDisplay(self, self.request)
-
-    def default_unique_codes(self):
-        return all_values_from_field(self.context,
-                                     self.fields['unique_codes'])
 
 
 class A1314ItemDisplay(ItemDisplayForm):

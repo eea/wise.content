@@ -119,7 +119,72 @@ class BaseUtil(object):
         return context.record_title
 
 
-class MainForm(Form):
+class BaseEnhancedForm(object):
+    """ Provides a set of default behaviors for enhanced forms
+    """
+
+    def extractData(self):
+        """ Override to be able to provide defaults
+        """
+        data, errors = Form.extractData(self)
+
+        for k, v in data.items():
+            if not v:
+                default = getattr(self, 'default_' + k, None)
+
+                if default:
+                    value = data[k] = default()
+
+                    if not value:
+                        continue
+                    widget = self.widgets[k]
+                    widget.value = value
+                    field = widget.field.bind(self.context)
+                    field.default = value
+                    widget.field = field
+                    widget.ignoreRequest = True
+                    widget.update()
+
+        return data, errors
+
+    def __new__(cls, context, request):
+        # introspect the class to automatically set
+        # default_X and get_selected_X methods
+
+        for name in cls.fields:
+            print "Setting default field", name
+            default = 'default_' + name
+            selected = 'get_selected_' + name
+
+            if not hasattr(cls, default):
+                def default_impl(self):
+                    local_name = name[:]
+                    field = self.fields[local_name]
+
+                    return all_values_from_field(self, field)
+
+                default_impl.func_name = default
+                setattr(cls,
+                        default,
+                        default_impl
+                        )
+
+            if not hasattr(cls, selected):
+                def selected_impl(self):
+                    local_name = name[:]
+
+                    return self.data[local_name]
+
+                selected_impl.func_name = selected
+                setattr(cls,
+                        selected,
+                        selected_impl
+                        )
+
+        return object.__new__(cls)
+
+
+class MainForm(BaseEnhancedForm, Form):
     """ The main forms need to inherit from this clas
     """
 
@@ -131,6 +196,9 @@ class MainForm(Form):
     subform_content = None
     should_download = False     # flag that signals download button is hit
     # method = 'get'
+
+    def __init__(self, context, request):
+        Form.__init__(self, context, request)
 
     main_forms = (
         ('msfd-c1', ('Articles 8, 9 & 10', '2012 reporting exercise')),
@@ -150,32 +218,6 @@ class MainForm(Form):
     @property
     def title(self):
         return [x[1] for x in self.main_forms if x[0] == self.name][0]
-
-    def extractData(self):
-        """ Override to be able to provide defaults
-        """
-        data, errors = super(MainForm, self).extractData()
-
-        for k, v in data.items():
-            print "Extracting value for:", k
-
-            if not v:
-                default = getattr(self, 'default_' + k, None)
-
-                if default:
-                    value = data[k] = default()
-
-                    if not value:
-                        continue
-                    widget = self.widgets[k]
-                    widget.value = value
-                    field = widget.field.bind(self.context)
-                    field.default = value
-                    widget.field = field
-                    widget.ignoreRequest = True
-                    widget.update()
-
-        return data, errors
 
     def update(self):
         super(MainForm, self).update()
@@ -247,7 +289,7 @@ class MainFormWrapper(FormWrapper):
         return super(MainFormWrapper, self).render()
 
 
-class EmbededForm(Form, BaseUtil):
+class EmbededForm(BaseEnhancedForm, Form, BaseUtil):
     """ Our most basic super-smart-superclass for forms
 
     It can embed other children forms
@@ -259,37 +301,10 @@ class EmbededForm(Form, BaseUtil):
     template = ViewPageTemplateFile('pt/subform.pt')
     subform_class = None
 
-    def __new__(cls, context, request):
-        # introspect the class to automatically set
-        # default_X and get_selected_X methods
-
-        inst = object.__new__(cls)
-        print "New obj from:", cls, inst
-
-        for name in inst.fields:
-            def default():
-                return all_values_from_field(inst, inst.fields[name])
-
-            def selected():
-                return inst.data[name]
-
-            mn = 'default_' + name
-
-            if not hasattr(inst, mn):
-                setattr(inst, mn, default)
-
-            mn = 'get_selected_' + name
-
-            if not hasattr(inst, mn):
-                print "Set selected", inst, mn, selected
-                setattr(inst, mn, selected)
-
-        return inst
-
     def __init__(self, context, request):
-        super(EmbededForm, self).__init__(context, request)
-        self.__parent__ = self.context = context
-        self.request = request
+        Form.__init__(self, context, request)
+        self.__parent__ = self.context      # = context
+        # self.request = request
         self.data = {}
 
     def update(self):
@@ -304,38 +319,6 @@ class EmbededForm(Form, BaseUtil):
 
             if subform is not None:
                 self.subform = subform
-
-    def extractData(self):
-        """ Override to be able to provide defaults
-
-        Create a function called "default_<name_of_field>" to provide default
-        value
-        """
-        data, errors = super(EmbededForm, self).extractData()
-        self.data = data
-
-        for k in list(self.fields):
-            print "Extracting data from subform for: ", k
-            v = data[k]
-
-            if not v:
-                default = getattr(self, 'default_' + k, None)
-
-                if default:
-                    value = data[k] = default()
-                    self.data[k] = data[k]
-
-                    if not value:
-                        continue
-                    widget = self.widgets[k]
-                    widget.value = value
-                    field = widget.field.bind(self.context)
-                    field.default = value
-                    widget.field = field
-                    widget.ignoreRequest = True
-                    widget.update()
-
-        return data, errors
 
     def get_subform(self, klass=None):
         if klass is None:
@@ -389,10 +372,9 @@ class MarineUnitIDSelectForm(EmbededForm):
         assert self.mapper_class
 
         # Get selected marineunitids. Method from base class
-        # import pdb; pdb.set_trace()
         ids = self.get_marine_unit_ids()
 
-        print "Parent available MUIDS", ids
+        # print "Parent available MUIDS", ids
 
         count, res = get_available_marine_unit_ids(
             ids, self.mapper_class

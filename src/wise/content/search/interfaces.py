@@ -79,7 +79,7 @@ class IMarineUnitIDSelect(Interface):
         # description=u"Select one or more MarineUnitIDs that you're
         # interested",
         required=False,
-        vocabulary="wise_search_marine_unit_ids"
+        vocabulary="wise_search_marine_unit_id"
     )
 
 
@@ -94,11 +94,17 @@ class IStartArticles1314(Interface):
         required=False,
     )
 
-    region = Choice(
-        title=u"Region",
-        vocabulary="wise_search_a1314_regions",
+    region_subregions = List(
+        title=u"Region and Subregions",
+        value_type=Choice(vocabulary="wise_search_region_subregions"),
         required=False,
     )
+
+    # region_subregions = Choice(
+    #     title=u"Region",
+    #     vocabulary="wise_search_a1314_regions",
+    #     required=False,
+    # )
 
 
 class IStartArticle11(Interface):
