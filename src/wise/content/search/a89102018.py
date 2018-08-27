@@ -1,3 +1,6 @@
+# TODO: we need to check behavior of this module after modifications to
+# extractData() in EmbededForm
+
 from sqlalchemy import and_, or_
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -17,8 +20,9 @@ class Art9Display(ItemDisplayForm):
     show_extra_data = True
 
     def download_results(self):
-        mapper_class = self.context.context.mapper_class
-        features_mc = self.context.context.features_mc
+        parent = self.context.context
+        mapper_class = parent.mapper_class
+        features_mc = parent.features_mc
         determination_mc = sql2018.ART9GESGESDetermination
 
         count, ges_component = db.get_all_records(
@@ -55,11 +59,12 @@ class Art9Display(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        mapper_class = self.context.context.mapper_class
-        features_mc = self.context.context.features_mc
-        determination_mc = self.context.context.determination_mc
-        country_codes = self.context.context.data.get('country_code', ())
-        ges_components = self.context.context.data.get('ges_component', ())
+        parent = self.context.context
+        mapper_class = parent.mapper_class
+        features_mc = parent.features_mc
+        determination_mc = parent.determination_mc
+        country_codes = parent.data.get('country_code', ())
+        ges_components = parent.data.get('ges_component', ())
         features = self.context.data.get('feature', ())
 
         count, id_ges_components = db.get_all_records_join(
@@ -258,8 +263,8 @@ class A2018Art10Display(ItemDisplayForm):
         ges_components_ids = map(int, ges_components_ids)
 
         self.target_ids = tuple(set(target_ids)
-                           & set(features_ids)
-                           & set(ges_components_ids))
+                                & set(features_ids)
+                                & set(ges_components_ids))
 
         res = db.get_item_by_conditions(
             target_mc,
