@@ -324,8 +324,10 @@ def default_value_from_field(context, field):
 
     term = vocab._terms[0]
 
+    # TODO: should we always return term.value?
+
     if isclass(term.value):
-        return term.value, term.token
+        return term.value
 
     return term.token
 

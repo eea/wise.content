@@ -93,51 +93,6 @@ def populate_labels():
 populate_labels()
 
 
-class SubFormsVocabulary(SimpleVocabulary):
-    """ An hackish vocabulary that retrieves subform names for a form
-    """
-
-    # TODO: I'm not sure if this is needed. Its existance needs to be defended
-
-    def __init__(self, form_klass):
-        self.form_klass = form_klass
-        pass
-
-    def __call__(self, context):
-        self.context = context
-
-    @property
-    def _terms(self):
-        terms = []
-
-        forms = SUBFORMS[self.form_klass]
-
-        for k in forms:
-            terms.append(SimpleTerm(k, k.title, k.title))
-
-        terms.sort(key=lambda t: t.title)
-
-        return terms
-
-    @property
-    def by_value(self):
-        d = {}
-
-        for term in self._terms:
-            d[term.value] = term
-
-        return d
-
-    @property
-    def by_token(self):
-        d = {}
-
-        for term in self._terms:
-            d[term.token] = term
-
-        return d
-
-
 def vocab_from_values(values):
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in values]
     # TODO fix UnicodeDecodeError
@@ -290,6 +245,23 @@ def monitoring_programme_vb_factory(context):
 @provider(IVocabularyFactory)
 def monitoring_programme_info_types(context):
     terms = [SimpleTerm(v, k, v.title) for k, v in FORMS_ART11.items()]
+    terms.sort(key=lambda t: t.title)
+    vocab = SimpleVocabulary(terms)
+
+    return vocab
+
+
+@provider(IVocabularyFactory)
+def a81_forms_vocab_factory(context):
+    klass = context.subform.__class__
+
+    terms = []
+
+    forms = SUBFORMS[klass]
+
+    for k in forms:
+        terms.append(SimpleTerm(k, k.title, k.title))
+
     terms.sort(key=lambda t: t.title)
     vocab = SimpleVocabulary(terms)
 
