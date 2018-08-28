@@ -422,13 +422,14 @@ def art11_marine_unit_id(context):
 
         if field['label'] == 'Country'
     ]
-    countries = [
-        country['value']
-
-        for country in countries_form_data[0]
-
-        if country['checked']
-    ]
+    # countries = [
+    #     country['value']
+    #
+    #     for country in countries_form_data[0]
+    #
+    #     if country['checked']
+    # ]
+    countries = []
     regions_form_data = [
         field['options']
 
@@ -436,13 +437,14 @@ def art11_marine_unit_id(context):
 
         if field['label'] == 'Region'
     ]
-    regions = [
-        region['value']
-
-        for region in regions_form_data[0]
-
-        if region['checked']
-    ]
+    # regions = [
+    #     region['value']
+    #
+    #     for region in regions_form_data[0]
+    #
+    #     if region['checked']
+    # ]
+    regions = []
 
     if countries and regions:
         mon_ids = db.get_unique_from_mapper(
@@ -570,6 +572,16 @@ def marine_unit_id_vocab(ids):
             label = id
         terms.append(SimpleTerm(id, id, label))
         terms.sort(key=lambda t: t.title)
+
+    # in Article 11 there are some Marine Unit IDs which are not found
+    # in t_MSFD4_GegraphicalAreasID, append these separately
+    terms_found = [x.value for x in terms]
+    terms_to_append = list(set(ids) - set(terms_found))
+
+    for term in terms_to_append:
+        terms.append(SimpleTerm(term, term, term))
+
+    terms.sort(key=lambda t: t.title)
 
     return SimpleVocabulary(terms)
 

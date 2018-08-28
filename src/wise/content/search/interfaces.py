@@ -123,17 +123,6 @@ class IStartArticle11(Interface):
 
 
 class IMonitoringProgramme(Interface):
-    regions = List(
-        title=u"Region",
-        value_type=Choice(vocabulary="wise_search_art11_region"),
-        required=False
-    )
-
-    countries = List(
-        title=u"Country",
-        value_type=Choice(vocabulary="wise_search_art11_country"),
-        required=False
-    )
 
     marine_unit_ids = List(
         title=u"Marine Unit IDs",
@@ -143,17 +132,6 @@ class IMonitoringProgramme(Interface):
 
 
 class IMonitoringSubprogramme(Interface):
-    regions = List(
-        title=u"Region",
-        value_type=Choice(vocabulary="wise_search_art11_region_ms"),
-        required=False
-    )
-
-    countries = List(
-        title=u"Country",
-        value_type=Choice(vocabulary="wise_search_art11_country_ms"),
-        required=False
-    )
 
     marine_unit_ids = List(
         title=u"Marine Unit IDs",
