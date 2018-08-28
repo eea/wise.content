@@ -87,6 +87,15 @@ class IStartArticles8910(IRegionSubregions):
     pass
 
 
+class IA81Form(Interface):
+
+    theme = Choice(
+        title=u"Select theme",
+        required=False,
+        vocabulary='wise_search_a81_forms'
+    )
+
+
 class IStartArticles1314(Interface):
     report_type = Choice(
         title=u"Report Type",

@@ -1,5 +1,6 @@
 """ Forms and views for Article 13-14 search
 """
+from sqlalchemy import and_
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces, sql
@@ -45,11 +46,13 @@ class MemberStatesForm(EmbededForm):
         mc = sql.MSFD13ReportingInfo
 
         ms = self.get_selected_member_states()
+        report_type = self.context.data['report_type']
 
         count, res = db.get_all_records_join(
             [mc.MarineUnitID],
             sql.MSFD13ReportingInfoMemberState,
-            sql.MSFD13ReportingInfoMemberState.MemberState.in_(ms),
+            and_(sql.MSFD13ReportingInfoMemberState.MemberState.in_(ms),
+                 mc.ReportType == report_type),
         )
 
         return [count, [x[0] for x in res]]
@@ -65,10 +68,12 @@ class MarineUnitIDsForm(EmbededForm):
 
     def get_subform(self):
         mc = sql.MSFD13ReportingInfo
+        report_type = self.context.context.data['report_type']
 
         count, res = db.get_all_records(
             mc.ID,
-            mc.MarineUnitID.in_(self.data.get('marine_unit_ids', []))
+            and_(mc.MarineUnitID.in_(self.data.get('marine_unit_ids', [])),
+                 mc.ReportType == report_type)
         )
         self.data['report_ids'] = [x[0] for x in res]
 

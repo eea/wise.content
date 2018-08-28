@@ -1,14 +1,12 @@
-from zope.schema import Choice
-
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 from z3c.form.field import Fields
 
 from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
+from .interfaces import IA81Form
 from .utils import (data_to_xls, register_form, register_form_section,
                     register_subform)
-from .vocabulary import SubFormsVocabulary
 
 
 @register_form
@@ -20,27 +18,7 @@ class A81aForm(EmbededForm):
 
     record_title = title = \
         'Article 8.1a (Analysis of the environmental status)'
-
-    @property
-    def fields(self):
-        # TODO: could this be reimplemented with simple vocab?
-
-        theme = Choice(
-            __name__='theme',
-            title=u"Select theme",
-            required=False,
-            vocabulary=SubFormsVocabulary(self.__class__)
-        )
-
-        return Fields(theme)
-
-    def default_theme(self):
-
-        field = self.fields['theme']
-        vocab = field.field.vocabulary
-        value = vocab._terms[0].value
-
-        return value
+    fields = Fields(IA81Form)
 
     def get_subform(self):
         klass = self.data.get('theme')
@@ -680,6 +658,7 @@ class A81cEconomicItemDisplay(MultiItemDisplayForm):
         ]
 
         return data_to_xls(xlsdata)
+
 
 @register_form_section(A81cEconomicItemDisplay)
 class A81cEconomicPressures(ItemDisplay):
