@@ -39,12 +39,12 @@ class StartArticle11Form(MainForm):
 
         return [int(x) for x in all_values_from_field(self, field)]
 
-    def default_monitoring_programme_info_type(self):
-        klass, token = default_value_from_field(
-            self, self.fields['monitoring_programme_info_type']
-        )
-
-        return klass
+    # def default_monitoring_programme_info_type(self):
+    #     klass, token = default_value_from_field(
+    #         self, self.fields['monitoring_programme_info_type']
+    #     )
+    #
+    #     return klass
 
 
 class A11MProgMemberStateForm(EmbededForm):
