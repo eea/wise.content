@@ -1156,10 +1156,15 @@
 
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
+                    if(subform_children.hasClass("subform")){
+                        subform_children.empty();
+                    }
                     subform_children.find('.panel').empty();
                     subform_children.find(".subform").empty();
-                }
+                } else {
+                    $(el).parent().parent().next().empty()
 
+                }
             };
             empty_sibling_input = function (el) {
                 var nextFieldID = $(el).parent().next().attr("id");
@@ -1167,21 +1172,20 @@
                 var panel_group, subform_parent, subform_children;
                 panel_group = $(el).closest('.panel-group');
                 subform_parent = panel_group.closest('.subform');
-                subform_children = subform_parent.find('.subform');
+                //subform_children = subform_parent.find('.subform');
+                 subform_children = $(el).parent().parent().next();
 
                 if( nextFieldID === "formfield-form-widgets-member_states" ){
-                    subform_children = $(el).parent().parent().next();
                     resetEmptyCheckboxes(nextFieldID);
                 } else {
-                    subform_children = $(el).parent().parent().next();
                     resetEmptyCheckboxes("memberstatesform");
                 }
+
 
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
                     subform_children.find(".subform").empty();
                 }
-
             };
             if (called_from_button) {
                 empty_next_inputs(called_from_button);
