@@ -594,6 +594,24 @@ def a1314_regions(context):
 
 
 @provider(IVocabularyFactory)
+def a1314_member_states(context):
+    regions = context.get_selected_region_subregions()
+
+    mc = sql.MSFD13ReportingInfo
+    if regions:
+        mc_join = sql.MSFD13ReportingInfoMemberState
+        count, rows = db.get_all_records_join(
+            [mc_join.MemberState],
+            mc,
+            mc.Region.in_(regions)
+        )
+
+        return values_to_vocab(set(x[0].strip() for x in rows))
+
+    return db_vocab(mc, 'MemberState')
+
+
+@provider(IVocabularyFactory)
 def a1314_unique_codes(context):
     codes = context.data.get('unique_codes')
     terms = [

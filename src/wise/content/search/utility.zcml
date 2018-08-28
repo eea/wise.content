@@ -81,6 +81,11 @@
     />
 
   <utility
+    component=".vocabulary.a1314_member_states"
+    name="wise_search_a1314_member_states"
+    />
+
+  <utility
     component=".vocabulary.a1314_unique_codes"
     name="wise_search_a1314_unique_codes"
     />

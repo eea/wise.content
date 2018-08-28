@@ -103,17 +103,17 @@ class IStartArticles1314(Interface):
         required=False,
     )
 
-    region_subregions = List(
-        title=u"Region and Subregions",
-        value_type=Choice(vocabulary="wise_search_region_subregions"),
-        required=False,
-    )
-
-    # region_subregions = Choice(
-    #     title=u"Region",
-    #     vocabulary="wise_search_a1314_regions",
+    # region_subregions = List(
+    #     title=u"Region and Subregions",
+    #     value_type=Choice(vocabulary="wise_search_region_subregions"),
     #     required=False,
     # )
+
+    region_subregions = List(
+        title=u"Region and Subregions",
+        value_type=Choice(vocabulary="wise_search_a1314_regions"),
+        required=False,
+    )
 
 
 class IStartArticle11(Interface):
@@ -156,6 +156,14 @@ class IMarineUnitIDsSelect(Interface):
         # interested",
         value_type=Choice(vocabulary="wise_search_marine_unit_ids"),
         required=False
+    )
+
+
+class IA1314MemberStates(Interface):
+    member_states = List(
+        title=u"Countries",
+        value_type=Choice(vocabulary="wise_search_a1314_member_states"),
+        required=False,
     )
 
 
