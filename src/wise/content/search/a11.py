@@ -182,8 +182,8 @@ class A11MonProgDisplay(ItemDisplayForm):
     css_class = 'left-side-form'
 
     def download_results(self):
-        mp_type_ids = self.context.context.get_mp_type_ids()
-        mon_prog_ids = self.context.get_monitoring_programme_ids()
+        mp_type_ids = self.context.context.context.context.get_mp_type_ids()
+        mon_prog_ids = self.context.context.context.get_monitoring_programme_ids()
 
         klass_join_mp = sql.MSFD11MP
         count_mp, data_mp = db.get_all_records_outerjoin(
