@@ -1162,10 +1162,10 @@
                     subform_children.find('.panel').empty();
                     subform_children.find(".subform").empty();
                 } else {
-                    $(el).parent().parent().next().empty()
-
+                    $(el).parent().parent().next().empty();
                 }
             };
+
             empty_sibling_input = function (el) {
                 var nextFieldID = $(el).parent().next().attr("id");
 
@@ -1180,7 +1180,6 @@
                 } else {
                     resetEmptyCheckboxes("memberstatesform");
                 }
-
 
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
