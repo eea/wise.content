@@ -34,8 +34,9 @@ class StartArticle1314Form(MainForm):
 class MemberStatesForm(EmbededForm):
     """ Select the member states based on region
     """
+    # fields = Fields(interfaces.IMemberStates)
+    fields = Fields(interfaces.IA1314MemberStates)
 
-    fields = Fields(interfaces.IMemberStates)
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
