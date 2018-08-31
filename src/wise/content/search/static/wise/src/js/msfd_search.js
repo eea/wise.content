@@ -554,7 +554,8 @@
             });
 
             $(selectElement).on("select2-selecting", function(ev) {
-                $(selectorLeftForm +  marineUnitTriggerSelector +"  a").text(ev.object.text);
+                //$(selectorLeftForm + " "+  marineUnitTriggerSelector +"  a").text(ev.object.text);
+
                 $(selectorFormContainer + " [name='form.widgets.page']").val(0);
                 $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(ev.val).trigger("change");
                 $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': ev.target});
@@ -1162,10 +1163,10 @@
                     subform_children.find('.panel').empty();
                     subform_children.find(".subform").empty();
                 } else {
-                    $(el).parent().parent().next().empty()
-
+                    $(el).parent().parent().next().empty();
                 }
             };
+
             empty_sibling_input = function (el) {
                 var nextFieldID = $(el).parent().next().attr("id");
 
@@ -1180,7 +1181,6 @@
                 } else {
                     resetEmptyCheckboxes("memberstatesform");
                 }
-
 
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
