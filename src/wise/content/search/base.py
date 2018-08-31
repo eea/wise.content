@@ -15,8 +15,8 @@ from z3c.form.form import Form
 from .db import (get_available_marine_unit_ids, get_item_by_conditions,
                  threadlocals)
 from .interfaces import IMainForm
-from .utils import (all_values_from_field, default_value_from_field,
-                    get_obj_fields, get_registered_form_sections, print_value,
+from .utils import (all_values_from_field, get_obj_fields,
+                    get_registered_form_sections, print_value,
                     request_cache_key)
 from .widget import MarineUnitIDSelectFieldWidget
 
