@@ -554,7 +554,8 @@
             });
 
             $(selectElement).on("select2-selecting", function(ev) {
-                $(selectorLeftForm +  marineUnitTriggerSelector +"  a").text(ev.object.text);
+                //$(selectorLeftForm + " "+  marineUnitTriggerSelector +"  a").text(ev.object.text);
+
                 $(selectorFormContainer + " [name='form.widgets.page']").val(0);
                 $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(ev.val).trigger("change");
                 $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': ev.target});
