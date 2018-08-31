@@ -14,6 +14,7 @@ from z3c.form.form import Form
 
 from .db import threadlocals
 from .vocabulary import db_vocab, vocab_from_values
+from .complianceA8 import Article8
 
 # from pprint import pprint
 
@@ -85,7 +86,7 @@ def row_to_dict(table, row):
     return res
 
 
-class DeterminationOfGES2012(BrowserView):
+class DeterminationOfGES2012(BrowserView, Article8):
     """ WIP on compliance tables
     """
 
@@ -94,6 +95,7 @@ class DeterminationOfGES2012(BrowserView):
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
+        self.descriptor = request.form.get('report_type', 'D5')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):
@@ -233,8 +235,7 @@ class DeterminationOfGES2012(BrowserView):
     def __call__(self):
         threadlocals.session_name = 'session'
 
-        descriptor = 'D5'
-
+        # descriptor = 'D5'
         # descriptor_prefix = descriptor[1:]
 
         self.country_name = self.get_country_name()
@@ -243,15 +244,15 @@ class DeterminationOfGES2012(BrowserView):
         # TODO: optimize this with a single function and a single query (w/
         # JOIN)
         self.descriptors = self.get_ges_descriptors()
-        self.descs = dict()
+        self.descs = {}
 
         for d in self.descriptors:
-            self.descs.update({d: self.get_ges_descriptor_label(d)})
-        self.desc_label = self.descs.get(descriptor, 'Descriptor Not Found')
+            self.descs[d] = self.get_ges_descriptor_label(d)
+        self.desc_label = self.descs.get(self.descriptor, 'Descriptor Not Found')
 
         self.muids = self.get_marine_unit_ids()
 
-        self.criterions = self.get_ges_criterions(descriptor)
+        self.criterions = self.get_ges_criterions(self.descriptor)
 
         # {u'5.2.2-indicator 5.2C': set([u'Transparency', u'InputN_Psubst']),
         self.indic_w_p = self.get_indicators_with_feature_pressures(
@@ -262,7 +263,7 @@ class DeterminationOfGES2012(BrowserView):
             self.get_criterion_labels(self.criterions)
         )
         # add D5 criterion to the criterion lists too
-        self.criterion_labels.update({descriptor: self.desc_label})
+        self.criterion_labels.update({self.descriptor: self.desc_label})
 
         self.indicator_descriptors = self.get_indicator_descriptors(
             self.muids, self.indic_w_p.keys()
@@ -294,9 +295,7 @@ class DeterminationOfGES2012(BrowserView):
 
                             for item in sublist])
 
-        self.a8_sections = []
-
-        for muid in self.muids:
-            self.a8_sections.append(muid)
+        # Article 8 stuff
+        # self.art8data = self.get_data_reported('BAL- LV- AA- 001', self.descriptor)
 
         return self.index()

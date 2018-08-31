@@ -367,3 +367,12 @@ def insert_record(mapper_class, **values):
     # TODO check how to insert rows
     sess = session()
     sess.insert(mapper_class).values(**values)
+
+
+def compliance_art8_join(columns, mc_join1, mc_join2, *conditions):
+    sess = session()
+    q = sess.query(*columns).join(mc_join1).join(mc_join2).filter(*conditions)
+    count = q.count()
+    q = [x for x in q]
+
+    return [count, q]

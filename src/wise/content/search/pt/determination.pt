@@ -30,22 +30,18 @@
 <h5>Criterion labels (criterion_labels)</h5>
 <div tal:replace="view/criterion_labels"></div>
 
-<h5>Indicators (indicators)</h5>
-<div>
-  <ul>
-    <li tal:repeat="indic view/indicator_descriptors">
-      <span tal:content="indic/ReportingFeature">
-      Indicator Code
-      </span>
-      <span tal:content="indic/MSFD9_Descriptor_ID">
-        ID
-      </span>
-    </li>
-  </ul>
-</div>
+<!--<h5>Indicators (indicators)</h5>-->
+<!--<div>-->
+  <!--<ul>-->
+    <!--<li tal:repeat="indic view/indicator_descriptors">-->
+      <!--Indicator Code: <span tal:content="indic/ReportingFeature"/>-->
+      <!--, ID: <span tal:content="indic/MSFD9_Descriptor_ID"/>-->
+    <!--</li>-->
+  <!--</ul>-->
+<!--</div>-->
 
 <div class="container-fluid">
-  <div tal:replace="structure view/art_9_tpl" ></div>
+  <!--<div tal:replace="structure view/art_9_tpl" ></div>-->
   <div tal:replace="structure view/art_8_tpl" ></div>
 </div>
 
