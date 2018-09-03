@@ -1,6 +1,7 @@
 import csv
 import json
 import logging
+import re
 
 from lxml.etree import parse
 from pkg_resources import resource_filename
@@ -15,6 +16,8 @@ from wise.content.search import db, sql, sql2018
 
 # from .a11 import ART11_GlOBALS
 from .utils import FORMS, FORMS_2018, FORMS_ART11, LABELS, SUBFORMS
+
+ART_RE = re.compile('\s(\d+\.*\d?\w?)\s')
 
 
 def populate_labels():
@@ -228,10 +231,28 @@ def get_area_type_vb_factory(context):
     return db_vocab(t, 'AreaType')
 
 
+def article_sort_helper(term):
+    """ Returns a float number for an article, to help with sorting
+    """
+    title = term.title
+    text = ART_RE.search(title).group().strip()
+    chars = []
+
+    for c in text:
+        if c.isdigit() or c is '.':
+            chars.append(c)
+        else:
+            chars.append(str(ord(c)))
+
+    f = ''.join(chars)
+
+    return float(f)
+
+
 @provider(IVocabularyFactory)
 def articles_vocabulary_factory(context):
     terms = [SimpleTerm(k, k, v.title) for k, v in FORMS.items()]
-    terms.sort(key=lambda t: t.title)
+    terms.sort(key=article_sort_helper)
     vocab = SimpleVocabulary(terms)
 
     return vocab
@@ -598,6 +619,7 @@ def a1314_member_states(context):
     regions = context.get_selected_region_subregions()
 
     mc = sql.MSFD13ReportingInfo
+
     if regions:
         mc_join = sql.MSFD13ReportingInfoMemberState
         count, rows = db.get_all_records_join(
