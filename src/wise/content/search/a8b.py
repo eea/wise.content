@@ -985,7 +985,7 @@ class A81bNoiseItemDisplay(MultiItemDisplayForm):
 
 
 @register_subform(A81bForm)
-class A81bNonIndigenousSubForm(MarineUnitIDSelectForm):
+class A81bNoiseSubForm(MarineUnitIDSelectForm):
     """ Select the MarineUnitID for the Article 8.1b form
     """
     title = 'Underwater noise'
