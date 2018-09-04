@@ -256,6 +256,13 @@ def get_obj_fields(obj, use_blacklist=True):
             if name in fields:
                 res.append(name)
 
+    # second strategy, go for the table
+
+    if not res:
+        tbl = obj.__table__
+
+        return tbl.c.keys()
+
     return res
 
 

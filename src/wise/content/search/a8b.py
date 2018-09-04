@@ -58,7 +58,8 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
         )
 
-        assesment_ids = [row.MSFD8b_ExtractionFishShellfish_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_ExtractionFishShellfish_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bExtractionFishShellfishAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -88,7 +89,6 @@ class A81bExtractionFishSubForm(MarineUnitIDSelectForm):
             mc_sum,
             mc_sum.MSFD8b_ExtractionFishShellfish.in_(extraction_ids)
         )
-
 
         xlsdata = [
             # worksheet title, row data
@@ -195,11 +195,13 @@ class A81bExtractionSeaweedSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_ExtractionSeaweedMaerlOther.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_ExtractionSeaweedMaerlOther_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_ExtractionSeaweedMaerlOther_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bExtractionSeaweedMaerlOtherAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
-            mc_ai.MSFD8b_ExtractionSeaweedMaerlOther_Assesment.in_(assesment_ids)
+            mc_ai.MSFD8b_ExtractionSeaweedMaerlOther_Assesment.in_(
+                assesment_ids)
         )
 
         mc_ac = sql.MSFD8bExtractionSeaweedMaerlOtherActivity
@@ -331,7 +333,8 @@ class A81bHazardousSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_HazardousSubstances.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_HazardousSubstances_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_HazardousSubstances_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bHazardousSubstancesAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -467,7 +470,8 @@ class A81bHydroSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_HydrologicalProcesses.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_HydrologicalProcesses_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_HydrologicalProcesses_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bHydrologicalProcessesAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -736,7 +740,8 @@ class A81bMicrobialSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_MicrobialPathogens.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_MicrobialPathogens_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_MicrobialPathogens_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bMicrobialPathogensAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -811,7 +816,8 @@ class A81bMicrobialAssessment(ItemDisplay):
 #  TODO
 # MSFD8bMicrobialPathogensActivity is not directly related to
 # MSFD8b_MicrobialPathogens table
-# needs to be joined with MSFD8bMicrobialPathogensActivityDescription table first
+# needs to be joined with MSFD8bMicrobialPathogensActivityDescription table
+# first
 @register_form_section(A81bMicrobialItemDisplay)
 class A81bMicrobialActivities(ItemDisplay):
     title = 'Activities producing microbial pathogens'
@@ -1269,7 +1275,8 @@ class A81bPhysicalDamageSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_PhysicalDamage.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_PhysicalDamage_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_PhysicalDamage_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bPhysicalDamageAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -1400,7 +1407,8 @@ class A81bPhysicalLosSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_PhysicalLoss.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_PhysicalLoss_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_PhysicalLoss_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bPhysicalLossAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,
@@ -1531,7 +1539,8 @@ class A81bPollutantEventSubForm(MarineUnitIDSelectForm):
             mc_a.MSFD8b_PollutantEvents.in_(base_ids)
         )
 
-        assesment_ids = [row.MSFD8b_PollutantEvents_Assesment_ID for row in data_a]
+        assesment_ids = [row.MSFD8b_PollutantEvents_Assesment_ID
+                         for row in data_a]
         mc_ai = sql.MSFD8bPollutantEventsAssesmentIndicator
         count, data_ai = db.get_all_records(
             mc_ai,

@@ -1,14 +1,13 @@
 
 from plone.z3cform.layout import wrap_form
-from wise.content.search import db, interfaces, sql
+from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import EmbededForm, MainForm, MainFormWrapper
-from .utils import (all_values_from_field, default_value_from_field, get_form,
-                    scan)
+from .utils import get_form, scan
 
 
 class StartArticle8910Form(MainForm):
@@ -23,9 +22,6 @@ class StartArticle8910Form(MainForm):
     def get_subform(self):
         if self.data['article']:
             return RegionForm(self, self.request)
-
-    # def default_article(self):
-    #     return default_value_from_field(self, self.fields['article'])
 
 
 class RegionForm(EmbededForm):
@@ -121,14 +117,12 @@ class StartArticle89102018Form(MainForm):
 
             return klass(self, self.request)
 
-    # def default_article(self):
-    #     return default_value_from_field(self, self.fields['article'])
-
 
 StartArticle89102018View = wrap_form(StartArticle89102018Form, MainFormWrapper)
 
 # discover and register associated views
 
+scan('a4')
 scan('a8ac')
 scan('a8b')
 scan('a9')

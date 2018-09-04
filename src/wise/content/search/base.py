@@ -15,8 +15,8 @@ from z3c.form.form import Form
 from .db import (get_available_marine_unit_ids, get_item_by_conditions,
                  threadlocals)
 from .interfaces import IMainForm
-from .utils import (all_values_from_field, default_value_from_field,
-                    get_obj_fields, get_registered_form_sections, print_value,
+from .utils import (all_values_from_field, get_obj_fields,
+                    get_registered_form_sections, print_value,
                     request_cache_key)
 from .widget import MarineUnitIDSelectFieldWidget
 
@@ -201,7 +201,7 @@ class MainForm(BaseEnhancedForm, Form):
         Form.__init__(self, context, request)
 
     main_forms = (
-        ('msfd-c1', ('Articles 8, 9 & 10', '2012 reporting exercise')),
+        ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
         ('msfd-c2', ('Article 11', '2014 reporting exercise')),
         ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
         ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
