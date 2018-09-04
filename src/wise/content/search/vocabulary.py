@@ -136,9 +136,11 @@ def vocab_from_values_with_count(values, column):
     return vocab
 
 
-def db_vocab(table, column):
+def db_vocab(table, column, sort_helper=None):
     """ Builds a vocabulary based on unique values in a column table
     """
+
+    sort_helper = sort_helper or (lambda t: t.title)
 
     if isinstance(table, Table):
         res = db.get_unique_from_table(table, column)
@@ -149,7 +151,7 @@ def db_vocab(table, column):
 
             for x in res
         ]
-        terms.sort(key=lambda t: t.title)
+        terms.sort(key=sort_helper)
         vocab = SimpleVocabulary(terms)
 
         return vocab
@@ -159,7 +161,7 @@ def db_vocab(table, column):
     res = [x.strip() for x in res]
 
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in res]
-    terms.sort(key=lambda t: t.title)
+    terms.sort(key=sort_helper)
     vocab = SimpleVocabulary(terms)
 
     return vocab
@@ -258,9 +260,37 @@ def articles_vocabulary_factory(context):
     return vocab
 
 
+def mptypes_sort_helper(term):
+    title = term.title
+
+    chars = []
+
+    for c in title[1:]:
+        if c.isdigit():
+            chars.append(c)
+
+        if c == ',' and '.' not in chars:
+            chars.append('.')
+
+    title = title.replace(u'\u2013', '-')
+
+    if 'Biodiversity' in title:
+        left, right = title.split('Biodiversity -', 1)
+        right = right.strip()
+
+        if '.' not in chars:
+            chars.append('.')
+        chars.append(str(ord(right[0])))
+
+    f = ''.join(chars)
+
+    return float(f)
+
+
 @provider(IVocabularyFactory)
 def monitoring_programme_vb_factory(context):
-    return db_vocab(sql.MSFD11MPType, 'ID')
+
+    return db_vocab(sql.MSFD11MPType, 'ID', mptypes_sort_helper)
 
 
 @provider(IVocabularyFactory)
