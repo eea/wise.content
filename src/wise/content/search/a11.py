@@ -8,9 +8,9 @@ from z3c.form.field import Fields
 from .base import (EmbededForm, ItemDisplay, ItemDisplayForm, MainForm,
                    MultiItemDisplayForm)
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
-                    default_value_from_field, pivot_data, register_form_art11,
-                    register_form_section)
+                    pivot_data, register_form_art11, register_form_section)
 
+# default_value_from_field,
 # TODO: cache in klass
 # ART11_GlOBALS = dict()
 
@@ -125,7 +125,8 @@ class A11MSubMemberStateForm(EmbededForm):
         q4g_subprogids_2 = db.get_unique_from_mapper(
             sql.MSFD11SubProgrammeIDMatch,
             'MP_ReferenceSubProgramme',
-            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(q4g_subprogids_1)
+            sql.MSFD11SubProgrammeIDMatch.Q4g_SubProgrammeID.in_(
+                q4g_subprogids_1)
         )
 
         mc_ref_sub = sql.MSFD11ReferenceSubProgramme
@@ -183,7 +184,8 @@ class A11MonProgDisplay(ItemDisplayForm):
 
     def download_results(self):
         mp_type_ids = self.context.context.context.context.get_mp_type_ids()
-        mon_prog_ids = self.context.context.context.get_monitoring_programme_ids()
+        mon_prog_ids = self.context.context.context\
+            .get_monitoring_programme_ids()
 
         klass_join_mp = sql.MSFD11MP
         count_mp, data_mp = db.get_all_records_outerjoin(
@@ -232,10 +234,11 @@ class A11MonProgDisplay(ItemDisplayForm):
         page = self.get_page()
         klass_join = sql.MSFD11MP
         needed_ID = self.context.context.context.context.get_mp_type_ids()
-        mon_prog_ids = self.context.context.context.get_monitoring_programme_ids()
+        ggp = self.context.context.context
+        mon_prog_ids = ggp.get_monitoring_programme_ids()
 
         if needed_ID:
-            return db.get_item_by_conditions_joined(
+            [count, item] =  db.get_item_by_conditions_joined(
                 self.mapper_class,
                 klass_join,
                 self.order_field,
@@ -243,6 +246,10 @@ class A11MonProgDisplay(ItemDisplayForm):
                      klass_join.MonitoringProgramme.in_(mon_prog_ids)),
                 page=page
             )
+            # import pdb; pdb.set_trace()
+            item.whitelist = ['Q4e_ProgrammeID']
+
+            return [count, item]
 
     def get_extra_data(self):
         if not self.item:
@@ -513,7 +520,8 @@ class A11MonSubDisplay(MultiItemDisplayForm):
 
     def download_results(self):
         mp_type_ids = self.context.context.context.context.get_mp_type_ids()
-        regions = self.context.context.context.data.get('region_subregions', [])
+        regions = self.context.context.context.data.get('region_subregions',
+                                                        [])
         countries = self.context.context.data.get('member_states', [])
         marine_unit_ids = self.context.data.get('marine_unit_ids', [])
 
@@ -602,7 +610,8 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         needed_ids = self.context.context.context.context.get_mp_type_ids()
         klass_join = sql.MSFD11MP
 
-        regions = self.context.context.context.data.get('region_subregions', [])
+        regions = self.context.context.context.data.get('region_subregions',
+                                                        [])
         countries = self.context.context.data.get('member_states', [])
         marine_unit_id = self.context.data.get('marine_unit_ids', [])
 
@@ -640,7 +649,7 @@ class A11MonSubDisplay(MultiItemDisplayForm):
         )
 
         if needed_ids:
-            return db.get_item_by_conditions_joined(
+            [count, item] = db.get_item_by_conditions_joined(
                 self.mapper_class,
                 klass_join,
                 self.order_field,
@@ -656,6 +665,9 @@ class A11MonSubDisplay(MultiItemDisplayForm):
                      )),
                 page=page
             )
+            item.whitelist = ['SubMonitoringProgrammeID']
+
+            return [count, item]
 
 
 @register_form_section(A11MonSubDisplay)

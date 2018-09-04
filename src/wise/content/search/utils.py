@@ -217,18 +217,22 @@ def data_to_xls(data):
     return out
 
 
-def get_obj_fields(obj, use_blacklist=True):
+def get_obj_fields(obj, use_blacklist=True, whitelist=None):
+    whitelist = whitelist or []
+    whitelist = getattr(obj, 'whitelist', whitelist)
+    BLACKLIST = ['ID', 'Import', 'Id']
+
     mapper = inspect(obj)
 
     fields = []
     keys = [c.key for c in mapper.attrs]        # forgo sorted use
 
-    BLACKLIST = ['ID', 'Import', 'Id']
-
     if not use_blacklist:
         return keys
 
     for key in keys:
+        if key in whitelist:
+            fields.append(key)
         flag = False
 
         for bit in BLACKLIST:
