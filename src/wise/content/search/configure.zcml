@@ -10,6 +10,14 @@
 
   <browser:page
     for="*"
+    name="msfd-start"
+    permission="zope2.View"
+    class = ".main.StartView"
+    template="pt/start.pt"
+    />
+
+  <browser:page
+    for="*"
     name="msfd-c1"
     class=".main.StartArticle8910View"
     permission="zope2.View"

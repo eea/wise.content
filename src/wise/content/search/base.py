@@ -184,6 +184,15 @@ class BaseEnhancedForm(object):
         return object.__new__(cls)
 
 
+MAIN_FORMS = (
+    ('msfd-start', ('Start', 'About search engine')),
+    ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
+    ('msfd-c2', ('Article 11', '2014 reporting exercise')),
+    ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
+    ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
+)
+
+
 class MainForm(BaseEnhancedForm, Form):
     """ The main forms need to inherit from this clas
     """
@@ -195,17 +204,11 @@ class MainForm(BaseEnhancedForm, Form):
     subform = None
     subform_content = None
     should_download = False     # flag that signals download button is hit
+    main_forms = MAIN_FORMS
     # method = 'get'
 
     def __init__(self, context, request):
         Form.__init__(self, context, request)
-
-    main_forms = (
-        ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
-        ('msfd-c2', ('Article 11', '2014 reporting exercise')),
-        ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
-        ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
-    )
 
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):

@@ -1,13 +1,18 @@
-
 from plone.z3cform.layout import wrap_form
+from Products.Five.browser import BrowserView
 from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
-from .base import EmbededForm, MainForm, MainFormWrapper
+from .base import MAIN_FORMS, EmbededForm, MainForm, MainFormWrapper
 from .utils import get_form, scan
+
+
+class StartView(BrowserView):
+    main_forms = MAIN_FORMS
+    name = 'msfd-start'
 
 
 class StartArticle8910Form(MainForm):
