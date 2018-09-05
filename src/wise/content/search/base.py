@@ -452,11 +452,12 @@ class ItemDisplayForm(EmbededForm):
         page = self.get_page()
         muid = self.get_marine_unit_id()
 
-        res = get_item_by_conditions(
-            self.mapper_class, self.order_field,
-            self.mapper_class.MarineUnitID == muid,
-            page=page,
-        )
+        args = [self.mapper_class, self.order_field]
+
+        if muid:
+            args.append(self.mapper_class.MarineUnitID == muid)
+
+        res = get_item_by_conditions(*args, page=page)
 
         return res
 

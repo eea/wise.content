@@ -21,7 +21,6 @@
     name="msfd-ca"
     permission="zope2.View"
     class = ".main.StartMSCompetentAuthoritiesView"
-    template="pt/start.pt"
     />
 
   <browser:page

@@ -1,6 +1,6 @@
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+# from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
@@ -18,14 +18,20 @@ class StartView(BrowserView):
     name = 'msfd-start'
 
 
-class StartMSCompetentAuthoritiesView(MainForm):
+class StartMSCompetentAuthoritiesForm(MainForm):
     name = 'msfd-ca'
 
+    record_title = title = 'Member States - Competent Authorities'
     fields = Fields(interfaces.IMemberStates)
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
+    session_name = 'session'
 
     def get_subform(self):
         return CompetentAuthorityItemDisplay(self, self.request)
+
+
+StartMSCompetentAuthoritiesView = wrap_form(StartMSCompetentAuthoritiesForm,
+                                            MainFormWrapper)
 
 
 class CompetentAuthorityItemDisplay(ItemDisplayForm):
@@ -33,6 +39,12 @@ class CompetentAuthorityItemDisplay(ItemDisplayForm):
     """
     mapper_class = MSCompetentAuthority
     order_field = 'C_CD'
+    css_class = "left-side-form"
+
+    def get_marine_unit_id(self):
+        # needed because of condition in get_db_results()
+
+        return None
 
 
 class StartArticle8910Form(MainForm):
