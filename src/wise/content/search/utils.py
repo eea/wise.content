@@ -12,6 +12,7 @@ from zope.schema import Choice, List
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
+from plone.intelligenttext.transforms import convertWebIntelligentPlainTextToHtml
 
 FORMS_2018 = {}
 FORMS_ART11 = {}
@@ -137,7 +138,8 @@ def print_value(value):
 
             return ret
 
-        return value
+        html = convertWebIntelligentPlainTextToHtml(value)
+        return html
 
     base_values = string_types + (int, datetime.datetime, list)
 
