@@ -1,18 +1,38 @@
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
-from .base import MAIN_FORMS, EmbededForm, MainForm, MainFormWrapper
+from .base import (MAIN_FORMS, EmbededForm, ItemDisplayForm, MainForm,
+                   MainFormWrapper)
+from .sql_extra import MSCompetentAuthority
 from .utils import get_form, scan
 
 
 class StartView(BrowserView):
     main_forms = MAIN_FORMS
     name = 'msfd-start'
+
+
+class StartMSCompetentAuthoritiesView(MainForm):
+    name = 'msfd-ca'
+
+    fields = Fields(interfaces.IMemberStates)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return CompetentAuthorityItemDisplay(self, self.request)
+
+
+class CompetentAuthorityItemDisplay(ItemDisplayForm):
+    """ The implementation for the Article 9 (GES determination) form
+    """
+    mapper_class = MSCompetentAuthority
+    order_field = 'C_CD'
 
 
 class StartArticle8910Form(MainForm):

@@ -186,6 +186,7 @@ class BaseEnhancedForm(object):
 
 MAIN_FORMS = (
     ('msfd-start', ('Start', 'About search engine')),
+    ('msfd-ca', ('Member States', 'Competent Authorities')),
     ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
     ('msfd-c2', ('Article 11', '2014 reporting exercise')),
     ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),

@@ -201,18 +201,24 @@ def get_region_subregions_vb_factory(context):
 
 @provider(IVocabularyFactory)
 def get_member_states_vb_factory(context):
-    regions = context.get_selected_region_subregions()
+    conditions = []
 
-    if regions:
-        t = sql.t_MSFD4_GegraphicalAreasID
-        count, rows = db.get_all_records(
-            t,
-            t.c.RegionSubRegions.in_(regions)
-        )
+    t = sql.t_MSFD4_GegraphicalAreasID
 
-        return values_to_vocab(set(x[1] for x in rows))
+    if hasattr(context, 'get_selected_region_subregions'):
+        regions = context.get_selected_region_subregions()
 
-    return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'MemberState')
+        if regions:
+            conditions.append(t.c.RegionSubRegions.in_(regions))
+
+    count, rows = db.get_all_records(
+        t,
+        *conditions
+    )
+
+    return values_to_vocab(set(x[1] for x in rows))
+
+    # return db_vocab(sql.t_MSFD4_GegraphicalAreasID, 'MemberState')
 
 
 @provider(IVocabularyFactory)
