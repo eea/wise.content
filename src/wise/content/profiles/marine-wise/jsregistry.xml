@@ -6,4 +6,10 @@
     insert-after="faceted_edit.js"
     enabled="True" expression="python: '@@msfd' in request.URL0"  inline="False"/>
 
+  <javascript
+    id="++resource++wise_javascript_variables.js"
+    cacheable="True" compression="safe" cookable="False"
+    insert-before="plone_javascript_variables.js"
+    enabled="True"  inline="False"/>
+
 </object>

@@ -315,8 +315,8 @@
         });
     }
 
-    function generateCheckboxes($fields){
-        var count = $fields.length;
+    function generateCheckboxes($fields, $fieldsnr){
+        var count = $fieldsnr;
         $fields.each(function(indx, field){
             var $field = $(field);
             var cheks = $field.find(".option");
@@ -682,7 +682,6 @@
         // top tabs width calculation
         var nrtabs = t.length;
         if(nrtabs > 1) {
-
             var tabLength = nrtabs === 2 ? 35 : Math.floor((100 - nrtabs) / nrtabs );
 
             t.css("width", tabLength + "%");
@@ -725,11 +724,21 @@
             $( tabswrapper + " .tab-pane").removeClass("fade");
         }
 
-        var nrTabs = $( selectorLeftForm + " ul.topnav li").length;
+        var nrTabs = $( selectorLeftForm + " ul.topnav li").length || "0";
 
         var wdth = (100/nrTabs) - 1;
 
         $( selectorLeftForm + " .topnav li").css({"width": wdth + "%", "margin-right": "1%" });
+
+        $( selectorLeftForm + " .topnav li > a span:first-child").css({
+           "font-size" : "1." + nrTabs + "rem"
+        });
+
+        $( selectorLeftForm + " .topnav li > a span:nth-child(2)").css({
+           "font-size" : "1.3rem"
+        });
+
+
         /*$.each( $( selectorLeftForm + " .topnav li"), function (indx, itm) {
             $(itm).css({
                 "max-width" : wdth + "%"
@@ -847,7 +856,12 @@
 
         initStyling();
 
-        generateCheckboxes( $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]") );
+        var $fields = $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]");
+        if($fields.length > 0){
+            generateCheckboxes( $fields, $fields.length );
+        } else {
+            $(selectorFormContainer + "," + selectorLeftForm).animate({"opacity" : 1}, 1000);
+        }
 
         addCheckboxHandlers( $(selectorFormContainer) );
 
@@ -1099,6 +1113,8 @@
             .css('cursor', 'pointer')
             .click(sort);
         $('table.listing:not(.nosort) tbody').each(setoddeven);
+
+        if(scanforlinks !== undefined) jQuery(scanforlinks);
     }
 
     function formAjaxError(req, status, error){
