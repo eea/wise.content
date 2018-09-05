@@ -1,6 +1,5 @@
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
-# from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
@@ -9,6 +8,7 @@ from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import (MAIN_FORMS, EmbededForm, ItemDisplayForm, MainForm,
                    MainFormWrapper)
+from .db import get_item_by_conditions
 from .sql_extra import MSCompetentAuthority
 from .utils import get_form, scan
 
@@ -41,10 +41,19 @@ class CompetentAuthorityItemDisplay(ItemDisplayForm):
     order_field = 'C_CD'
     css_class = "left-side-form"
 
-    def get_marine_unit_id(self):
-        # needed because of condition in get_db_results()
+    # TODO: implement excel download method
+    def get_db_results(self):
+        page = self.get_page()
 
-        return None
+        args = [self.mapper_class, self.order_field]
+        c_codes = self.context.data.get('member_states')
+
+        if c_codes:
+            args.append(self.mapper_class.C_CD.in_(c_codes))
+
+        res = get_item_by_conditions(*args, page=page)
+
+        return res
 
 
 class StartArticle8910Form(MainForm):
