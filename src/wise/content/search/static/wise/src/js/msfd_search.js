@@ -315,8 +315,8 @@
         });
     }
 
-    function generateCheckboxes($fields){
-        var count = $fields.length;
+    function generateCheckboxes($fields, $fieldsnr){
+        var count = $fieldsnr;
         $fields.each(function(indx, field){
             var $field = $(field);
             var cheks = $field.find(".option");
@@ -847,7 +847,12 @@
 
         initStyling();
 
-        generateCheckboxes( $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]") );
+        var $fields = $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]");
+        if($fields.length > 0){
+            generateCheckboxes( $fields, $fields.length );
+        } else {
+            $(selectorFormContainer + "," + selectorLeftForm).animate({"opacity" : 1}, 1000);
+        }
 
         addCheckboxHandlers( $(selectorFormContainer) );
 
