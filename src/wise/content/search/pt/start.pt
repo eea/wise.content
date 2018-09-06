@@ -8,7 +8,7 @@
 
   <body metal:fill-slot="content">
 
-    <div id="layout-contents">
+    <div id="layout-contents" tal:define="text context/text | nothing" >
       <div id="wise-search-form">
         <div id="wise-search-form-top">
           <ul class="nav nav-pills topnav hidden-xs">
@@ -48,6 +48,12 @@
               </tal:rep>
             </select>
           </div>
+        </div>
+
+        <div
+          class="start-page-content left-side-form"
+          tal:content="structure text/output"
+          tal:condition="text">
         </div>
       </div>
     </div>
