@@ -5,7 +5,12 @@ from .base import ItemDisplay, ItemDisplayForm, MarineUnitIDSelectForm
 from .sql_extra import MSFD4GeographicalAreaID, MSFD4GeograpicalAreaDescription
 from .utils import (data_to_xls, db_objects_to_dict, pivot_data, register_form,
                     register_form_section, register_subform)
+from six import string_types
+from io import BytesIO
+from plone.intelligenttext.transforms import convertWebIntelligentPlainTextToHtml
+import datetime
 
+LABELS = {}                        # vocabulary of labels
 
 @register_form
 class A4Form(MarineUnitIDSelectForm):
@@ -63,6 +68,11 @@ class A4ItemDisplay(ItemDisplayForm):
         )
 
         rows = db_objects_to_dict(coops, excluded_columns=blacklist)
+        
+        for row in rows:
+            for prop in row:
+                row[prop] = convertWebIntelligentPlainTextToHtml(row[prop])
+
         regcoop = pivot_data(rows, 'RegionsSubRegions')
         pivot_html = self.extra_data_pivot(extra_data=[
             ('Regional Cooperation', regcoop),
@@ -72,3 +82,34 @@ class A4ItemDisplay(ItemDisplayForm):
             ('Area description', desc_html),
             ('', pivot_html)
         ]
+
+    """Overwrite print_value of utils.py """
+    def print_value(self, value):
+        if not value:
+            return value
+
+        if isinstance(value, string_types):
+            if value in LABELS:
+                tmpl = '<span title="{}">{}</span>'
+                try:
+                    ret = tmpl.format(value, LABELS[value])
+                except UnicodeEncodeError as e:
+                    ret = tmpl.format(value, LABELS[value].encode('utf-8'))
+                except Exception as e:
+                    ret = tmpl.format(value, unicode(LABELS[value]))
+
+                return ret
+
+            return value
+
+        base_values = string_types + (int, datetime.datetime, list)
+
+        if not isinstance(value, base_values):
+            # TODO: right now we're not showing complex, table-like values
+            # Activate below to show tables
+            # return self.value_template(item=value)
+
+            return None
+            # return '&lt;hidden&gt;'
+
+        return value
