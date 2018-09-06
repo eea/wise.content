@@ -599,6 +599,8 @@
     border-top-right-radius: 10px;
 
     a {
+      padding: 8px;
+
       >span {
         display: block;
         white-space: normal;
@@ -612,6 +614,14 @@
       > span:nth-child(2){
         font-size: 1.2rem;
         line-height: 1em;
+      }
+    }
+  }
+
+  ul.topnav li:first-child {
+    a {
+      > span:nth-child(2){
+        white-space: nowrap;
       }
     }
   }

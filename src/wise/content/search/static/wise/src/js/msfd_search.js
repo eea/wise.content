@@ -728,7 +728,7 @@
 
         var wdth = (100/nrTabs) - 1;
 
-        $( selectorLeftForm + " .topnav li").css({"width": wdth + "%", "margin-right": "1%" });
+        $( selectorLeftForm + " .topnav li").css({"width": wdth  + "%", "margin-right": "0.8rem" });
 
         /*$.each( $( selectorLeftForm + " .topnav li"), function (indx, itm) {
             $(itm).css({
