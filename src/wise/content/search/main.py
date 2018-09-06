@@ -1,13 +1,72 @@
-
 from plone.z3cform.layout import wrap_form
+from Products.Five.browser import BrowserView
 from wise.content.search import db, interfaces
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
-from .base import EmbededForm, MainForm, MainFormWrapper
-from .utils import get_form, scan
+from .base import (MAIN_FORMS, EmbededForm, ItemDisplayForm, MainForm,
+                   MainFormWrapper)
+from .db import get_all_records, get_item_by_conditions
+from .sql_extra import MSCompetentAuthority
+from .utils import data_to_xls, get_form, scan
+
+
+class StartView(BrowserView):
+    main_forms = MAIN_FORMS
+    name = 'msfd-start'
+
+
+class StartMSCompetentAuthoritiesForm(MainForm):
+    name = 'msfd-ca'
+
+    record_title = title = 'Member States - Competent Authorities'
+    fields = Fields(interfaces.IMemberStates)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+    session_name = 'session'
+
+    def get_subform(self):
+        return CompetentAuthorityItemDisplay(self, self.request)
+
+    def download_results(self):
+        c_codes = self.data.get('member_states')
+        count, data = get_all_records(
+            MSCompetentAuthority,
+            MSCompetentAuthority.C_CD.in_(c_codes)
+        )
+
+        xlsdata = [
+            ('MSCompetentAuthority', data),
+        ]
+
+        return data_to_xls(xlsdata)
+
+
+StartMSCompetentAuthoritiesView = wrap_form(StartMSCompetentAuthoritiesForm,
+                                            MainFormWrapper)
+
+
+class CompetentAuthorityItemDisplay(ItemDisplayForm):
+    """ The implementation for the Article 9 (GES determination) form
+    """
+    mapper_class = MSCompetentAuthority
+    order_field = 'C_CD'
+    css_class = "left-side-form"
+
+    # TODO: implement excel download method
+    def get_db_results(self):
+        page = self.get_page()
+
+        args = [self.mapper_class, self.order_field]
+        c_codes = self.context.data.get('member_states')
+
+        if c_codes:
+            args.append(self.mapper_class.C_CD.in_(c_codes))
+
+        res = get_item_by_conditions(*args, page=page)
+
+        return res
 
 
 class StartArticle8910Form(MainForm):

@@ -184,6 +184,16 @@ class BaseEnhancedForm(object):
         return object.__new__(cls)
 
 
+MAIN_FORMS = (
+    ('msfd-start', ('Start', 'About search engine')),
+    ('msfd-ca', ('Member States', 'Competent Authorities')),
+    ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
+    ('msfd-c2', ('Article 11', '2014 reporting exercise')),
+    ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
+    ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
+)
+
+
 class MainForm(BaseEnhancedForm, Form):
     """ The main forms need to inherit from this clas
     """
@@ -195,17 +205,11 @@ class MainForm(BaseEnhancedForm, Form):
     subform = None
     subform_content = None
     should_download = False     # flag that signals download button is hit
+    main_forms = MAIN_FORMS
     # method = 'get'
 
     def __init__(self, context, request):
         Form.__init__(self, context, request)
-
-    main_forms = (
-        ('msfd-c1', ('Articles 4, 8, 9 & 10', '2012 reporting exercise')),
-        ('msfd-c2', ('Article 11', '2014 reporting exercise')),
-        ('msfd-c3', ('Articles 13 & 14', '2015 reporting exercise')),
-        ('msfd-c4', ('Articles 8, 9 & 10', '2018 reporting exercise')),
-    )
 
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):
@@ -248,8 +252,10 @@ class MainForm(BaseEnhancedForm, Form):
             data = download_action()
 
             sh = self.request.response.setHeader
-            sh('Content-Type', 'application/vnd.ms-excel')
-            sh('Content-Disposition', 'attachment; filename=marinedb.xls')
+
+            sh('Content-Type', 'application/vnd.openxmlformats-officedocument.'
+               'spreadsheetml.sheet')
+            sh('Content-Disposition', 'attachment; filename=marinedb.xlsx')
 
             return data.read()
 
@@ -448,11 +454,12 @@ class ItemDisplayForm(EmbededForm):
         page = self.get_page()
         muid = self.get_marine_unit_id()
 
-        res = get_item_by_conditions(
-            self.mapper_class, self.order_field,
-            self.mapper_class.MarineUnitID == muid,
-            page=page,
-        )
+        args = [self.mapper_class, self.order_field]
+
+        if muid:
+            args.append(self.mapper_class.MarineUnitID == muid)
+
+        res = get_item_by_conditions(*args, page=page)
 
         return res
 
