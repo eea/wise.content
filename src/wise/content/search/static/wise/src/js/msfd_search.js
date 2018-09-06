@@ -730,15 +730,6 @@
 
         $( selectorLeftForm + " .topnav li").css({"width": wdth + "%", "margin-right": "1%" });
 
-        $( selectorLeftForm + " .topnav li > a span:first-child").css({
-           "font-size" : "1." + nrTabs + "rem"
-        });
-
-        $( selectorLeftForm + " .topnav li > a span:nth-child(2)").css({
-           "font-size" : "1.3rem"
-        });
-
-
         /*$.each( $( selectorLeftForm + " .topnav li"), function (indx, itm) {
             $(itm).css({
                 "max-width" : wdth + "%"
