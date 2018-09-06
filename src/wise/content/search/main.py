@@ -8,9 +8,9 @@ from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
 from .base import (MAIN_FORMS, EmbededForm, ItemDisplayForm, MainForm,
                    MainFormWrapper)
-from .db import get_item_by_conditions
+from .db import get_all_records, get_item_by_conditions
 from .sql_extra import MSCompetentAuthority
-from .utils import get_form, scan
+from .utils import data_to_xls, get_form, scan
 
 
 class StartView(BrowserView):
@@ -28,6 +28,19 @@ class StartMSCompetentAuthoritiesForm(MainForm):
 
     def get_subform(self):
         return CompetentAuthorityItemDisplay(self, self.request)
+
+    def download_results(self):
+        c_codes = self.data.get('member_states')
+        count, data = get_all_records(
+            MSCompetentAuthority,
+            MSCompetentAuthority.C_CD.in_(c_codes)
+        )
+
+        xlsdata = [
+            ('MSCompetentAuthority', data),
+        ]
+
+        return data_to_xls(xlsdata)
 
 
 StartMSCompetentAuthoritiesView = wrap_form(StartMSCompetentAuthoritiesForm,

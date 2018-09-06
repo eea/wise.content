@@ -252,8 +252,10 @@ class MainForm(BaseEnhancedForm, Form):
             data = download_action()
 
             sh = self.request.response.setHeader
-            sh('Content-Type', 'application/vnd.ms-excel')
-            sh('Content-Disposition', 'attachment; filename=marinedb.xls')
+
+            sh('Content-Type', 'application/vnd.openxmlformats-officedocument.'
+               'spreadsheetml.sheet')
+            sh('Content-Disposition', 'attachment; filename=marinedb.xlsx')
 
             return data.read()
 
