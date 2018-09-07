@@ -73,10 +73,15 @@
       </tr>
 
       <tr>
-        <th>CriteriaType [GESComponent]</th>
-        <tal:block tal:repeat="crit python: view.crit_lab_indics.keys()">
-        <td tal:attributes="colspan python: len(view.crit_lab_indics[crit])"
-            tal:content="python: view.criterion_labels[crit]"/>
+        <th>CriteriaType
+          [GESComponent]</th>
+        <!--<tal:block tal:repeat="crit python: art8_crit_indics.keys()">-->
+        <!--<td tal:attributes="colspan python: len(art8_crit_indics[crit])"-->
+            <!--tal:content="python: view.criterion_labels[crit]"/>-->
+        <!--</tal:block>-->
+        <tal:block tal:repeat="crit python: view.get_criterias_list(view.descriptor)">
+        <td tal:attributes="hello string:world"
+            tal:content="python: crit"/>
         </tal:block>
       </tr>
 
@@ -91,7 +96,8 @@
       </tr>
 
       <tr tal:define="col_name string:ThresholdValueUnit">
-        <th>SumInfo1Unit/ThresholdValueUnit [ValueUnit]</th>
+        <th>SumInfo1Unit/
+          ThresholdValueUnit [ValueUnit]</th>
         <metal:macro use-macro="template/macros/print_value"/>
       </tr>
 
