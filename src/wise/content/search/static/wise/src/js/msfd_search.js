@@ -558,7 +558,7 @@
 
                 $(selectorFormContainer + " [name='form.widgets.page']").val(0);
                 $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(ev.val).trigger("change");
-                $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': ev.target});
+                $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': ev.target, "from_marine_widget": true});
             });
 
             $(selectElement).on("select2-close", function () {
@@ -764,7 +764,7 @@
         // reset paging
         $(selectorFormContainer + " [name='form.widgets.page']").remove();
 
-        $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(dir).trigger("change");
+        $(selectorFormContainer + " #form-widgets-marine_unit_id").select2().val(dir).trigger("change", { "from_marine_widget": true});
         $(selectorFormContainer + " #s2id_form-widgets-marine_unit_id").hide();
 
         //$(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
@@ -1152,7 +1152,7 @@
         });
     }
 
-    function resetConfigsbelowFacet(called_from, called_from_button, called_from_select){
+    function resetConfigsbelowFacet(called_from, called_from_button, called_from_select, args){
         var empty_next_inputs;
         var empty_sibling_input;
         if (!called_from || called_from_button || called_from_select) {
@@ -1183,16 +1183,20 @@
                 //subform_children = subform_parent.find('.subform');
                  subform_children = $(el).parent().parent().next();
 
+                if(called_from.from_marine_widget !== undefined || called_from.from_marine_widget === true){
+                    return true;
+                }
+
                 if( nextFieldID === "formfield-form-widgets-member_states" ){
                     resetEmptyCheckboxes(nextFieldID);
                 } else {
                     resetEmptyCheckboxes("memberstatesform");
                 }
-
                 panel_group.nextAll('.panel-group').find('.panel').empty();
                 if (subform_children.length) {
                     subform_children.find(".subform").empty();
                 }
+
             };
             if (called_from_button) {
                 empty_next_inputs(called_from_button);
@@ -1250,7 +1254,7 @@
 
                 var resetFacets = true;
                 if(resetFacets){
-                    resetConfigsbelowFacet(called_from, called_from_button, called_from_select);
+                    resetConfigsbelowFacet(called_from, called_from_button, called_from_select, arguments);
                 }
 
                 var form =  $( selectorFormContainer ).find("form");
