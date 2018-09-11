@@ -46,7 +46,8 @@
     <table tal:repeat="muid view/muids" class="table table-bordered">
     <tal:block tal:define="art8data python: view.get_data_reported(muid, view.descriptor);
             topic_assessment python: view.get_topic_assessment(muid, view.descriptor);
-            criterias python: view.get_criterias_list(view.descriptor)">
+            criterias python: view.get_criterias_list(view.descriptor);
+            colspan_base python:1;">
             <!-- art8assesment_data python: view.get_assesment_data(muid, view.descriptor); -->
 
       <h6>Article 8 topics/indicators (topic_assessment)</h6>
@@ -119,7 +120,7 @@
         <td colspan="42">Row not implemented</td>
       </tr>
 
-      <tr tal:define="col_name string:SumInfo1;">
+      <tr tal:define="col_name string:SumInfo1">
         <th>PressureLevelN/P/
           Oconcentration/
           ImpactsPressureWater/
@@ -129,7 +130,8 @@
           <tal:block tal:repeat="crit criterias">
             <tal:block tal:repeat="print_val python:
                   view.print_base(crit[0], col_name, topic_group_index)">
-              <td tal:content="print_val"/>
+              <td tal:attributes="colspan python: colspan_base if print_val else 1"
+                  tal:content="print_val"/>
             </tal:block>
           </tal:block>
         </metal:row>
@@ -239,7 +241,10 @@
       </tal:block>
 
 
-      <tal:block tal:define="topic_group_index python:1;">
+      <tal:block tal:define="topic_group_index python:1;
+        colspan_base python: sum((len(topic_assessment['LevelPressureNConcentration']),
+                        len(topic_assessment['LevelPressurePConcentration']),
+                        len(topic_assessment['LevelPressureOConcentration'])));">
       <tr tal:define="col_name string:Description;">
         <th>LevelPressureOverall:
           Description</th>
