@@ -850,9 +850,9 @@
         var $fields = $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]");
         if($fields.length > 0){
             generateCheckboxes( $fields, $fields.length );
-        } else {
-            $(selectorFormContainer + "," + selectorLeftForm).animate({"opacity" : 1}, 1000);
         }
+
+        $(selectorFormContainer + "," + selectorLeftForm).animate({"opacity" : 1}, 1000);
 
         addCheckboxHandlers( $(selectorFormContainer) );
 
