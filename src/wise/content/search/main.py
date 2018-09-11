@@ -114,6 +114,13 @@ class AreaTypesForm(EmbededForm):
         self.data['region_subregions'] = \
             self.context.context.data['region_subregions']
 
+        data = self.get_main_form().data
+
+        if data['article'] == 'a4form':
+            klass = get_form(data['article'])
+
+            return klass(self, self.request)
+
         return MarineUnitIDsForm(self, self.request)
 
     def get_available_marine_unit_ids(self):

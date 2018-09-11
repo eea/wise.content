@@ -1,16 +1,12 @@
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 
-from .base import ItemDisplay, ItemDisplayForm, MarineUnitIDSelectForm
+from .base import ItemDisplayForm, MarineUnitIDSelectForm
 from .sql_extra import MSFD4GeographicalAreaID, MSFD4GeograpicalAreaDescription
-from .utils import (data_to_xls, db_objects_to_dict, pivot_data, register_form,
-                    register_form_section, register_subform)
-from six import string_types
-from io import BytesIO
-from plone.intelligenttext.transforms import convertWebIntelligentPlainTextToHtml
-import datetime
+from .utils import data_to_xls, db_objects_to_dict, pivot_data, register_form
 
 LABELS = {}                        # vocabulary of labels
+
 
 @register_form
 class A4Form(MarineUnitIDSelectForm):
@@ -24,6 +20,23 @@ class A4Form(MarineUnitIDSelectForm):
     def get_subform(self):
         return A4ItemDisplay(self, self.request)
 
+    def get_marine_unit_ids(self):
+        return self.get_available_marine_unit_ids()
+
+    def get_available_marine_unit_ids(self):
+        # Copied from MarineUnitIdsForm because we no longer have it in the
+        # inheritance chain
+        data = {}
+        parent = self.context
+
+        # lookup values in the inheritance tree
+
+        for crit in ['area_types', 'member_states', 'region_subregions']:
+            data[crit] = getattr(parent, 'get_selected_' + crit)()
+            parent = parent.context
+
+        return db.get_marine_unit_ids(**data)
+
 
 class A4ItemDisplay(ItemDisplayForm):
     """ The implementation of the Article 10 fom
@@ -35,6 +48,9 @@ class A4ItemDisplay(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-simple.pt')
     extra_data_pivot = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
+    # TODO: implement xls download
+
+    # TODO: add to blacklist MSFD4 Gegraphical Areas ID Import
     def get_extra_data(self):
         if not self.item:
             return []
@@ -68,10 +84,6 @@ class A4ItemDisplay(ItemDisplayForm):
         )
 
         rows = db_objects_to_dict(coops, excluded_columns=blacklist)
-        
-        for row in rows:
-            for prop in row:
-                row[prop] = convertWebIntelligentPlainTextToHtml(row[prop])
 
         regcoop = pivot_data(rows, 'RegionsSubRegions')
         pivot_html = self.extra_data_pivot(extra_data=[
@@ -82,34 +94,3 @@ class A4ItemDisplay(ItemDisplayForm):
             ('Area description', desc_html),
             ('', pivot_html)
         ]
-
-    """Overwrite print_value of utils.py """
-    def print_value(self, value):
-        if not value:
-            return value
-
-        if isinstance(value, string_types):
-            if value in LABELS:
-                tmpl = '<span title="{}">{}</span>'
-                try:
-                    ret = tmpl.format(value, LABELS[value])
-                except UnicodeEncodeError as e:
-                    ret = tmpl.format(value, LABELS[value].encode('utf-8'))
-                except Exception as e:
-                    ret = tmpl.format(value, unicode(LABELS[value]))
-
-                return ret
-
-            return value
-
-        base_values = string_types + (int, datetime.datetime, list)
-
-        if not isinstance(value, base_values):
-            # TODO: right now we're not showing complex, table-like values
-            # Activate below to show tables
-            # return self.value_template(item=value)
-
-            return None
-            # return '&lt;hidden&gt;'
-
-        return value
