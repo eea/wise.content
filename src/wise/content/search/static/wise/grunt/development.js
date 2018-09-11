@@ -12,8 +12,7 @@ module.exports = {
               '<%= path.src %>/less/search-form.less',
               '<%= path.src %>/less/select2-override.less',
               '<%= path.src %>/less/select2-top-override.less',
-              '<%= path.src %>/less/msfd_start.less'
-
+              '<%= path.src %>/less/search-style.less'
           ]
       }
 
