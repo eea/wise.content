@@ -92,6 +92,7 @@ class DeterminationOfGES2012(BrowserView, Article8):
 
     art_9_tpl = ViewPageTemplateFile('pt/compliance-a9.pt')
     art_8_tpl = ViewPageTemplateFile('pt/compliance-a8.pt')
+    # art_10_tpl = ViewPageTemplateFile('pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
