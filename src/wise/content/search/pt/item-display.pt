@@ -1,5 +1,5 @@
 <dl tal:define="item options/item | view/item;
-  blacklist options/blacklist | python: [];
+  blacklist options/blacklist | view/blacklist | python: [];
   ">
   <tal:cond tal:condition="item">
     <tal:def define="fields python:view.get_obj_fields(item);

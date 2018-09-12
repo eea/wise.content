@@ -47,6 +47,7 @@ class A4ItemDisplay(ItemDisplayForm):
 
     extra_data_template = ViewPageTemplateFile('pt/extra-data-simple.pt')
     extra_data_pivot = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    blacklist = ('MSFD4_GegraphicalAreasID_Import',)
 
     # TODO: implement xls download
 

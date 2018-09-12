@@ -30,6 +30,9 @@ threadlocals = threading.local()
 def session():
     session_name = getattr(threadlocals, 'session_name')
 
+    print "Using session", session_name, DSN
+    print "DBS", DBS
+
     if hasattr(threadlocals, session_name):
         return getattr(threadlocals, session_name)
 
