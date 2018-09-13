@@ -7,17 +7,28 @@
 
   <browser:page
     for="*"
-    name="compliance"
-    class=".compliance.ComplianceFormView"
+    name="comp-start"
+    class=".compliance_start.StartComplianceView"
     permission="zope2.View"
     />
 
   <browser:page
     for="*"
     name="comp-start"
-    class=".compliance_start.MainAssessmentFormView"
+    class=".compliance_start.StartComplianceView"
     permission="zope2.View"
     />
+
+
+
+  # older pages
+  <browser:page
+    for="*"
+    name="compliance"
+    class=".compliance.ComplianceFormView"
+    permission="zope2.View"
+    />
+
 
   <browser:page
     for="*"

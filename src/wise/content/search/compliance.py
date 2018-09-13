@@ -249,7 +249,8 @@ class DeterminationOfGES2012(BrowserView, Article8):
 
         for d in self.descriptors:
             self.descs[d] = self.get_ges_descriptor_label(d)
-        self.desc_label = self.descs.get(self.descriptor, 'Descriptor Not Found')
+        self.desc_label = self.descs.get(self.descriptor,
+                                         'Descriptor Not Found')
 
         self.muids = self.get_marine_unit_ids()
 

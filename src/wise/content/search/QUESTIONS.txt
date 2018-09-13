@@ -1,0 +1,10 @@
+- the "General" table in MSFDcompliancemodulefields.
+  - is it for a wizard like "Create a new report"... to choose what type of
+    report?
+
+  - assessment topic: not needed if we have tabs?
+
+
+- what to do about the different databases?
+- general data: is it one per descriptor? (asta se intelege din exemplul cu
+  Latvia). Cum se completeaza general data?
