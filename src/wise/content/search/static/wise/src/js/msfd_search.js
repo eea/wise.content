@@ -1060,7 +1060,6 @@
             .filter(':even').addClass('odd');
     }
 
-
     function formAjaxComplete(jqXHR, textStatus){
         if(textStatus === "success"){
             $(selectorFormContainer).fadeIn("fast", function () {
