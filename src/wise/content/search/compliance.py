@@ -12,9 +12,9 @@ from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
+from .complianceA8 import Article8
 from .db import threadlocals
 from .vocabulary import db_vocab, vocab_from_values
-from .complianceA8 import Article8
 
 # from pprint import pprint
 
@@ -297,6 +297,7 @@ class DeterminationOfGES2012(BrowserView, Article8):
                             for item in sublist])
 
         # Article 8 stuff
-        # self.art8data = self.get_data_reported('BAL- LV- AA- 001', self.descriptor)
+        # self.art8data = self.get_data_reported('BAL- LV- AA- 001',
+        # self.descriptor)
 
         return self.index()

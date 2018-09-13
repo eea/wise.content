@@ -6,7 +6,7 @@
   <body>
 
     <metal:slot metal:fill-slot="main" i18n:domain="cmf_default">
-    <div id="">
+    <div id="compliance-form">
       <span tal:replace="structure view/contents" />
     </div>
     </metal:slot>

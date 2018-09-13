@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from UserDict import UserDict
+
 from zope.component import getMultiAdapter
 from zope.interface import Interface, implements
 from zope.schema import Choice
@@ -12,6 +16,17 @@ from .base import MainFormWrapper as BaseFormWrapper
 from .base import BaseEnhancedForm, EmbededForm
 from .interfaces import IMainForm
 from .vocabulary import vocab_from_values
+
+# definition of what pages we need to implement
+COMPLIANCE_PAGES = [
+    # title, explanation
+    ('National descriptor assessment',
+     'National descriptor MS reports and Commission assessments'),
+    ('Regional descriptor assessments',
+     'Regional descriptor MS reports and Commission assessments'),
+    ('National overviews', 'National overview for an MS'),
+    ('Regional overviews', 'Regional overview for all MS in a region',),
+]
 
 assessment_environmental_status_A = [
     ('Yes',
@@ -83,7 +98,7 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
     subform = None
     subform_content = None
     fields = Fields(IMainAssessmentForm)
-    css_class = 'left-side-form'
+    css_class = 'compliance-form-main'
     session_name = 'session'
 
     main_forms = (
@@ -215,3 +230,122 @@ class AssessmentDisplayForm(EmbededForm):
                                             name='deter')()
 
         return res
+
+
+class Leaf(object):
+    """ A generic leaf in a tree. Behaves somehow like a tree
+    """
+
+    children = ()
+
+    def __init__(self, name, children=None):
+        self.name = name
+        self.children = [Leaf(c) for c in (children or ())]
+
+    def __getitem__(self, name):
+        for c in self.children:
+            if c.name == name:
+                return c
+        raise KeyError
+
+    def __setitem__(self, name, v):
+        v.name = name
+        self.children.append(v)
+
+
+# evidences_criteria = [
+#     'Primary criterion used',
+#     'Primary criterion replaced with secondary criterion',
+#     'Primary criterion not used',
+#     'Secondary criterion used',
+#     'Secondary criterion used instead of primary criterion',
+#     'Secondary criterion not used',
+#     '2010 criterion/indicator used',
+#     '2010 criterion/indicator not used',
+#     'Other criterion (indicator) used',
+#     'Not relevant',
+# ]
+
+# art9_assessment_criterias = ['Adequacy', 'Coherence']
+
+L = Leaf    # short alias
+
+hierarchy = [
+    'MSFD article', 'AssessmentCriteria', 'AssessedInformation', 'Evidence'
+]
+
+articles = L(
+    'articles', [
+        L('Art4'),
+        L('Art8'),
+        L('Art9', [
+            L('Adequacy', [
+                L('CriteriaUsed', [
+                    L('Primary criterion used'),
+                    L('Primary criterion replaced with secondary criterion'),
+                    L('Primary criterion not used'),
+                    L('Secondary criterion used'),
+                    L('Secondary criterion used instead of primary criterion'),
+                    L('Secondary criterion not used'),
+                    L('2010 criterion/indicator used'),
+                    L('2010 criterion/indicator not used'),
+                    L('Other criterion (indicator) used'),
+                    L('Not relevant'),
+                ]),
+                L('GESQualitative', [
+                    L('Adapted from Annex I definition'),
+                    L('Adapted from 2017 Decision'),
+                    L('Adapted from 2010 Decision'),
+                    L('Not relevant'),
+                ]),
+                L('GESQuantitative', [
+                    L('Threshold values per MRU'),
+                    L('No threshold values'),
+                    L('Not relevant'),
+                ]),
+                L('GESAmbition', [
+                    L('No GES extent threshold defined'),
+                    L('Proportion value per MRU set'),
+                    L('No proportion value set'),
+                ]),
+            ]),
+            L('Coherence', [
+                L('CriteriaUsed', [
+                    L('Criterion used by all MS in region'),
+                    L('Criterion used by ≥75% MS in region'),
+                    L('Criterion used by ≥50% MS in region'),
+                    L('Criterion used by ≥25% MS in region'),
+                    L('Criterion used by ≤25% MS in region'),
+                    L('Criterion used by all MS in subregion'),
+                ]),
+                L('GESQualitative', [
+                    L('High'),
+                    L('Moderate'),
+                    L('Poor'),
+                    L('Not relevant'),
+                ]),
+                L('GESQuantitative', [
+                    L('All MS in region use EU (Directive, Regulation or Decision) values'),
+                    L('All MS in region use regional (RSC) values'),
+                    L('All MS in region use EU (WFD coastal) and regional (RSC offshore) values'),
+                    L('All MS in region use EU (WFD coastal); and national (offshore) values'),
+                    L('All MS in region use national values'),
+                    L('Some MS in region use EU (Directive, Regulation or Decision) values and some MS use national values'),
+                    L('Some MS in region use regional (RSC) values and some MS use national values'),
+                    L('Not relevant'),
+                ]),
+                L('GESAmbition', [
+                    L('GES extent value same/similar for all MS in region'),
+                    L('GES extent value varies between MS in region'),
+                    L('GES extent threshold varies markedly between MS'),
+                    L('GES extent threshold not reported'),
+                    L('GES proportion value same/similar for all MS in region'),
+                    L('GES proportion value varies between MS in region'),
+                    L('GES proportion value varies markedly between MS'),
+                    L('GES proportion value not reported'),
+                    L('Not relevant'),
+                ]),
+            ]),
+        ]),
+        L('Art10'),
+    ])

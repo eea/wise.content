@@ -14,6 +14,13 @@
 
   <browser:page
     for="*"
+    name="comp-start"
+    class=".compliance_start.MainAssessmentFormView"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    for="*"
     name="deter"
     class=".compliance.DeterminationOfGES2012"
     template='pt/determination.pt'
