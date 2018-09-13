@@ -106,7 +106,7 @@ class A1314ItemDisplay(ItemDisplayForm):
     """ The implementation for the Article 9 (GES determination) form
     """
     extra_data_template = ViewPageTemplateFile('pt/extra-data-item.pt')
-    pivot_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
+    pivot_template = ViewPageTemplateFile('pt/extra-data-pivot-notselect.pt')
 
     css_class = "left-side-form"
 
