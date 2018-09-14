@@ -844,10 +844,8 @@
             return false;
         }
 
-        $(paginationTextResult).css({
-            "text-decoration": "underline",
-            "cursor" : "pointer"
-        });
+        $(paginationTextResult).addClass("pagination-result");
+
 
         if($(paginationTextResult).parent().find("input").length === 0){
             $(paginationTextResult).after('<input type="text" class="pagination-input" />');
