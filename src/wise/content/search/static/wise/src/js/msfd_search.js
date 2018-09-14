@@ -832,9 +832,100 @@
                 $("#form-buttons-next-top").trigger("click")
             });
         } else {
-
             $( marineUnitTrigger + " .arrow-right-container").hide();
         }
+    }
+
+    var paginationTextResult = ".pagination-text > span:first-child";
+
+    function initPaginationInput(){
+        // check if results more than 2, if not then disable
+        if(parseInt($($(".pagination-text > span:nth-child(2)")[0]).text()) < 3){
+            return false;
+        }
+
+        $(paginationTextResult).css({
+            "text-decoration": "underline",
+            "cursor" : "pointer"
+        });
+
+        if($(paginationTextResult).parent().find("input").length === 0){
+            $(paginationTextResult).after('<input type="text" class="pagination-input" />');
+            $(".pagination-text .pagination-input").hide();
+
+            paginationInputHandlers();
+        }
+
+        $(".center-section").on("click", paginationTextResult, function (ev){
+            $(ev.target).parent().find("input").show().focus();
+
+            $(ev.target).hide();
+        });
+
+        $(".center-section").on("click", function (ev) {
+            // if click is on the result text
+            if($(ev.target).is(paginationTextResult) || $(ev.target).is(".pagination-text .pagination-input") ) {
+
+            } else {
+                $(paginationTextResult).parent().find("input").hide();
+                $(paginationTextResult).show();
+            }
+        });
+
+    }
+
+    function paginationInputHandlers(){
+        var inp = $(".pagination-text .pagination-input");
+
+        // hide pagination input on focus out
+        /*inp.on("focusout", function (){
+            inp.hide();
+            $(paginationTextResult).show();
+        });*/
+
+        // pagination input delay auto-submit
+        inp.bind('focusout', function(e) {
+            var val = $(e.target).val();
+            var maximum = parseInt( $($(e.target).parent().find("> span")[1]).text());
+
+            if(loading){
+                return false;
+            }
+
+            var _this = $(this);
+            var validateNr = function(x, maximum){
+                if (isNaN(parseInt(x))){
+                    return false;
+                } else {
+                    x = parseInt(x);
+                    var res = $( $(paginationTextResult)[0] ).text();
+                    if(x === parseInt(res)){
+                        return false;
+                    }
+                    if(x > maximum){
+                        return maximum - 1;
+                    }
+                    if(x <= 0){
+                        return false;
+                    }
+                }
+                return x === 1 ? 0 : x-1;
+
+            };
+            var validator = validateNr(val, maximum );
+                if(validator !== false){
+                    $(selectorFormContainer + " [name='form.widgets.page']").val(validator);
+                    $(paginationTextResult).text(val);
+                    $(paginationTextResult).show();
+                    $(paginationTextResult).parent().find("input").hide();
+                    $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
+                } else {
+                    $(e.target).val("");
+                    $(paginationTextResult).parent().find("input").hide();
+                    $(paginationTextResult).show();
+                }
+
+        });
     }
 
     function initPageElems(){
@@ -866,6 +957,7 @@
 
         setPaginationButtons();
 
+        initPaginationInput();
     }
 
     /*
@@ -1104,7 +1196,7 @@
             .click(sort);
         $('table.listing:not(.nosort) tbody').each(setoddeven);
 
-        if(scanforlinks !== undefined) jQuery(scanforlinks);
+        if (undefined !== scanforlinks) jQuery(scanforlinks);
     }
 
     function formAjaxError(req, status, error){
@@ -1217,6 +1309,8 @@
 
     jQuery(document).ready(function($){
         initPageElems();
+
+
 
         /*$(window).on("resize", function () {
             if (window.matchMedia("(max-width: 1024px)").matches) {
