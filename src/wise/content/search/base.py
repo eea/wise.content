@@ -239,7 +239,7 @@ class MainForm(BaseEnhancedForm, Form):
                 self.subform_content = self.subform()
                 # self.subform.update()
 
-    @cache(request_cache_key)
+    # @cache(request_cache_key)
     def render(self):
         download_action = self.find_download_action()
 
@@ -464,7 +464,6 @@ class ItemDisplayForm(EmbededForm):
         return res
 
     # def item_title(self, item):
-    #     import pdb; pdb.set_trace()
     #     state = inspect(item)
     #
     #     if state.identity:

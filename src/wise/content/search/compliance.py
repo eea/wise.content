@@ -15,6 +15,9 @@ from z3c.form.form import Form
 from .complianceA8 import Article8
 from .db import threadlocals
 from .vocabulary import db_vocab, vocab_from_values
+from .complianceA8 import Article8
+from .complianceA10 import Article10
+
 
 # from pprint import pprint
 
@@ -86,13 +89,13 @@ def row_to_dict(table, row):
     return res
 
 
-class DeterminationOfGES2012(BrowserView, Article8):
+class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
     art_9_tpl = ViewPageTemplateFile('pt/compliance-a9.pt')
     art_8_tpl = ViewPageTemplateFile('pt/compliance-a8.pt')
-    # art_10_tpl = ViewPageTemplateFile('pt/compliance-a10.pt')
+    art_10_tpl = ViewPageTemplateFile('pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
@@ -291,6 +294,7 @@ class DeterminationOfGES2012(BrowserView, Article8):
 
             if not self.crit_lab_indics[crit_lab]:
                 self.crit_lab_indics[crit_lab].append('')
+        self.crit_lab_indics[u'GESOther'] = ['']
 
         self.colspan = len([item
                             for sublist in self.crit_lab_indics.values()
