@@ -9,6 +9,7 @@
   </head>
 <body>
 
+  <div style="display:none">
 <h5>Descriptors (descriptors)</h5>
 <div tal:replace="view/descriptors"></div>
 
@@ -39,6 +40,7 @@
     <!--</li>-->
   <!--</ul>-->
 <!--</div>-->
+  </div>
 
 <div class="container-fluid">
   <!--<div tal:replace="structure view/art_9_tpl" ></div>-->

@@ -4,19 +4,12 @@
 from collections import defaultdict
 
 from sqlalchemy import and_, or_
-from zope.interface import Interface, implements, provider
-from zope.schema import Choice  # , List
-from zope.schema.interfaces import IVocabularyFactory
 
-from plone.z3cform.layout import FormWrapper, wrap_form
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from wise.content.search import db, sql, sql2018
-from z3c.form.field import Fields
-from z3c.form.form import Form
+from wise.content.search import db, sql  # , sql2018
 
-from ..db import threadlocals
-from ..vocabulary import db_vocab, vocab_from_values
+from ..db import switch_session, threadlocals
 from .nd_A8 import Article8
 from .nd_A10 import Article10
 
@@ -32,15 +25,15 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
-    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
-    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
-    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
     art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
+    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
+    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
         self.descriptor = request.form.get('report_type', 'D5')
-        self.article = request.form.get('article', 'art9')
+        self.article_template = request.form.get('article', 'art9')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):
@@ -177,6 +170,7 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
             key=lambda o: o.ReportingFeature
         )
 
+    @switch_session
     def __call__(self):
         threadlocals.session_name = 'session'
 
@@ -246,6 +240,6 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
         # self.art8data = self.get_data_reported('BAL- LV- AA- 001',
         # self.descriptor)
 
-        # return self.index()
-        view = getattr(self, self.article)
-        return view
+        template = getattr(self, self.article_template)
+
+        return template

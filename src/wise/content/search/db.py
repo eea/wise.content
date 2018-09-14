@@ -44,6 +44,22 @@ def session():
     return session
 
 
+def switch_session(func):
+    """ Decorator to save the session name and switch back after function runs
+    """
+
+    def inner(*args, **kwargs):
+        saved_session = getattr(threadlocals, 'session_name', None)
+
+        res = func(*args, **kwargs)
+
+        threadlocals.session_name = saved_session
+
+        return res
+
+    return inner
+
+
 def _make_session(dsn):
     engine = create_engine(dsn, pool_recycle=1800)
     Session = scoped_session(sessionmaker(bind=engine))

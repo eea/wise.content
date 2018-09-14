@@ -6,7 +6,8 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from Products.Five.browser.pagetemplatefile import \
+    ViewPageTemplateFile as Template
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
@@ -14,9 +15,6 @@ from z3c.form.form import Form
 from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
 from ..interfaces import IMainForm
-from ..vocabulary import vocab_from_values
-from .nat_desc import DeterminationOfGES2012
-
 
 MAIN_FORMS = [
     # view name, (title, explanation)
@@ -91,8 +89,6 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
                 # the self.session current session name
                 self.subform_content = self.subform()
 
-                # self.subform.update()
-
 
 class MainFormWrapper(BaseFormWrapper):
     index = ViewPageTemplateFile('../pt/compliance-layout.pt')
@@ -140,18 +136,6 @@ GES_DESCRIPTORS = (
 )
 
 
-# def vocab_from_dict(d):
-#     """ Build a zope.schema vocabulary from a dict of value: title shape
-#     """
-#     terms = []
-#
-#     for k, v in d.items():
-#         term = SimpleTerm(k, k, v)
-#         terms.append(term)
-#
-#     return SimpleVocabulary(terms)
-
-
 def vocab_from_pairs(pairs):
     """ Build a zope.schema vocabulary from pairs of (value(token), title)
     """
@@ -165,9 +149,7 @@ def vocab_from_pairs(pairs):
 
 
 def vocab_from_list(values):
-    terms = [SimpleTerm(x, x, x) for x in values]
-
-    return SimpleVocabulary(terms)
+    return SimpleVocabulary([SimpleTerm(x, x, x) for x in values])
 
 
 class IGESDescriptor(Interface):
@@ -188,7 +170,8 @@ class GESDescriptorForm(EmbededForm):
 
 ASSESSED_ARTICLES = (
     ('art3', 'Art. 3(1) Marine waters',),
-    ('art4', 'Art. 4/2017 Decision: Marine regions, subregions, and subdivisions '),
+    ('art4', 'Art. 4/2017 Decision: Marine regions, subregions, '
+     'and subdivisions '),
     ('art5', '(MRUs)', ),
     ('art6', 'Art. 6 Regional cooperation', ),
     ('art7', 'Art. 7 Competent authorities', ),
@@ -215,18 +198,48 @@ class ArticleForm(EmbededForm):
     fields = Fields(IArticle)
 
     def get_subform(self):
-        article = self.get_form_data_by_key(self, 'article')
-        descriptor = self.get_form_data_by_key(self, 'descriptor')
-        member_state = self.get_form_data_by_key(self, 'member_state')
+        # def data(k):
+        #     return self.get_form_data_by_key(self, k)
+        #
+        # self.request.form['country'] = data('member_state')
+        # self.request.form['article'] = data('article')
 
-        self.request.form['article'] = article
         # self.request.form['report_type'] = descriptor
-        self.request.form['country'] = member_state
+        # TODO: misssing?
+        # descriptor = self.get_form_data_by_key(self, 'descriptor')
 
-        view = getMultiAdapter((self, self.request), name='deter')
+        # return getMultiAdapter((self, self.request), name='deter')
 
-        # return DeterminationOfGES2012(self, self.request)
-        return view
+        return NationalDescriptorAssessmentForm(self, self.request)
+
+
+class NationalDescriptorAssessmentForm(EmbededForm):
+    """ Form to create and assess a national descriptor overview
+    """
+    layout = Template('../pt/compliance-page.pt')
+
+    def get_subform(self):
+        return self.index
+
+    # report header 2012        - view
+    # report data 2012          - view
+
+    # assessment header 2012    - view
+    # assessment data_2012      - view
+
+    # reporting header 2018     - form
+    # reporting data 2018       - view
+
+    # assessment header 2018    - form
+    # assessment FORM 2018      - form
+
+    # reporting_data_header = Template('../pt/reporting-data-header.pt')
+    # assessment_header = Template('../pt/assessment-header.pt')
+
+# overview = data table with info
+# views needed:
+#   - national descriptor overview, 2012
+#   - national descriptor overview, 2018
 
 
 # - assessment topic
