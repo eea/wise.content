@@ -40,7 +40,7 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
         self.descriptor = request.form.get('report_type', 'D5')
-        self.article = request.form.get('article', 'art10')
+        self.article = request.form.get('article', 'art9')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):

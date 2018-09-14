@@ -42,8 +42,8 @@
 
 <div class="container-fluid">
   <!--<div tal:replace="structure view/art_9_tpl" ></div>-->
-  <!--<div tal:replace="structure view/art_8_tpl" ></div>-->
-  <div tal:replace="structure view/art_10_tpl" ></div>
+  <div tal:replace="structure view/art_8_tpl" ></div>
+  <!--<div tal:replace="structure view/art_10_tpl" ></div>-->
 </div>
 
 </body>

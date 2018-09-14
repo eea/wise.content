@@ -196,10 +196,9 @@ class Article8(object):
             theme_name = mc[0]
             mc_assessment = getattr(sql, 'MSFD8b' + theme_name + 'Activity')
 
-            d = self.activ_descr_data[0][0]
-            _id_act_descr = d.MSFD8b_Nutrients_ActivityDescription_ID \
-                if self.activ_descr_data[0] \
-                else 0
+            d = self.activ_descr_data
+            col = 'MSFD8b_Nutrients_ActivityDescription_ID'
+            _id_act_descr = getattr(d[0][0], col) if d[0] else 0
 
             count, res = db.get_all_records(
                 mc_assessment,

@@ -50,10 +50,12 @@
             colspan_base python:1;">
             <!-- art8assesment_data python: view.get_assesment_data(muid, view.descriptor); -->
 
+      <div style="display:none">
       <h6>Article 8 topics/indicators (topic_assessment)</h6>
       <div tal:replace="topic_assessment"></div>
       <h6>Article 8 criterias (get_criterias_list())</h6>
       <div tal:replace="criterias"></div>
+      </div>
 
       <tr>
         <th>MarineUnitID</th>

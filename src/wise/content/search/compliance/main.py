@@ -17,6 +17,7 @@ from ..interfaces import IMainForm
 from ..vocabulary import vocab_from_values
 from .nat_desc import DeterminationOfGES2012
 
+
 MAIN_FORMS = [
     # view name, (title, explanation)
     ('comp-national-descriptor',
@@ -174,6 +175,7 @@ class IGESDescriptor(Interface):
         title=u"Descriptor",
         vocabulary=vocab_from_pairs(GES_DESCRIPTORS),
         required=False,
+        default='D5'
     )
 
 
@@ -219,9 +221,7 @@ class ArticleForm(EmbededForm):
 
         self.request.form['article'] = article
         # self.request.form['report_type'] = descriptor
-        # self.request.form['country'] = member_state
-
-        # import pdb;pdb.set_trace()
+        self.request.form['country'] = member_state
 
         view = getMultiAdapter((self, self.request), name='deter')
 
