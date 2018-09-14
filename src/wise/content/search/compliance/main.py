@@ -184,27 +184,27 @@ class GESDescriptorForm(EmbededForm):
         return ArticleForm(self, self.request)
 
 
-ASSESSED_ARTICLES = [
-    'Art. 3(1) Marine waters',
-    'Art. 4/2017 Decision: Marine regions, subregions, and subdivisions '
-    '(MRUs)',
-    'Art. 6 Regional cooperation',
-    'Art. 7 Competent authorities',
-    'Art. 8 Initial assessment (and Art. 17 updates)',
-    'Art. 9 Determination of GES (and Art. 17 updates) ',
-    'Art. 10 Environmental targets (and Art. 17 updates)',
-    'Art. 11 Monitoring programmes (and Art. 17 updates)',
-    'Art. 13 Programme of measures (and Art. 17 updates)',
-    'Art. 14 Exceptions (and Art. 17 updates)',
-    'Art. 18 Interim report on programme of measures',
-    'Art. 19(3) Access to data',
-]
+ASSESSED_ARTICLES = (
+    ('art3', 'Art. 3(1) Marine waters',),
+    ('art4', 'Art. 4/2017 Decision: Marine regions, subregions, and subdivisions '),
+    ('art5', '(MRUs)', ),
+    ('art6', 'Art. 6 Regional cooperation', ),
+    ('art7', 'Art. 7 Competent authorities', ),
+    ('art8', 'Art. 8 Initial assessment (and Art. 17 updates)', ),
+    ('art9', 'Art. 9 Determination of GES (and Art. 17 updates) ', ),
+    ('art10', 'Art. 10 Environmental targets (and Art. 17 updates)', ),
+    ('art11', 'Art. 11 Monitoring programmes (and Art. 17 updates)', ),
+    ('art13', 'Art. 13 Programme of measures (and Art. 17 updates)', ),
+    ('art14', 'Art. 14 Exceptions (and Art. 17 updates)', ),
+    ('art18', 'Art. 18 Interim report on programme of measures', ),
+    ('art19', 'Art. 19(3) Access to data', ),
+)
 
 
 class IArticle(Interface):
     article = Choice(
         title=u"Article",
-        vocabulary=vocab_from_values(ASSESSED_ARTICLES),
+        vocabulary=vocab_from_pairs(ASSESSED_ARTICLES),
         required=False,
     )
 
@@ -217,13 +217,16 @@ class ArticleForm(EmbededForm):
         descriptor = self.get_form_data_by_key(self, 'descriptor')
         member_state = self.get_form_data_by_key(self, 'member_state')
 
-        self.request.form['descriptor'] = descriptor
-        self.request.form['country'] = member_state
+        self.request.form['article'] = article
+        # self.request.form['report_type'] = descriptor
+        # self.request.form['country'] = member_state
 
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
 
-        return DeterminationOfGES2012(self, self.request)
-        # return ArticleForm(self, self.request)
+        view = getMultiAdapter((self, self.request), name='deter')
+
+        # return DeterminationOfGES2012(self, self.request)
+        return view
 
 
 # - assessment topic

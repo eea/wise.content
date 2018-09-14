@@ -32,13 +32,15 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
-    art_9_tpl = ViewPageTemplateFile('../pt/compliance-a9.pt')
-    art_8_tpl = ViewPageTemplateFile('../pt/compliance-a8.pt')
-    art_10_tpl = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
+    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
+    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
         self.descriptor = request.form.get('report_type', 'D5')
+        self.article = request.form.get('article', 'art10')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):
@@ -244,4 +246,6 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
         # self.art8data = self.get_data_reported('BAL- LV- AA- 001',
         # self.descriptor)
 
-        return self.index()
+        # return self.index()
+        view = getattr(self, self.article)
+        return view
