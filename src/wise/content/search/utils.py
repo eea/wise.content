@@ -237,6 +237,7 @@ def get_obj_fields(obj, use_blacklist=True, whitelist=None):
     for key in keys:
         if key in whitelist:
             fields.append(key)
+            continue
         flag = False
 
         for bit in BLACKLIST:

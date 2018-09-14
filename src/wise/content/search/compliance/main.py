@@ -15,6 +15,7 @@ from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
 from ..interfaces import IMainForm
 from ..vocabulary import vocab_from_values
+from .nat_desc import DeterminationOfGES2012
 
 MAIN_FORMS = [
     # view name, (title, explanation)
@@ -120,11 +121,11 @@ NationalDescriptorFormView = wrap_form(NationalDescriptorForm, MainFormWrapper)
 GES_DESCRIPTORS = (
     ('D1', 'D1 Biodiversity'),
     ('D1 Birds', 'D1 Biodiversity – birds'),
-    ('D1 Mammals', 'D1 Biodiversity – mammals'),
-    ('D1 Reptiles', 'D1 Biodiversity – reptiles'),
-    ('D1 Fish', 'D1 Biodiversity – fish'),
     ('D1 Cephalopods', 'D1 Biodiversity –  cephalopods'),
+    ('D1 Fish', 'D1 Biodiversity – fish'),
+    ('D1 Mammals', 'D1 Biodiversity – mammals'),
     ('D1 Pelagic habitats', 'D1 Biodiversity – pelagic habitats'),
+    ('D1 Reptiles', 'D1 Biodiversity – reptiles'),
     ('D2', 'D2 Non-indigenous species'),
     ('D3', 'D3 Commercial fish and shellfish'),
     ('D4/D1', 'D4 Food webs/D1 Biodiversity - ecosystems'),
@@ -212,7 +213,16 @@ class ArticleForm(EmbededForm):
     fields = Fields(IArticle)
 
     def get_subform(self):
-        return None
+        article = self.get_form_data_by_key(self, 'article')
+        descriptor = self.get_form_data_by_key(self, 'descriptor')
+        member_state = self.get_form_data_by_key(self, 'member_state')
+
+        self.request.form['descriptor'] = descriptor
+        self.request.form['country'] = member_state
+
+        import pdb;pdb.set_trace()
+
+        return DeterminationOfGES2012(self, self.request)
         # return ArticleForm(self, self.request)
 
 
