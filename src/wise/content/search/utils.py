@@ -12,7 +12,8 @@ from zope.schema import Choice, List
 from zope.schema.interfaces import IVocabularyFactory
 
 import xlsxwriter
-from plone.intelligenttext.transforms import convertWebIntelligentPlainTextToHtml
+from plone.intelligenttext.transforms import \
+    convertWebIntelligentPlainTextToHtml
 
 FORMS_2018 = {}
 FORMS_ART11 = {}
@@ -139,6 +140,7 @@ def print_value(value):
             return ret
 
         html = convertWebIntelligentPlainTextToHtml(value)
+
         return html
 
     base_values = string_types + (int, datetime.datetime, list)
@@ -235,6 +237,7 @@ def get_obj_fields(obj, use_blacklist=True, whitelist=None):
     for key in keys:
         if key in whitelist:
             fields.append(key)
+            continue
         flag = False
 
         for bit in BLACKLIST:
@@ -353,6 +356,9 @@ def all_values_from_field(context, field):
         return None
 
     name = field.field.value_type.vocabularyName
+
+    # TODO: we need to also use the vocabulary, if available, just like
+    # default_value_from_field does. Edge case not covered here, yet
 
     # we use the parent for the vocabulary because parents usually have the
     # values that we want to filter in the current vocabulary

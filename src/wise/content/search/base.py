@@ -118,6 +118,17 @@ class BaseUtil(object):
 
         return context.record_title
 
+    def get_form_data_by_key(self, context, key):
+        while context:
+            data = getattr(context, 'data', None)
+            if data:
+                value = data.get(key, None)
+                if value:
+                    return value
+            context = getattr(context, 'context', None)
+
+        return None
+
 
 class BaseEnhancedForm(object):
     """ Provides a set of default behaviors for enhanced forms
@@ -239,7 +250,7 @@ class MainForm(BaseEnhancedForm, Form):
                 self.subform_content = self.subform()
                 # self.subform.update()
 
-    @cache(request_cache_key)
+    # @cache(request_cache_key)
     def render(self):
         download_action = self.find_download_action()
 
@@ -464,7 +475,6 @@ class ItemDisplayForm(EmbededForm):
         return res
 
     # def item_title(self, item):
-    #     import pdb; pdb.set_trace()
     #     state = inspect(item)
     #
     #     if state.identity:

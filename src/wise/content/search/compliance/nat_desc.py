@@ -1,3 +1,6 @@
+""" Classes and views to implement the National Descriptors compliance page
+"""
+
 from collections import defaultdict
 
 from sqlalchemy import and_, or_
@@ -12,71 +15,10 @@ from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
-from .db import threadlocals
-from .vocabulary import db_vocab, vocab_from_values
-from .complianceA8 import Article8
-
-# from pprint import pprint
-
-
-class MainFormWrapper(FormWrapper):
-    """ Override mainform wrapper to be able to return XLS file
-    """
-
-    index = ViewPageTemplateFile('pt/layout.pt')
-
-    def __init__(self, context, request):
-        FormWrapper.__init__(self, context, request)
-        threadlocals.session_name = self.form.session_name
-
-    # def render(self):
-    #    if 'text/html' not in self.request.response.getHeader('Content-Type'):
-    #         return self.contents
-    #
-    #     return super(MainFormWrapper, self).render()
-
-
-class IComplianceForm(Interface):
-    country = Choice(
-        title=u"Country",
-        vocabulary="compliance_countries",
-        required=True
-    )
-    report_type = Choice(
-        title=u"Report Type",
-        vocabulary="compliance_report_types",
-        required=True,
-    )
-
-
-class ComplianceForm(Form):
-    """ The main forms need to inherit from this clas
-    """
-
-    implements(IComplianceForm)
-    template = ViewPageTemplateFile('pt/complianceform.pt')
-    ignoreContext = True
-    reset_page = False
-    subform = None
-    fields = Fields(IComplianceForm)
-    session_name = 'session_2018'
-
-    # @buttonAndHandler(u'Apply filters', name='continue')
-    # def handle_continue(self, action):
-    #     self.reset_page = True
-
-
-ComplianceFormView = wrap_form(ComplianceForm, MainFormWrapper)
-
-
-@provider(IVocabularyFactory)
-def compliance_countries(context):
-    return db_vocab(sql2018.ReportingHistory, 'CountryCode')
-
-
-@provider(IVocabularyFactory)
-def compliance_report_types(context):
-    return vocab_from_values([])
+from ..db import threadlocals
+from ..vocabulary import db_vocab, vocab_from_values
+from .nd_A8 import Article8
+from .nd_A10 import Article10
 
 
 def row_to_dict(table, row):
@@ -86,17 +28,19 @@ def row_to_dict(table, row):
     return res
 
 
-class DeterminationOfGES2012(BrowserView, Article8):
+class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
-    art_9_tpl = ViewPageTemplateFile('pt/compliance-a9.pt')
-    art_8_tpl = ViewPageTemplateFile('pt/compliance-a8.pt')
-    # art_10_tpl = ViewPageTemplateFile('pt/compliance-a10.pt')
+    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
+    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
+    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
         self.descriptor = request.form.get('report_type', 'D5')
+        self.article = request.form.get('article', 'art10')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
     def get_country_name(self):
@@ -249,7 +193,8 @@ class DeterminationOfGES2012(BrowserView, Article8):
 
         for d in self.descriptors:
             self.descs[d] = self.get_ges_descriptor_label(d)
-        self.desc_label = self.descs.get(self.descriptor, 'Descriptor Not Found')
+        self.desc_label = self.descs.get(self.descriptor,
+                                         'Descriptor Not Found')
 
         self.muids = self.get_marine_unit_ids()
 
@@ -290,6 +235,7 @@ class DeterminationOfGES2012(BrowserView, Article8):
 
             if not self.crit_lab_indics[crit_lab]:
                 self.crit_lab_indics[crit_lab].append('')
+        self.crit_lab_indics[u'GESOther'] = ['']
 
         self.colspan = len([item
                             for sublist in self.crit_lab_indics.values()
@@ -297,6 +243,9 @@ class DeterminationOfGES2012(BrowserView, Article8):
                             for item in sublist])
 
         # Article 8 stuff
-        # self.art8data = self.get_data_reported('BAL- LV- AA- 001', self.descriptor)
+        # self.art8data = self.get_data_reported('BAL- LV- AA- 001',
+        # self.descriptor)
 
-        return self.index()
+        # return self.index()
+        view = getattr(self, self.article)
+        return view
