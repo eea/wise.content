@@ -48,7 +48,7 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
     # mostly similar to .base.MainForm
     """
     implements(IMainForm)
-    template = ViewPageTemplateFile('../pt/compliance-main.pt')
+    template = Template('../pt/compliance-main.pt')
     ignoreContext = True
     reset_page = False
     subform = None
@@ -91,7 +91,7 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
 
 
 class MainFormWrapper(BaseFormWrapper):
-    index = ViewPageTemplateFile('../pt/compliance-layout.pt')
+    index = Template('../pt/compliance-layout.pt')
 
 
 class IMemberState(Interface):
