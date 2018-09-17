@@ -112,6 +112,16 @@ jQuery(document).ready(function($){
             $("#mobile-select-article").one("select2-selecting", function (ev){
                 document.location.href =  ev.choice.id;
             });
+
+            $("#mobile-select-article").on("select2-open", function (ev){
+                if($("#mobile-select-article option[selected='selected']").length == 0 ){
+                    $(".select2-highlighted").css({
+                        "background": "transparent",
+                        //"color": ""
+                    });
+                }
+            });
+
         }
     }
 });
