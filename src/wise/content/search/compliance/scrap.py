@@ -465,3 +465,22 @@ class ComplianceAssessment(EmbededForm):
         data, errors = super(ComplianceAssessment, self).extractData()
 
         return data, errors
+
+
+# def vocab_from_dict(d):
+#     """ Build a zope.schema vocabulary from a dict of value: title shape
+#     """
+#     terms = []
+#
+#     for k, v in d.items():
+#         term = SimpleTerm(k, k, v)
+#         terms.append(term)
+#
+#     return SimpleVocabulary(terms)
+# from ..vocabulary import vocab_from_values  # db_vocab,
+# from plone.z3cform.layout import FormWrapper, wrap_form
+# from z3c.form.field import Fields
+# from zope.schema import Choice  # , List
+# from zope.schema.interfaces import IVocabularyFactory
+# from z3c.form.form import Form
+# from zope.interface import Interface, implements, provider

@@ -237,6 +237,7 @@ def get_obj_fields(obj, use_blacklist=True, whitelist=None):
     for key in keys:
         if key in whitelist:
             fields.append(key)
+
             continue
         flag = False
 
@@ -328,6 +329,9 @@ def pivot_query(query, pivot):
 def default_value_from_field(context, field):
     """ Get the defaulf value for a choice field
     """
+
+    if field.field.default:
+        return field.field.default
     parent = context.context
     vocab = field.field.vocabulary
 

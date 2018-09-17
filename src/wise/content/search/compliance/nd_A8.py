@@ -76,9 +76,13 @@ class Descriptor5(Nutrients):
 class Article8(object):
     def get_criterias_list(self, descriptor):
         descriptor_class = DESCRIPTORS.get(descriptor, None)
-        criterias_list = descriptor_class.criterias_order
 
-        return criterias_list
+        if descriptor_class:
+            criterias_list = descriptor_class.criterias_order
+
+            return criterias_list
+
+        return []
 
     # old method to get data, not used
     # TODO maybe delete this in the future
