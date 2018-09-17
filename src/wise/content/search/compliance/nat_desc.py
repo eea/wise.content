@@ -1,17 +1,22 @@
 """ Classes and views to implement the National Descriptors compliance page
 """
-
 from collections import defaultdict
 
 from sqlalchemy import and_, or_
+from zope.interface import Interface
+from zope.schema import Text, TextLine
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql  # , sql2018
+from z3c.form.field import Fields
 
+from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
+from .vocabulary import ASSESSED_ARTICLES, form_structure
 
 
 def row_to_dict(table, row):
@@ -243,3 +248,70 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
         template = getattr(self, self.article_template)
 
         return template
+
+
+class ReportData2018(BrowserView):
+    def __call__(self):
+        return 'report data 2018'
+
+
+class ReportHeaderForm2018(EmbededForm):
+    def __call__(self):
+        return 'report header form 2018'
+
+
+class AssessmentHeaderForm2018(BrowserView):
+    def __call__(self):
+        return 'assessment header form 2018'
+
+
+class AssessmentDataForm2018(Container):
+    """
+    """
+    def build_form(self):
+        article = form_structure['Art9']
+        assessment_criterias = article.children
+
+        for criteria in assessment_criterias:
+            pass
+
+        import pdb; pdb.set_trace()
+
+        return lambda: 'bla'
+
+    def update(self):
+        self.children = [
+            BasicAssessmentDataForm2018(self, self.request),
+            self.build_form(),
+            SummaryAssessmentDataForm2018(self, self.request),
+        ]
+
+
+class IBasicAssessmentData2018(Interface):
+    """ The basic fields for the assessment data for 2018
+    """
+    reporting_area = TextLine(title=u'Reporting Area')
+    feature_reported = TextLine(title=u'Reporting Area')
+
+
+class BasicAssessmentDataForm2018(EmbededForm):
+    """
+    """
+    def __init__(self, context, request):
+        super(BasicAssessmentDataForm2018, self).__init__(context, request)
+        fields = [IBasicAssessmentData2018]
+        self.fields = Fields(*fields)
+
+
+class ISummaryAssessmentData2018(Interface):
+    assessment_summary = Text(title=u'Assessment summary')
+    recommendations = Text(title=u'Recomandations')
+
+
+class SummaryAssessmentDataForm2018(EmbededForm):
+    """
+    """
+    def __init__(self, context, request):
+        super(SummaryAssessmentDataForm2018, self).__init__(context, request)
+        fields = [ISummaryAssessmentData2018]
+        self.fields = Fields(*fields)

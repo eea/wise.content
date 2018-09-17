@@ -90,26 +90,6 @@
 #                                             name='deter')()
 #
 #         return res
-class Leaf(object):
-    """ A generic leaf in a tree. Behaves somehow like a tree
-    """
-
-    children = ()
-
-    def __init__(self, name, children=None):
-        self.name = name
-        self.children = [Leaf(c) for c in (children or ())]
-
-    def __getitem__(self, name):
-        for c in self.children:
-            if c.name == name:
-                return c
-        raise KeyError
-
-    def __setitem__(self, name, v):
-        v.name = name
-        self.children.append(v)
-
 
 # evidences_criteria = [
 #     'Primary criterion used',
@@ -131,82 +111,6 @@ L = Leaf    # short alias
 hierarchy = [
     'MSFD article', 'AssessmentCriteria', 'AssessedInformation', 'Evidence'
 ]
-
-articles = L(
-    'articles', [
-        L('Art4'),
-        L('Art8'),
-        L('Art9', [
-            L('Adequacy', [
-                L('CriteriaUsed', [
-                    L('Primary criterion used'),
-                    L('Primary criterion replaced with secondary criterion'),
-                    L('Primary criterion not used'),
-                    L('Secondary criterion used'),
-                    L('Secondary criterion used instead of primary criterion'),
-                    L('Secondary criterion not used'),
-                    L('2010 criterion/indicator used'),
-                    L('2010 criterion/indicator not used'),
-                    L('Other criterion (indicator) used'),
-                    L('Not relevant'),
-                ]),
-                L('GESQualitative', [
-                    L('Adapted from Annex I definition'),
-                    L('Adapted from 2017 Decision'),
-                    L('Adapted from 2010 Decision'),
-                    L('Not relevant'),
-                ]),
-                L('GESQuantitative', [
-                    L('Threshold values per MRU'),
-                    L('No threshold values'),
-                    L('Not relevant'),
-                ]),
-                L('GESAmbition', [
-                    L('No GES extent threshold defined'),
-                    L('Proportion value per MRU set'),
-                    L('No proportion value set'),
-                ]),
-            ]),
-            L('Coherence', [
-                L('CriteriaUsed', [
-                    L('Criterion used by all MS in region'),
-                    L('Criterion used by ≥75% MS in region'),
-                    L('Criterion used by ≥50% MS in region'),
-                    L('Criterion used by ≥25% MS in region'),
-                    L('Criterion used by ≤25% MS in region'),
-                    L('Criterion used by all MS in subregion'),
-                ]),
-                L('GESQualitative', [
-                    L('High'),
-                    L('Moderate'),
-                    L('Poor'),
-                    L('Not relevant'),
-                ]),
-                L('GESQuantitative', [
-                    L('All MS in region use EU (Directive, Regulation or Decision) values'),
-                    L('All MS in region use regional (RSC) values'),
-                    L('All MS in region use EU (WFD coastal) and regional (RSC offshore) values'),
-                    L('All MS in region use EU (WFD coastal); and national (offshore) values'),
-                    L('All MS in region use national values'),
-                    L('Some MS in region use EU (Directive, Regulation or Decision) values and some MS use national values'),
-                    L('Some MS in region use regional (RSC) values and some MS use national values'),
-                    L('Not relevant'),
-                ]),
-                L('GESAmbition', [
-                    L('GES extent value same/similar for all MS in region'),
-                    L('GES extent value varies between MS in region'),
-                    L('GES extent threshold varies markedly between MS'),
-                    L('GES extent threshold not reported'),
-                    L('GES proportion value same/similar for all MS in region'),
-                    L('GES proportion value varies between MS in region'),
-                    L('GES proportion value varies markedly between MS'),
-                    L('GES proportion value not reported'),
-                    L('Not relevant'),
-                ]),
-            ]),
-        ]),
-        L('Art10'),
-    ])
 
 ASSESSMENT_TOPICS = [
     'National summary',
@@ -484,3 +388,106 @@ class ComplianceAssessment(EmbededForm):
 # from zope.schema.interfaces import IVocabularyFactory
 # from z3c.form.form import Form
 # from zope.interface import Interface, implements, provider
+
+    # report header 2012        - view
+    # report data 2012          - view
+
+    # assessment header 2012    - view
+    # assessment data_2012      - view
+
+    # reporting header 2018     - form
+    # reporting data 2018       - view
+
+    # assessment header 2018    - form
+    # assessment FORM 2018      - form
+
+    # reporting_data_header = Template('../pt/reporting-data-header.pt')
+    # assessment_header = Template('../pt/assessment-header.pt')
+
+# overview = data table with info
+# views needed:
+#   - national descriptor overview, 2012
+#   - national descriptor overview, 2018
+
+
+# - assessment topic
+#     - national descriptors
+#         - choose country
+#             - choose article
+#                 - 2012 data
+#                 - 2018 data
+#             - fill in general data
+#             - choose descriptor
+#     - regional descriptors
+#     - national overviews
+#     - regional overviews
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD4Geo_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFDFeature_Overview.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD9GES_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD8cESA_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD8bPressures_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD8bPressures_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD8aFeatures_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD8aFeatures_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD4Geo_2p0.xsd
+# http://icm.eionet.europa.eu/schemas/dir200856ec/MSFD10TI_2p0.xsd
+
+
+# class ReportAssessment2012(BrowserView, BaseUtil):
+#     """ Report and assessment for 2012 national descriptor overview
+#     """
+#     def __init__(self, context, request):
+#         super(ReportAssessment2012, self).__init__(context, request)
+#
+#         data = self.get_flattened_data(self)
+#         self.article_title = dict(ASSESSED_ARTICLES)[data['article']]
+#
+#         self.report_form_2018 = ReportForm2018(self, self.request)
+#
+
+# class IReportForm(Interface):
+#     pass
+#
+#
+# class ReportForm2018(EmbededForm):
+#     fields = Fields(IReportForm)
+  <!-- <browser:page -->
+  <!--   for="*" -->
+  <!--   name="report_assessment_2012" -->
+  <!--   class=".nat_desc.ReportAssessment2012" -->
+  <!--   template='../pt/nat&#45;desc&#45;overview&#45;report&#45;assessment&#45;2012.pt' -->
+  <!--   permission="zope2.View" -->
+  <!--   /> -->
+  <!--  -->
+  <!-- <browser:page -->
+  <!--   for="*" -->
+  <!--   name="report_assessment_2018" -->
+  <!--   class=".nat_desc.ReportAssessment2018" -->
+  <!--   permission="zope2.View" -->
+  <!--   /> -->
+
+  <!-- <browser:page -->
+  <!--   for="*" -->
+  <!--   name="deter" -->
+  <!--   class=".nat_desc.DeterminationOfGES2012" -->
+  <!--   template='../pt/determination.pt' -->
+  <!--   permission="zope2.View" -->
+  <!--   /> -->
+
+  <!-- <browser:page -->
+  <!--   for="*" -->
+  <!--   name="report_data_2012" -->
+  <!--   class=".nat_desc.ReportData2012" -->
+  <!--   template='../pt/report&#45;header&#45;display.pt' -->
+  <!--   permission="zope2.View" -->
+  <!--   /> -->
+
+  <!-- <utility -->
+  <!--   component=".compliance.compliance_countries" -->
+  <!--   name="compliance_countries" -->
+  <!--   /> -->
+  <!--  -->
+  <!-- <utility -->
+  <!--   component=".compliance.compliance_report_types" -->
+  <!--   name="compliance_report_types" -->
+  <!--   /> -->

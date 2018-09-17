@@ -121,13 +121,33 @@ class BaseUtil(object):
     def get_form_data_by_key(self, context, key):
         while context:
             data = getattr(context, 'data', None)
+
             if data:
                 value = data.get(key, None)
+
                 if value:
                     return value
             context = getattr(context, 'context', None)
 
         return None
+
+    def get_flattened_data(self, context):
+        """ Return all form data from all present forms
+        """
+        res = {}
+
+        while context:
+            data = getattr(context, 'data', None)
+
+            if data:
+                res.update(data)
+
+            if IMainForm.providedBy(context):
+                break
+
+            context = getattr(context, 'context', None)
+
+        return res
 
 
 class BaseEnhancedForm(object):

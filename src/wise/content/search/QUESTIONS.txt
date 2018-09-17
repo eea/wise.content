@@ -16,4 +16,9 @@
 
 
 - pot fi 2 assessemnturi pentru acelasi topic? una de la comisie, alta de la
-  consultanti?
+  consultanti? Can there be multiple assessments?
+
+
+- multiple regions?
+
+- how to get from feature to list of descriptors?
