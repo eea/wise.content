@@ -10,23 +10,26 @@
 
     <div tal:omit-tag="">
       <div id="wise-compliance-form-top" tal:define="text context/text | nothing">
-        <ul class="nav nav-pills topnav hidden-xs">
-          <tal:rep tal:repeat="info view/main_forms">
-            <li tal:define="name python:info[0];
-              maintitle python: info[1][0];
-              subtitle python: info[1][1];
-              active python: view.name == name"
-              tal:attributes="class python: active and 'tab-active'"
-              >
-              <a href=""
-                tal:attributes="href string:./@@${name}"
-                >
-                <span tal:content="maintitle">Article X</span>
-                <span tal:content="subtitle">Subtitle here</span>
-              </a>
-            </li>
-          </tal:rep>
-        </ul>
+
+          <div id="tabs-wrapper">
+            <ul class="nav nav-pills topnav hidden-xs">
+                <tal:rep tal:repeat="info view/main_forms">
+                    <li tal:define="name python:info[0];
+                            maintitle python: info[1][0];
+                            subtitle python: info[1][1];
+                            active python: 'active' if view.name == name else ( 'active' if repeat['info'].index == 0 else '')"
+                             tal:attributes="class python: active and 'tab-active'"
+                    >
+                        <a href=""
+                                 tal:attributes="href string:./@@${name}"
+                        >
+                            <span tal:content="maintitle">Article X</span>
+                            <span tal:content="subtitle">Subtitle here</span>
+                        </a>
+                    </li>
+                </tal:rep>
+            </ul>
+          </div>
 
         <div class="visible-xs" style="clear: both;">
           <div>

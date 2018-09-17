@@ -13,6 +13,9 @@ module.exports = {
               '<%= path.src %>/less/select2-override.less',
               '<%= path.src %>/less/select2-top-override.less',
               '<%= path.src %>/less/search-style.less'
+          ],
+          '<%= path.dest %>/css/tabs.css' : [
+              '<%= path.src %>/less/tabs.less'
           ]
       }
 
