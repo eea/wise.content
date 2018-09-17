@@ -1,0 +1,19 @@
+- the "General" table in MSFDcompliancemodulefields.
+  - is it for a wizard like "Create a new report"... to choose what type of
+    report?
+
+  - assessment topic: not needed if we have tabs?
+
+
+- what to do about the different databases?
+- general data: is it one per descriptor? (asta se intelege din exemplul cu
+  Latvia). Cum se completeaza general data?
+
+- cum se completeaza Assessment Topic din general? Se completeaza automat, pe
+  baza a informatiei din context (daca fac evaluarea la un GES descriptor
+  pentru Latvia, atunci voi fi cu assessment topic ca si "GES Descriptor", sau
+  poate fi "National Summary". Ce sunt celelalte valori?
+
+
+- pot fi 2 assessemnturi pentru acelasi topic? una de la comisie, alta de la
+  consultanti?

@@ -1,22 +1,10 @@
-<div>
-  <div id="wise-search-form-top">
-    <ul class="nav nav-pills topnav hidden-xs">
-      <tal:rep tal:repeat="info view/main_forms">
-        <li tal:define="name python:info[0];
-          maintitle python: info[1][0];
-          subtitle python: info[1][1];
-          active python: view.name == name"
-          tal:attributes="class python: active and 'tab-active'"
-          >
-          <a href=""
-            tal:attributes="href string:./@@${name}"
-            >
-            <span tal:content="maintitle">Article X</span>
-            <span tal:content="subtitle">Subtitle here</span>
-          </a>
-        </li>
-      </tal:rep>
-    </ul>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+  lang="en"
+  metal:use-macro="context/main_template/macros/master"
+  i18n:domain="eea">
 
   <body metal:fill-slot="content">
 
@@ -43,10 +31,6 @@
             </ul>
           </div>
 
-        <div class="visible-xs" style="clear: both;">
-          <div>
-          </div>
-
           <div class="visible-xs" style="clear: both;">
               <div>
               </div>
@@ -66,19 +50,13 @@
               </select>
           </div>
 
-      <metal:slot fill-slot="actions">
-        <div tal:content="structure view/subform_content | nothing">subform here</div>
-        <div class="form-right-side">
-          <metal:block use-macro="context/@@ploneform-macros/actions" />
+        <div
+          class="start-page-content left-side-form"
+          tal:content="structure text/output"
+          tal:condition="text">
         </div>
-      </metal:slot>
 
-      <metal:css fill-slot="formtop">
-        <style>
-        </style>
-      </metal:css>
-
-    </metal:block>
-  </div>
-</div>
-
+      </div>
+    </div>
+  </body>
+</html>
