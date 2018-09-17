@@ -31,24 +31,24 @@
             </ul>
           </div>
 
-        <div class="visible-xs" style="clear: both;">
-          <div>
+          <div class="visible-xs" style="clear: both;">
+              <div>
+              </div>
+              <select class="notselect" id="mobile-select-article" >
+                <tal:rep tal:repeat="info view/main_forms" >
+                  <tal:block tal:define="name python:info[0];
+                    maintitle python: info[1][0];
+                    subtitle python: info[1][1];
+                    active python: view.name == name">
+                    <option tal:attributes="value string:./@@${name}; data-maintitle maintitle; data-subtitle subtitle;
+                      selected python: active and 'selected'"
+                      tal:content="python: info[1][0] + ' ' + info[1][1]"
+                      >
+                    </option>
+                  </tal:block>
+                </tal:rep>
+              </select>
           </div>
-          <select class="notselect" id="mobile-select-article" >
-            <tal:rep tal:repeat="info view/main_forms" >
-              <tal:block tal:define="name python:info[0];
-                maintitle python: info[1][0];
-                subtitle python: info[1][1];
-                active python: view.name == name">
-                <option tal:attributes="value string:./@@${name}; data-maintitle maintitle; data-subtitle subtitle;
-                  selected python: active and 'selected'"
-                  tal:content="python: info[1][0] + ' ' + info[1][1]"
-                  >
-                </option>
-              </tal:block>
-            </tal:rep>
-          </select>
-        </div>
 
         <div
           class="start-page-content left-side-form"
