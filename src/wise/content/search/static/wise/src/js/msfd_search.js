@@ -624,33 +624,6 @@
             }
         });
 
-        if (window.matchMedia("(max-width: 967px)").matches){
-            function formatArticle (article) {
-                var el = $(article.element[0]);
-                return '<span style="font-size: 1.5rem; font-weight: bold;color: #337ab7">' + el.attr("data-maintitle")+ '</span> '+
-                    '<span style="color: #337ab7;font-size: 1.3rem;">('+el.attr("data-subtitle") +')</span>';
-            }
-
-            var moptions = {
-                placeholder: 'Select an option',
-                closeOnSelect: true,
-                dropdownAutoWidth : daw,
-                width: w,
-                theme: "flat",
-                minimumResultsForSearch: 20,
-                formatSelection: formatArticle,
-                formatResult: formatArticle
-            };
-
-            if($.fn.select2 !== undefined){
-                $("#mobile-select-article").select2(moptions);
-
-                $("#mobile-select-article").one("select2-selecting", function (ev) {
-                    document.location.href =  ev.choice.id;
-                });
-            }
-        }
-
         $( selectorLeftForm + " .extra-details .tab-panel").fadeOut('slow', function () {
             $.each( $( selectorLeftForm + " .extra-details .extra-details-section"), function (indx, item){
                 $($(item).find(".tab-panel")[0]).show();
