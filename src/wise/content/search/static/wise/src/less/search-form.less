@@ -1,10 +1,5 @@
 @import "./bootstrap/variables.less";
-
-@dark-theme-color:  #337ab7;
-@controls-link-color : @dark-theme-color;
-@border-bottom-color-tabs: @dark-theme-color;
-@checkbox-other-color: #f0f6f9;
-
+@import "variables.less";
 
 .vendor-prefix(@prop; @val) {
     @{prop}: @val;
@@ -58,7 +53,6 @@
       background-color: #EEE;
     }
   }
-
 
   .pagination-text {
     display: block;
@@ -127,7 +121,6 @@
     margin-bottom: 10px;
   }
 
-
   dl {
     overflow: hidden;
     display: flex;
@@ -163,8 +156,6 @@
     .vendor-prefix(box-shadow ; inset 1px 0px 1px rgba(0,0,0,0.1));
   }
 
-
-
   ul {
     &.nav {
       list-style-type: none !important;
@@ -176,6 +167,7 @@
 
       li {
         text-align: center;
+        margin-bottom: 0;
         /*max-height: 4rem;*/
 
         a {
@@ -298,7 +290,7 @@
         border-bottom-right-radius: 0;
 
         margin: 0 auto;
-        margin-right: 2px;
+        margin-right: 0.8rem;
         padding-bottom: 99999px;
         margin-bottom: -99999px;
       }
@@ -342,11 +334,7 @@
   }
 }
 
-
-@checkboxes-radius: 3px;
-@checkboxes-box-shadow: rgba(3,3,3,0.05);
-
- .option {
+.option {
   display: block;
   width: 100%;
   border-left: 1px solid rgba(0,0,0,0.1);
@@ -410,8 +398,6 @@
       color: black;
     }
   }
-
-
 }
 
 .controls {
@@ -574,13 +560,11 @@
     }
 
   }
-
-
-
 }
 
 .wise-search-form-container,
-#wise-search-form {
+#wise-search-form
+{
   & > ul.topnav li {
     &:hover {
       border-top-left-radius: 10px;
@@ -667,9 +651,6 @@
     margin-top: 10px;
     margin-bottom: 16px;
     position: relative;
-
-
-
 
     #form-buttons-prev-top {
       /*width: 30%;*/

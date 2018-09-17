@@ -12,4 +12,9 @@
     insert-before="plone_javascript_variables.js"
     enabled="True"  inline="False"/>
 
+   <javascript
+    id="++resource++tabs.js"
+    cacheable="True" compression="safe" cookable="False"
+    enabled="True"  inline="False"/>
+
 </object>

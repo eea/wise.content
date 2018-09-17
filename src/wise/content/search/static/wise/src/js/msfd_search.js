@@ -6,7 +6,6 @@
        * Page elements init
        * ****************************************************
        * */
-
     var exceptVal = ["all", "none", "invert", "apply"];
     var selectorFormContainer = ".wise-search-form-container";
     var selectorLeftForm = "#wise-search-form";
@@ -646,79 +645,6 @@
     * SELECT2 functions END
     * */
 
-    /*
-    * TABS
-    * */
-    function setupTabs() {
-        var t = $("ul.nav:not(.topnav) > li");
-
-        // top tabs width calculation
-        var nrtabs = t.length;
-        if(nrtabs > 1) {
-            var tabLength = nrtabs === 2 ? 35 : Math.floor((100 - nrtabs) / nrtabs );
-
-            t.css("width", tabLength + "%");
-            var rest = 100 - tabLength * nrtabs;
-
-            var totalL = $("ul.nav").width();
-            var mrR = Math.floor( totalL /100 ) ;
-
-            $(t).css({
-                "margin-left": 0,
-                "margin-right" : mrR/2 + "px"
-            });
-
-        } else {
-            $(t).css({"margin-left": 0});
-        }
-        /* david commented
-        if ($("#tabs-wrapper ul").find("li").length === 0){
-            if( $("#tabs-wrapper").find("ul").length ===  0 ){ //return true;
-            }
-            //if($("#tabs-wrapper").find("ul li").length === 0) $("#tabs-wrapper").hide();
-        } */
-        var tabswrapper = "#tabs-wrapper";
-
-        $.each( $( ".tabs-wrapper") , function (indx, item) {
-            if($(item).find("ul").length ===  0){ return true;}
-            //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
-        });
-
-        if( $( tabswrapper + " ul li").length === 1 ){
-            $("#tabContents").removeClass("tab-content");
-            $( tabswrapper + " ul").attr("class", "");
-            $( tabswrapper + " ul li").css({
-                "background-color": "transparent",
-                "float" : "none"
-            });
-            var lt = $( tabswrapper + " ul li a").text();
-            $( tabswrapper + " ul li").append("<h4>" + lt + "</h4>");
-            $( tabswrapper + " ul li a").remove();
-            $( tabswrapper + " .tab-pane").removeClass("fade");
-        }
-
-        var nrTabs = $( selectorLeftForm + " ul.topnav li").length || "0";
-
-        var wdth = (100/nrTabs) - 1;
-
-        $( selectorLeftForm + " .topnav li").css({"width": wdth  + "%", "margin-right": "0.8rem" });
-
-        /*$.each( $( selectorLeftForm + " .topnav li"), function (indx, itm) {
-            $(itm).css({
-                "max-width" : wdth + "%"
-            });
-        });*/
-
-    }
-
-    function clickFirstTab(){
-        $("#tabs-wrapper ul li:first-child a").trigger('click');
-        $(".tabs-wrapper ul li:first-child a").trigger('click');
-    }
-    /*
-    * TABS END
-    * */
-
     function marineBtnHandler(ev){
         var direction = ev.data.direction;
         var marinUidSelect = $( selectorFormContainer + " #s2id_form-widgets-marine_unit_id");
@@ -922,7 +848,7 @@
 
         attachSelect2();
 
-        setupTabs();
+        //if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
 
         clickFirstTab();
 
@@ -1276,12 +1202,8 @@
         }
     }
 
-
-
     jQuery(document).ready(function($){
         initPageElems();
-
-
 
         /*$(window).on("resize", function () {
             if (window.matchMedia("(max-width: 1024px)").matches) {
