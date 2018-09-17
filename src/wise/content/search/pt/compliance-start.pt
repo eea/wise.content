@@ -17,12 +17,10 @@
                     <li tal:define="name python:info[0];
                             maintitle python: info[1][0];
                             subtitle python: info[1][1];
-                            active python: 'active' if view.name == name else ( 'active' if repeat['info'].index == 0 else '')"
-                             tal:attributes="class python: active and 'tab-active'"
+                            active python: view.name == name "
+                            tal:attributes="class python: active and 'tab-active'"
                     >
-                        <a href=""
-                                 tal:attributes="href string:./@@${name}"
-                        >
+                        <a href="" tal:attributes="href string:./@@${name}">
                             <span tal:content="maintitle">Article X</span>
                             <span tal:content="subtitle">Subtitle here</span>
                         </a>
