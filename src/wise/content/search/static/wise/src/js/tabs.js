@@ -3,10 +3,9 @@
 /*
 * TABS
 * */
-function setupTabsInit() {
+function setupInnerTabs(tabsW) {
     var t = $("ul.nav:not(.topnav) > li");
-
-    // top tabs width calculation
+    // tabs width calculation
     var nrtabs = t.length;
     if(nrtabs > 1) {
         var tabLength = nrtabs === 2 ? 35 : Math.floor((100 - nrtabs) / nrtabs );
@@ -25,6 +24,18 @@ function setupTabsInit() {
     } else {
         $(t).css({"margin-left": 0});
     }
+
+    /*$.each( $( ".tabs-wrapper") , function (indx, item) {
+        if($(item).find("ul").length ===  0){ return true;}
+        //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
+    });*/
+}
+
+function setupTabsInit(tabswrapper) {
+    var tabswrapper = tabswrapper || "#mainform-tabs";
+
+    setupInnerTabs(tabswrapper);
+
     /* david commented
     if ($("#tabs-wrapper ul").find("li").length === 0){
         if( $("#tabs-wrapper").find("ul").length ===  0 ){ //return true;
@@ -32,12 +43,28 @@ function setupTabsInit() {
         //if($("#tabs-wrapper").find("ul li").length === 0) $("#tabs-wrapper").hide();
     } */
 
-    var tabswrapper = "#tabs-wrapper";
+    var renderTopTabs = function () {
+        var nrTabs = $( " ul.topnav li").length || 0;
 
-    $.each( $( ".tabs-wrapper") , function (indx, item) {
-        if($(item).find("ul").length ===  0){ return true;}
-        //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
-    });
+        if(nrTabs === 0){
+            return false;
+        }
+
+        var tabWidth = Math.floor(100/nrTabs) - 1;
+
+        var rest = 100 - (tabWidth * nrTabs) - 1;
+
+        var tabSpace = Math.floor(rest/nrTabs);
+
+        if(tabSpace < 1){
+            tabSpace = rest/nrTabs;
+        }
+
+        $( ".topnav li").css({
+            "width": tabWidth  + "%",
+            "margin-right": tabSpace + "%"
+        });
+    };
 
     if( $( tabswrapper + " ul li").length === 1 ){
         $("#tabContents").removeClass("tab-content");
@@ -52,20 +79,12 @@ function setupTabsInit() {
         $( tabswrapper + " .tab-pane").removeClass("fade");
     }
 
-    var nrTabs = $( " ul.topnav li").length || "0";
-
-    var wdth = (100/nrTabs) - 1;
-
-    var rest = 100 - (wdth * nrTabs);
-
-    $( ".topnav li").css({
-        "width": wdth  + "%",
-        //"margin-right": (rest/nrTabs)/nrTabs + "%"
-    });
+    renderTopTabs();
 
 }
 
 function clickFirstTab(){
+    //$("#mainform-tabs ul li:first-child a").trigger('click');
     $("#tabs-wrapper ul li:first-child a").trigger('click');
     $(".tabs-wrapper ul li:first-child a").trigger('click');
 }

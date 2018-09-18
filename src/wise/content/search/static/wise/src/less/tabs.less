@@ -1,7 +1,9 @@
 @import "./bootstrap/variables.less";
 @import "variables.less";
 
-#tabs-wrapper {
+#mainform-tabs,
+#tabs-wrapper
+{
 
   .tab-content {
     padding-top: 10px;
@@ -135,6 +137,112 @@
       }
     }
 
+    &.nav {
+      list-style-type: none !important;
+      display: inline-block;
+
+      overflow: hidden;
+      margin-left: 0;
+      width: 100%;
+
+      li {
+        text-align: center;
+
+        a {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        &:hover {
+          background-color: #006699;
+          border-right: none;
+          color:white;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          transition: background-color 0.5s ease-in;
+          -webkit-transition: background-color 0.5 ease-in;
+          -moz-transition: background-color 0.5s ease-in;
+          -o-transition: background-color 0.5s ease-in;
+
+          a {
+            margin: 0 auto;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        &.active {
+          background-color: #337ab7;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+
+          &:hover {
+            background-color: #337ab7;
+
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+
+          a {
+            background-color: transparent;
+            border-left: none;
+            border-right: none;
+            color: white;
+            border-top: none;
+            font-weight: 700;
+
+            &:hover {
+              color: white;
+              background-color: transparent;
+              border-left: none;
+              border-right: none;
+              border-top: none;
+            }
+          }
+        }
+
+        a:hover {
+          background-color: transparent;
+          color: white;
+        }
+      }
+    }
+
+    li {
+      list-style-type: none !important;
+      display: inline-block;
+      float: left;
+      border: none;
+      background-color: #eeeeee;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      transition: background-color 0.5s ease-in;
+      -webkit-transition: background-color 0.5 ease-out;
+      -moz-transition: background-color 0.5s ease-out;
+      -o-transition: background-color 0.5s ease-out;
+
+      padding-bottom: 99999px;
+      margin-bottom: -99999px;
+
+      &:not(:first-child){
+        margin-left: 2px;
+      }
+    }
+
   }
 
   & > ul.topnav li.tab-active,
@@ -148,14 +256,18 @@
   }
 
 }
-
-#wise-compliance-form-top #tabs-wrapper
+/*
+#wise-compliance-form-top #mainform-tabs
 {
   .topnav li {
     margin-right: 1%;
   }
+}*/
+
+.tab-content {
+  padding-top: 10px;
 }
 
-.mobile-select-article {
+#mobile-select-article {
   margin-top: 2rem;
 }

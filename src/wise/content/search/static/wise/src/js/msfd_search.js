@@ -848,7 +848,7 @@
 
         attachSelect2();
 
-        //if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
+        if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
 
         clickFirstTab();
 
