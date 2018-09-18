@@ -9,7 +9,6 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 class IWiseContentLayer(IDefaultBrowserLayer):
     """Marker interface that defines a browser layer."""
 
-
 class IWiseContentTypesSettings(Interface):
     """ portal_registry IWiseContentTypes settings
     """
