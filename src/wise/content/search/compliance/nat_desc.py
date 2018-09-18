@@ -4,7 +4,8 @@ from collections import defaultdict
 
 from sqlalchemy import and_, or_
 from zope.interface import Interface
-from zope.schema import Text, TextLine
+from zope.schema import Choice, Text, TextLine
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -266,23 +267,61 @@ class AssessmentHeaderForm2018(BrowserView):
 
 
 class AssessmentDataForm2018(Container):
+    """ The assessment form for 2018
     """
-    """
-    def build_form(self):
+
+    def _build_subforms(self, tree):
+        """ Build a form of options from a tree of options
+        """
+        base_name = tree.name
+        descriptor_criterions = ['D4C1', 'D5C2']
+
+        forms = []
+
+        for row in tree.children:
+            row_name = row.name
+
+            form = EmbededForm(self, self.request)
+            fields = []
+
+            form.title = '{}: {}'.format(base_name, row_name)
+
+            for crit in descriptor_criterions:
+                field_title = u'{} {}: {}'.format(base_name, row_name, crit)
+                field_name = '{}_{}_{}'.format(base_name, row_name, crit)
+                choices = [x.name for x in row.children]
+                terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
+                field = Choice(
+                    title=field_title,
+                    __name__=field_name,
+                    vocabulary=SimpleVocabulary(terms)
+                )
+                fields.append(field)
+
+            form.fields = Fields(*fields)
+
+            forms.append(form)
+
+        return forms
+
+    def build_forms(self):
         article = form_structure['Art9']
         assessment_criterias = article.children
 
+        out = u''
+
         for criteria in assessment_criterias:
-            pass
+            subforms = self._build_subforms(criteria)
 
-        import pdb; pdb.set_trace()
+            for subform in subforms:
+                out += subform()
 
-        return lambda: 'bla'
+        return out
 
     def update(self):
         self.children = [
             BasicAssessmentDataForm2018(self, self.request),
-            self.build_form(),
+            self.build_forms,
             SummaryAssessmentDataForm2018(self, self.request),
         ]
 
