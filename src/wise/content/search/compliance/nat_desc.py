@@ -1,17 +1,23 @@
 """ Classes and views to implement the National Descriptors compliance page
 """
-
 from collections import defaultdict
 
 from sqlalchemy import and_, or_
+from zope.interface import Interface
+from zope.schema import Choice, Text, TextLine
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql  # , sql2018
+from z3c.form.field import Fields
 
+from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
+from .vocabulary import ASSESSED_ARTICLES, form_structure
 
 
 def row_to_dict(table, row):
@@ -243,3 +249,108 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
         template = getattr(self, self.article_template)
 
         return template
+
+
+class ReportData2018(BrowserView):
+    def __call__(self):
+        return 'report data 2018'
+
+
+class ReportHeaderForm2018(EmbededForm):
+    def __call__(self):
+        return 'report header form 2018'
+
+
+class AssessmentHeaderForm2018(BrowserView):
+    def __call__(self):
+        return 'assessment header form 2018'
+
+
+class AssessmentDataForm2018(Container):
+    """ The assessment form for 2018
+    """
+
+    def _build_subforms(self, tree):
+        """ Build a form of options from a tree of options
+        """
+        base_name = tree.name
+        descriptor_criterions = ['D4C1', 'D5C2']
+
+        forms = []
+
+        for row in tree.children:
+            row_name = row.name
+
+            form = EmbededForm(self, self.request)
+            fields = []
+
+            form.title = '{}: {}'.format(base_name, row_name)
+
+            for crit in descriptor_criterions:
+                field_title = u'{} {}: {}'.format(base_name, row_name, crit)
+                field_name = '{}_{}_{}'.format(base_name, row_name, crit)
+                choices = [x.name for x in row.children]
+                terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
+                field = Choice(
+                    title=field_title,
+                    __name__=field_name,
+                    vocabulary=SimpleVocabulary(terms)
+                )
+                fields.append(field)
+
+            form.fields = Fields(*fields)
+
+            forms.append(form)
+
+        return forms
+
+    def build_forms(self):
+        article = form_structure['Art9']
+        assessment_criterias = article.children
+
+        out = u''
+
+        for criteria in assessment_criterias:
+            subforms = self._build_subforms(criteria)
+
+            for subform in subforms:
+                out += subform()
+
+        return out
+
+    def update(self):
+        self.children = [
+            BasicAssessmentDataForm2018(self, self.request),
+            self.build_forms,
+            SummaryAssessmentDataForm2018(self, self.request),
+        ]
+
+
+class IBasicAssessmentData2018(Interface):
+    """ The basic fields for the assessment data for 2018
+    """
+    reporting_area = TextLine(title=u'Reporting Area')
+    feature_reported = TextLine(title=u'Reporting Area')
+
+
+class BasicAssessmentDataForm2018(EmbededForm):
+    """
+    """
+    def __init__(self, context, request):
+        super(BasicAssessmentDataForm2018, self).__init__(context, request)
+        fields = [IBasicAssessmentData2018]
+        self.fields = Fields(*fields)
+
+
+class ISummaryAssessmentData2018(Interface):
+    assessment_summary = Text(title=u'Assessment summary')
+    recommendations = Text(title=u'Recomandations')
+
+
+class SummaryAssessmentDataForm2018(EmbededForm):
+    """
+    """
+    def __init__(self, context, request):
+        super(SummaryAssessmentDataForm2018, self).__init__(context, request)
+        fields = [ISummaryAssessmentData2018]
+        self.fields = Fields(*fields)

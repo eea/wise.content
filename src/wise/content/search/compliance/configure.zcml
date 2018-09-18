@@ -20,22 +20,4 @@
     permission="zope2.View"
     />
 
-  <browser:page
-    for="*"
-    name="deter"
-    class=".nat_desc.DeterminationOfGES2012"
-    template='../pt/determination.pt'
-    permission="zope2.View"
-    />
-
-  <!-- <utility -->
-  <!--   component=".compliance.compliance_countries" -->
-  <!--   name="compliance_countries" -->
-  <!--   /> -->
-  <!--  -->
-  <!-- <utility -->
-  <!--   component=".compliance.compliance_report_types" -->
-  <!--   name="compliance_report_types" -->
-  <!--   /> -->
-
 </configure>
