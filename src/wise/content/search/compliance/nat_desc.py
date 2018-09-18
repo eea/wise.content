@@ -252,28 +252,59 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
 
 
 class ReportData2018(BrowserView):
+    """ TODO: get code in this
+    """
+
     def __call__(self):
         return 'report data 2018'
 
+    def update(self):
+        pass
+
 
 class ReportHeaderForm2018(EmbededForm):
+    """ TODO: get code in this
+    """
     def __call__(self):
         return 'report header form 2018'
 
 
 class AssessmentHeaderForm2018(BrowserView):
+    """ TODO: get code in this
+    """
     def __call__(self):
         return 'assessment header form 2018'
 
+    def update(self):
+        pass
 
-class AssessmentDataForm2018(Container):
+
+class AssessmentDataForm2018(Container, BaseUtil):
     """ The assessment form for 2018
     """
+
+    def __init__(self, context, request):
+        super(AssessmentDataForm2018, self).__init__(context, request)
+        main_form = self.get_main_form()
+        main_form.add_save_handler(self.handle_save)
+        self.subforms = []   # make subforms discoverable for saving
+
+    def handle_save(self):
+        # TODO: build records from the subforms
+        print "Saving assessment form data"
+        data = {}
+
+        for form in self.subforms:
+            data.update(form.data)
+
+        print data
+        # import pdb; pdb.set_trace()
 
     def _build_subforms(self, tree):
         """ Build a form of options from a tree of options
         """
         base_name = tree.name
+        # TODO: get list of descriptors?
         descriptor_criterions = ['D4C1', 'D5C2']
 
         forms = []
@@ -289,12 +320,13 @@ class AssessmentDataForm2018(Container):
             for crit in descriptor_criterions:
                 field_title = u'{} {}: {}'.format(base_name, row_name, crit)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit)
-                choices = [x.name for x in row.children]
+                choices = [''] + [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
                 field = Choice(
                     title=field_title,
                     __name__=field_name,
-                    vocabulary=SimpleVocabulary(terms)
+                    vocabulary=SimpleVocabulary(terms),
+                    default=''      # TODO: set the default
                 )
                 fields.append(field)
 
@@ -308,20 +340,27 @@ class AssessmentDataForm2018(Container):
         article = form_structure['Art9']
         assessment_criterias = article.children
 
-        out = u''
-
         for criteria in assessment_criterias:
             subforms = self._build_subforms(criteria)
 
             for subform in subforms:
-                out += subform()
+                self.subforms.append(subform)
+
+    def render_subforms(self):
+        out = u''
+
+        for form in self.subforms:
+            out += form()
 
         return out
 
     def update(self):
+        print ("====Doing assessment data form update")
+        self.build_forms()
+
         self.children = [
             BasicAssessmentDataForm2018(self, self.request),
-            self.build_forms,
+            self.render_subforms,
             SummaryAssessmentDataForm2018(self, self.request),
         ]
 
@@ -329,8 +368,8 @@ class AssessmentDataForm2018(Container):
 class IBasicAssessmentData2018(Interface):
     """ The basic fields for the assessment data for 2018
     """
-    reporting_area = TextLine(title=u'Reporting Area')
-    feature_reported = TextLine(title=u'Reporting Area')
+    # TODO: this needs a select box?
+    feature_reported = TextLine(title=u'Feature reported')
 
 
 class BasicAssessmentDataForm2018(EmbededForm):
@@ -350,6 +389,7 @@ class ISummaryAssessmentData2018(Interface):
 class SummaryAssessmentDataForm2018(EmbededForm):
     """
     """
+
     def __init__(self, context, request):
         super(SummaryAssessmentDataForm2018, self).__init__(context, request)
         fields = [ISummaryAssessmentData2018]
