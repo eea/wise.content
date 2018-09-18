@@ -1,2 +1,0 @@
-<metal:block use-macro="context/@@ploneform-macros/titlelessform">
-</metal:block>

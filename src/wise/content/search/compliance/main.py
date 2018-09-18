@@ -40,6 +40,8 @@ MAIN_FORMS = [
      ),
 ]
 
+# TODO: define the tabs selection label for mobile view (see wise-macros.pt)
+
 
 class StartComplianceView(BrowserView):
     main_forms = MAIN_FORMS
@@ -52,23 +54,28 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
     # mostly similar to .base.MainForm
     """
     implements(IMainForm)
-    template = Template('../pt/compliance-main.pt')
+    template = Template('../pt/mainform.pt')        # compliance-main
     ignoreContext = True
     reset_page = False
     subform = None
     subform_content = None
     fields = Fields()
-    css_class = 'compliance-form-main'
+    # css_class = 'compliance-form-main'
     session_name = 'session'
 
     main_forms = MAIN_FORMS
+    _is_save = False
 
     def __init__(self, context, request):
         Form.__init__(self, context, request)
+        self.save_handlers = []
+
+    def add_save_handler(self, handler):
+        self.save_handlers.append(handler)
 
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):
-        pass
+        self._is_save = True
 
     def get_subform(self):
         if self.subform:
@@ -76,6 +83,7 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
 
     def update(self):
         super(MainAssessmentForm, self).update()
+        print ("===Doing main form update")
         self.data, self.errors = self.extractData()
 
         has_values = self.data.values() and all(self.data.values())
@@ -93,9 +101,13 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
                 # the self.session current session name
                 self.subform_content = self.subform()
 
+        if self._is_save:
+            for handler in self.save_handlers:
+                handler()
+
 
 class MainFormWrapper(BaseFormWrapper):
-    index = Template('../pt/compliance-layout.pt')
+    index = Template('../pt/layout.pt')     # compliance-
 
 
 class IMemberState(Interface):
@@ -202,7 +214,10 @@ class ArticleForm(EmbededForm):
 class NationalDescriptorAssessmentForm(Container):
     """ Form to create and assess a national descriptor overview
     """
-    layout = Template('../pt/container.pt')
+
+    form_name = "national-descriptor-assessment-form"
+    render = Template('../pt/container.pt')
+    css_class = "left-side-form"
 
     def update(self):
         super(NationalDescriptorAssessmentForm, self).update()
@@ -211,9 +226,20 @@ class NationalDescriptorAssessmentForm(Container):
         # subforms. Some of them are actually views. They're callbables that:
         # - render themselves
         # - answer to the save() method?
-        self.children = [
+        self.subforms = [
             ReportHeaderForm2018(self, self.request),
             ReportData2018(self, self.request),
             AssessmentHeaderForm2018(self, self.request),
             AssessmentDataForm2018(self, self.request)
         ]
+
+        for child in self.subforms:
+            child.update()
+
+    # def subform(self):
+    #     out = u''
+    #
+    #     for child in self.children:
+    #         out += child()
+    #
+    #     return out

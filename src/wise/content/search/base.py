@@ -183,7 +183,7 @@ class BaseEnhancedForm(object):
         # default_X and get_selected_X methods
 
         for name in cls.fields:
-            print "Setting default field", name
+            # print "Setting default field", name
             default = 'default_' + name
             selected = 'get_selected_' + name
 
