@@ -186,35 +186,15 @@ class IArticleSelect2018(Interface):
                      vocabulary="wise_search_articles_2018")
 
 
-class ICountryCodeMarineReportingUnits(Interface):
-    country_code = List(
-        title=u"Country Code",
-        required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_country")
-    )
-
-    marine_reporting_unit = List(
-        title=u"Marine Reporting Unit",
-        required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_marine_reporting_unit")
-    )
-
-
 class ICountryCode(Interface):
-    country_code = List(
+    member_states = List(
         title=u"Country Code",
         required=False,
         value_type=Choice(vocabulary="wise_search_a2018_country")
     )
 
 
-class ICountryCodeGESComponents(Interface):
-    country_code = List(
-        title=u"Country Code",
-        required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_country")
-    )
-
+class IGESComponentsA9(Interface):
     ges_component = List(
         title=u"GES Component",
         required=False,
@@ -222,13 +202,15 @@ class ICountryCodeGESComponents(Interface):
     )
 
 
-class IFeaturesGESComponents(Interface):
+class IFeatures(Interface):
     feature = List(
         title=u"Features",
         required=False,
         value_type=Choice(vocabulary="wise_search_a2018_feature")
     )
 
+
+class IGESComponents(Interface):
     ges_component = List(
         title=u"GES Component",
         required=False,
@@ -236,7 +218,7 @@ class IFeaturesGESComponents(Interface):
     )
 
 
-class IFeatures(Interface):
+class IFeaturesA9(Interface):
     feature = List(
         title=u"Features",
         required=False,
@@ -252,41 +234,25 @@ class IFeatures81c(Interface):
     )
 
 
-class IIndicatorsGESFeatureMRU(Interface):
-    ges_component = List(
-        title=u"GES Component",
-        required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_ges_component_ind")
-    )
-
+class IIndicatorsFeature(Interface):
     feature = List(
         title=u"Features",
         required=False,
         value_type=Choice(vocabulary="wise_search_a2018_feature_ind")
     )
 
-    marine_reporting_unit = List(
+
+class IIndicatorsGesComponent(Interface):
+    ges_component = List(
+        title=u"GES Component",
+        required=False,
+        value_type=Choice(vocabulary="wise_search_a2018_ges_component_ind")
+    )
+
+
+class IMarineUnit2018(Interface):
+    marine_unit_id = List(
         title=u"Marine Reporting Unit",
         required=False,
-        value_type=Choice(vocabulary="wise_search_a2018_mru_ind")
-    )
-
-
-class IComplianceModule(Interface):
-    file = Choice(
-        title=u"File",
-        required=False,
-        vocabulary="wise_search_compliance_factory"
-    )
-
-
-class IComplianceAssessment(Interface):
-    com_assessment = Text(
-        title=u"COM assessments",
-        required=False,
-    )
-
-    assessment_comment = Text(
-        title=u"Assessments comments",
-        required=False
+        value_type=Choice(vocabulary="wise_search_a2018_marine_reporting_unit")
     )
