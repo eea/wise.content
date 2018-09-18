@@ -12,7 +12,9 @@ from wise.content import _
 from zope.component import adapts
 from zope.interface import Interface, implements
 from zope.schema import TextLine
-
+from plone.memoize.view import memoize
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
 
 class FixCheckout(BrowserView):
     """ A view to fix getBaseline error when the original item was deleted
@@ -155,3 +157,29 @@ class IssueCreate(BrowserView):
             status_id=1,
             category_id=794,
         )
+
+
+class FullWidthContentTypes(BrowserView):
+    """ Fullwidth body class content-types
+    """
+
+    def __init__(self, context, request):
+        """ init
+        """
+        super(FullWidthContentTypes, self).__init__(context, request)
+        self.context = context
+        self.request = request
+
+    def __call__(self):
+        """ boolean if fullwidth class should be enabled for given content-type
+        """
+        fullwidth_ctypes = self.get_full_registry() or []
+        return self.context.portal_type in fullwidth_ctypes
+
+    @memoize
+    def get_full_registry(self):
+        """ content registry cache
+        """
+        registry = getUtility(IRegistry)
+        return registry.get('wise.content.interfaces.'
+                            'IWiseContentTypesSettings.fullwidthFor')
