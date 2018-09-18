@@ -72,13 +72,4 @@
         handler=".upgrades.upgrade_to_8"
         profile="wise.content:default" />
 
-    <!-- v9 upgrade -->
-    <genericsetup:upgradeStep
-        title="Upgrade wise.content to v9"
-        description=""
-        source="8"
-        destination="9"
-        handler=".upgrades.upgrade_to_9"
-        profile="wise.content:default" />
-
 </configure>

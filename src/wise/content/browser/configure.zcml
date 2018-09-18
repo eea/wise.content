@@ -77,11 +77,4 @@
     handler=".misc.preventFolderDeletionEvent"
   />
 
-  <browser:page
-    class=".misc.FullWidthContentTypes"
-    for="*"
-    name="fullwidth_content_types"
-    permission="zope.Public"
-  />
-
 </configure>
