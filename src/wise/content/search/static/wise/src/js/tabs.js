@@ -90,8 +90,9 @@ jQuery(document).ready(function($){
 
         function formatArticle (article) {
             var el = $(article.element[0]);
+            var subtitle = el.attr("data-subtitle") !== "" ? "(" + el.attr("data-subtitle")  + ")" : '';
             return '<span style="font-size: 1.5rem; font-weight: bold;color: #337ab7">' + el.attr("data-maintitle")+ '</span> '+
-                '<span style="color: #337ab7;font-size: 1.3rem;">('+el.attr("data-subtitle") +')</span>';
+                '<span style="color: #337ab7;font-size: 1.3rem;">'+ subtitle +'</span>';
         }
 
         var moptions = {
@@ -107,6 +108,11 @@ jQuery(document).ready(function($){
         };
 
         if($.fn.select2 !== undefined){
+            if($("#mobile-select-article option[selected='selected']").length == 0 ){
+                $("#mobile-select-article").prepend('<option selected="selected" value="choose" ' +
+                    'data-maintitle="Choose..." data-subtitle="">Choose section</option>');
+            }
+
             $("#mobile-select-article").select2(moptions);
 
             $("#mobile-select-article").one("select2-selecting", function (ev){
