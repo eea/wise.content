@@ -1,50 +1,42 @@
-/* global setupTabs */
+/* global setupTabs, clickFirstTab */
 
-/*
-* TABS
-* */
 function clickFirstTab(){
     //$("#mainform-tabs ul li:first-child a").trigger('click');
     $("#tabs-wrapper ul li:first-child a").trigger('click');
     $(".tabs-wrapper ul li:first-child a").trigger('click');
 }
-/*
-* TABS END
-* */
 
 setupTabs = function (tabswrapper) {
     function setupInnerTabs(tabsW) {
-    var t = $("ul.nav:not(.topnav) > li");
-    // tabs width calculation
-    var nrtabs = t.length;
-    if(nrtabs > 1) {
-        var tabLength = nrtabs === 2 ? 35 : Math.floor((100 - nrtabs) / nrtabs );
+        var t = $("ul.nav:not(.topnav) > li");
+        // tabs width calculation
+        var nrtabs = t.length;
+        if(nrtabs > 1) {
+            var tabLength = nrtabs === 2 ? 35 : Math.floor((100 - nrtabs) / nrtabs );
 
-        t.css("width", tabLength + "%");
-        var rest = 100 - tabLength * nrtabs;
+            t.css("width", tabLength + "%");
+            var rest = 100 - tabLength * nrtabs;
 
-        var totalL = $("ul.nav").width();
-        var mrR = Math.floor( totalL /100 ) ;
+            var totalL = $("ul.nav").width();
+            var mrR = Math.floor( totalL /100 ) ;
 
-        $(t).css({
-            "margin-left": 0,
-            "margin-right" : mrR/2 + "px"
-        });
+            $(t).css({
+                "margin-left": 0,
+                "margin-right" : mrR/2 + "px"
+            });
 
-    } else {
-        $(t).css({"margin-left": 0});
+        } else {
+            $(t).css({"margin-left": 0});
+        }
+
+        /*$.each( $( ".tabs-wrapper") , function (indx, item) {
+            if($(item).find("ul").length ===  0){ return true;}
+            //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
+        });*/
     }
 
-    /*$.each( $( ".tabs-wrapper") , function (indx, item) {
-        if($(item).find("ul").length ===  0){ return true;}
-        //if($(item).find("ul li").length === 0) $(".tabs-wrapper").hide();
-    });*/
-}
-
-    function setupTabsInit(tabswrapper) {
+    function setupTopTabs(tabswrapper) {
         var tabswrapper = tabswrapper || "#mainform-tabs";
-
-        setupInnerTabs(tabswrapper);
 
         /* david commented
         if ($("#tabs-wrapper ul").find("li").length === 0){
@@ -84,18 +76,21 @@ setupTabs = function (tabswrapper) {
             $( tabswrapper + " ul li a").remove();
             $( tabswrapper + " .tab-pane").removeClass("fade");
         }
-
         renderTopTabs();
-
     }
 
-    setupTabsInit(tabswrapper);
+    setupTopTabs(tabswrapper);
+    setupInnerTabs(tabswrapper);
+
     clickFirstTab();
 }
 
 jQuery(document).ready(function($){
     setupTabs();
 
+    /* mobile select setup
+    *
+    * */
     var w = "auto";
     var daw = true;
 
@@ -138,11 +133,10 @@ jQuery(document).ready(function($){
                 if($("#mobile-select-article option[selected='selected']").length == 0 ){
                     $(".select2-highlighted").css({
                         "background": "transparent",
-                        //"color": ""
                     });
                 }
             });
-
         }
+
     }
 });
