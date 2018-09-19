@@ -1212,9 +1212,6 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
     conditions_ind_assess = list()
 
     def download_results(self):
-        if not self.conditions_ind_assess:
-            return []
-
         parent = self.context.context.context.context
 
         mapper_class = parent.mapper_class
@@ -1222,8 +1219,11 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
         ges_components_mc = parent.ges_components_mc
         marine_mc = parent.marine_mc
 
+        ids_needed = set(self.ids_indicator_main) & set(self.ids_ind_ass_ges)
+
         count, indicator_assessment = db.get_all_records(
             mapper_class,
+            # mapper_class.Id.in_(ids_needed)
             *self.conditions_ind_assess
         )
 
@@ -1320,6 +1320,8 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             conditions.append(mapper_class.Id.in_(ids_ind_ass_ges))
 
         self.conditions_ind_assess = conditions
+        self.ids_indicator_main = ids_indicator_main
+        self.ids_ind_ass_ges = ids_ind_ass_ges
 
         if ids_ind_ass_marine:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_marine))
