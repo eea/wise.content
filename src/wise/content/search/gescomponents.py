@@ -1,25 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# A - GES (general)	GESOther	GES - other (describe)
-
-# B - GES descriptor	D1	D1 Biodiversity
-# B - GES descriptor	D1 Birds	D1 Biodiversity – birds
-# B - GES descriptor	D1 Mammals	D1 Biodiversity – mammals
-# B - GES descriptor	D1 Reptiles	D1 Biodiversity – reptiles
-# B - GES descriptor	D1 Fish	D1 Biodiversity – fish
-# B - GES descriptor	D1 Cephalopods	D1 Biodiversity –  cephalopods
-# B - GES descriptor	D1 Pelagic habitats	D1 Biodiversity – pelagic habitats
-# B - GES descriptor	D2	D2 Non-indigenous species
-# B - GES descriptor	D3	D3 Commercial fish and shellfish
-# B - GES descriptor	D4/D1	D4 Food webs/D1 Biodiversity - ecosystems
-# B - GES descriptor	D5	D5 Eutrophication
-# B - GES descriptor	D6/D1	D6 Sea-floor integrity/D1 Biodiversity - benthic habitats
-# B - GES descriptor	D7	D7 Hydrographical changes
-# B - GES descriptor	D8	D8 Contaminants
-# B - GES descriptor	D9	D9 Contaminants in seafood
-# B - GES descriptor	D10	D10 Marine litter
-# B - GES descriptor	D11	D11 Energy, incl. underwater noise
-
 # GES criterias have been used in 2010/2012 reports and then revamped for 2018
 # reports. As such, some exist in 2010 that didn't exist in 2018, some exist
 # for 2018 that didn't exist for 2010 and they have changed their ids between
