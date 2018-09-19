@@ -11,7 +11,7 @@ from z3c.form.field import Fields
 from .base import EmbededForm, ItemDisplayForm, MarineUnitIDSelectForm
 # from .compliance import ComplianceModule, register_compliance_module
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
-                    pivot_data, register_form_2018)
+                    pivot_data, register_form_2018, BLACKLIST)
 from .sql_extra import MSFD4GeographicalAreaID
 
 
@@ -323,7 +323,7 @@ class A2018Art10Display(ItemDisplayForm):
             getattr(mc, column) == target_id
         )
 
-        paremeters = db_objects_to_dict(result)
+        paremeters = db_objects_to_dict(result, BLACKLIST)
         paremeters = pivot_data(paremeters, 'Parameter')
 
         res = [
@@ -553,8 +553,8 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         id_overall = self.item.Id
 
-        # excluded_columns = ('Id', 'IdOverallStatus')
-        excluded_columns = ()
+        excluded_columns = ('Id', 'IdOverallStatus', 'IdElementStatus')
+        # excluded_columns = BLACKLIST
 
         pressure_codes = db.get_unique_from_mapper(
             sql2018.ART8GESOverallStatusPressure,
@@ -634,38 +634,32 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         res = list()
 
-        if pressure_codes:
-            res.append(
-                ('Pressure code(s)', {
-                    '': [{'PressureCode': x} for x in pressure_codes]
-                }))
+        res.append(
+            ('Pressure code(s)', {
+                '': [{'PressureCode': x} for x in pressure_codes]
+            }))
 
-        if target_codes:
-            res.append(
-                ('Target code(s)', {
-                    '': [{'TargetCode': x} for x in target_codes]
-                }))
+        res.append(
+            ('Target code(s)', {
+                '': [{'TargetCode': x} for x in target_codes]
+            }))
 
-        if element_status_pivot:
-            res.append(
-                ('Element Status', element_status_pivot)
-            )
+        res.append(
+            ('Element Status', element_status_pivot)
+        )
 
-        if criteria_status:
-            res.append(
-                ('Criteria Status', criteria_status)
-            )
+        res.append(
+            ('Criteria Status', criteria_status)
+        )
 
-        if criteria_value:
-            res.append(
-                ('Criteria Value', criteria_value)
-            )
+        res.append(
+            ('Criteria Value', criteria_value)
+        )
 
-        if criteria_value_ind:
-            res.append(
-                ('Criteria Value Indicator', {
-                    '': [{'IndicatorCode': x} for x in criteria_value_ind]
-                }))
+        res.append(
+            ('Criteria Value Indicator', {
+                '': [{'IndicatorCode': x} for x in criteria_value_ind]
+            }))
 
         return res
 
@@ -1306,6 +1300,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             mc.IdIndicatorAssessment == id_indicator_assessment
         )
         excluded_columns = ('Id', 'IdIndicatorAssessment')
+        # excluded_columns = BLACKLIST
         indicators_dataset = db_objects_to_dict(indicators_dataset,
                                                 excluded_columns)
 
