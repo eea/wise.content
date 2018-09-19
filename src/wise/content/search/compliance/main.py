@@ -122,7 +122,11 @@ class NationalDescriptorForm(MainAssessmentForm):
     fields = Fields(IMemberState)
     name = "comp-national-descriptor"
 
-    # subform_class = GESDescriptorForm
+    form_id = 'wise-compliance-form'
+
+    form_id_top = 'wise-compliance-form-top'
+
+    form_container_class = 'wise-compliance-form-container'
 
     def get_subform(self):
         return GESDescriptorForm(self, self.request)
@@ -181,8 +185,6 @@ class NationalDescriptorAssessmentForm(Container):
     form_name = "national-descriptor-assessment-form"
     render = Template('../pt/container.pt')
     css_class = "left-side-form"
-
-    form_id = 'wise-compliance-form'
 
     def update(self):
         super(NationalDescriptorAssessmentForm, self).update()

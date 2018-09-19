@@ -14,6 +14,7 @@ from z3c.form.field import Fields
 
 from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from ..gescomponents import get_ges_criterions
 from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
@@ -298,14 +299,15 @@ class AssessmentDataForm2018(Container, BaseUtil):
             data.update(form.data)
 
         print data
-        # import pdb; pdb.set_trace()
 
     def _build_subforms(self, tree):
         """ Build a form of options from a tree of options
         """
         base_name = tree.name
         # TODO: get list of descriptors?
-        descriptor_criterions = ['D4C1', 'D5C2']
+        data = self.get_flattened_data(self)
+        descriptor = data['descriptor']
+        descriptor_criterions = get_ges_criterions(descriptor)
 
         forms = []
 
@@ -318,8 +320,10 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.title = '{}: {}'.format(base_name, row_name)
 
             for crit in descriptor_criterions:
-                field_title = u'{} {}: {}'.format(base_name, row_name, crit)
-                field_name = '{}_{}_{}'.format(base_name, row_name, crit)
+                print crit
+                field_title = u'{} {}: {}'.format(base_name, row_name,
+                                                  crit.title)
+                field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
                 choices = [''] + [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
                 field = Choice(

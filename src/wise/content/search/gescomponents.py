@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # A - GES (general)	GESOther	GES - other (describe)
 
 # B - GES descriptor	D1	D1 Biodiversity
@@ -128,42 +130,60 @@ class Criterion(object):
     """ A container for a GES criterion information
     """
 
-    id_2012 = None
-    title_2012 = None
-    id_2018 = None
-    title_2018 = None
+    _id = None      # id for the 2018 version
+    _title = None   # title for the 2018 version
+    _alternatives = None
 
-    def __init__(self, *args):
-        self.id_2012, self.title_2012, self.id_2018, self.title_2018 = args
+    def __init__(self, id, title, alternatives=None):
+        self._id = id
+        self._title = title
+        self.alternatives = alternatives or []        # tuples of (id, title)
 
     def __str__(self):
-        return "<Criterion: 2012: {}, 2018: {}>".format(self.id_2012,
-                                                        self.id_2018)
+        return "<Criterion {}>".format(self.title)
 
     def is_2018_exclusive(self):
-        return not self.id_2012
+        return not self.alternatives
 
     def is_2012_exclusive(self):
-        return not self.id_2018
+        return not self._id
 
     @property
     def id(self):
-        return self.id_2018 or self.id_2012
+        return self._id or self.alternatives[0][0]
 
     @property
     def title(self):
-        return self.title_2018 or self.title_2012
+        alter = self.alternatives
+
+        if not alter:
+            return "{} {}".format(self._id, self._title)
+
+        if not self._id:
+            id, title = alter[0]
+
+            return "{} {}".format(id, title)
+
+        alter_ids = len(alter) == 0 and alter[0][0] \
+            or ', '.join([a[0] for a in alter])
+
+        return "{} ({}) {}".format(
+            self._id,
+            alter_ids,
+            self._title,
+        )
 
     @property
     def descriptor(self):
         """ Returns the descriptor as a D<n> id
         """
 
-        if self.id_2018:
-            return self.id_2018.split('C')[0]
+        if self._id:        # 2018 version
+            return self._id.split('C')[0]
 
-        if self.id_2012:
-            return 'D' + self.id_2012.split('.')[0]
+        id = self.alternatives[0][0]    # 2012 version
+
+        return 'D' + id.split('.')[0]
 
 
 def parse_ges_terms(terms):
@@ -172,8 +192,12 @@ def parse_ges_terms(terms):
 
     for line in lines:
         line = line.strip()
+
+        if not line:
+            continue
         bits = line.split('\t')
         bits = [b.strip() for b in bits]
+
         b1, b2, b3, b4 = bits
 
         id_2012 = None
@@ -185,14 +209,30 @@ def parse_ges_terms(terms):
             # new style criterions. Ex:
             # D6C5	D6C5 Benthic habitat condition	38	6.2.3 Proportion of ...
             id_2018 = b1
-            title_2018 = b2
+            title_2018 = b2.split(' ', 1)[1]
 
             if b4[0].isdigit():
                 # we also have the old criterion
                 id_2012 = b4.split(' ', 1)[0]
-                title_2012 = b4
+                title_2012 = b4.split(' ', 1)[1]
 
-            res.append(Criterion(id_2012, title_2012, id_2018, title_2018))
+            # if the criterion has already been defined, annotate that one
+
+            seen = False
+
+            for crit in res:
+                if id_2018 and (crit.id == id_2018):
+                    # already seen this criterion, let's append the title
+                    seen = True
+                    crit.alternatives.append((id_2012, title_2012))
+
+            if not seen:
+                crit = Criterion(id_2018, title_2018)
+
+                if id_2012:
+                    crit.alternatives.append((id_2012, title_2012))
+
+                res.append(crit)
 
             continue
 
@@ -200,9 +240,13 @@ def parse_ges_terms(terms):
             # old style criterions. Ex:
             # 5.3	5.3 Indirect effects of nutrient enrichment	52	Y
             id_2012 = b1
-            title_2012 = b2
+            title_2012 = b2.split(' ', 1)[1]
 
-            res.append(Criterion(id_2012, title_2012, id_2018, title_2018))
+            crit = Criterion(None, None)
+            crit.alternatives.append((id_2012, title_2012))
+            res.append(crit)
+
+    return res
 
 
 GES_CRITERIONS = parse_ges_terms(_GES_TERMS)
