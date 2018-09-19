@@ -10,6 +10,13 @@
 
   <browser:page
     for="*"
+    name="wise-macros"
+    permission="zope.Public"
+    template="pt/wise-macros.pt"
+    />
+
+  <browser:page
+    for="*"
     name="msfd-start"
     permission="zope2.View"
     class = ".main.StartView"
@@ -68,5 +75,9 @@
      file="./static/wise/dist/js/tabs.js"
   />
 
+  <browser:resource
+     name="compliance.js"
+     file="./static/wise/dist/js/compliance.js"
+  />
 
 </configure>

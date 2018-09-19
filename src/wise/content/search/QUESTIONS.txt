@@ -16,4 +16,13 @@
 
 
 - pot fi 2 assessemnturi pentru acelasi topic? una de la comisie, alta de la
-  consultanti?
+  consultanti? Can there be multiple assessments?
+
+
+- multiple regions?
+
+- how to get from feature to list of descriptors?
+
+
+- ce inseamna "Feature(s) reported" din Assessment 2018 pt Art 8? Are impact
+  asupra selectiei de GES descriptors?

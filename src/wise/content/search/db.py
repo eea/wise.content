@@ -7,7 +7,7 @@ from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
 from eea.cache import cache
-from wise.content.search import sql
+from wise.content.search import sql, sql2018
 from wise.content.search.utils import db_result_key, pivot_query
 
 env = os.environ.get
@@ -30,8 +30,8 @@ threadlocals = threading.local()
 def session():
     session_name = getattr(threadlocals, 'session_name')
 
-    print "Using session", session_name, DSN
-    print "DBS", DBS
+    # print "Using session", session_name, DSN
+    # print "DBS", DBS
 
     if hasattr(threadlocals, session_name):
         return getattr(threadlocals, session_name)
@@ -306,9 +306,12 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
 
 
 @cache(db_result_key)
+@switch_session
 def get_marine_unit_id_names(marine_unit_ids):
     """ Returns tuples of (id, label) based on the marine_unit_ids
     """
+    threadlocals.session_name = 'session'
+
     sess = session()
     t = sql.t_MSFD4_GegraphicalAreasID
 
@@ -316,6 +319,8 @@ def get_marine_unit_id_names(marine_unit_ids):
         .filter(t.c.MarineUnitID.in_(marine_unit_ids))\
         .order_by(t.c.MarineUnits_ReportingAreas)\
         .distinct()
+
+    # import pdb; pdb.set_trace()
 
     total = q.count()
     q = [x for x in q]
@@ -358,11 +363,13 @@ def get_all_records(mapper_class, *conditions):
 @cache(db_result_key)
 def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
     sess = session()
-    q = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
-    count = q.count()
-    q = [x for x in q]
+    res = sess.query(mapper_class).outerjoin(klass_join).filter(*conditions)
+    count = res.count()
+    res = [x for x in res]
 
-    return [count, q]
+    # import pdb; pdb.set_trace()
+
+    return [count, res]
 
 
 @cache(db_result_key)
@@ -373,19 +380,6 @@ def get_all_records_join(columns, klass_join, *conditions):
     q = [x for x in q]
 
     return [count, q]
-
-
-def update_record(mapper_class, *conditions, **values):
-    # TODO check how to update rows
-    sess = session()
-    sess.update(mapper_class).where(*conditions)\
-        .values(**values)
-
-
-def insert_record(mapper_class, **values):
-    # TODO check how to insert rows
-    sess = session()
-    sess.insert(mapper_class).values(**values)
 
 
 def compliance_art8_join(columns, mc_join1, mc_join2, *conditions):

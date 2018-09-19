@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from zope.component import getMultiAdapter
+# from zope.component import getMultiAdapter
 from zope.interface import Interface, implements
 from zope.schema import Choice
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -15,6 +15,10 @@ from z3c.form.form import Form
 from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
 from ..interfaces import IMainForm
+from .base import Container
+from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
+                       ReportData2018, ReportHeaderForm2018)
+from .vocabulary import ASSESSED_ARTICLES
 
 MAIN_FORMS = [
     # view name, (title, explanation)
@@ -36,6 +40,8 @@ MAIN_FORMS = [
      ),
 ]
 
+# TODO: define the tabs selection label for mobile view (see wise-macros.pt)
+
 
 class StartComplianceView(BrowserView):
     main_forms = MAIN_FORMS
@@ -48,23 +54,28 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
     # mostly similar to .base.MainForm
     """
     implements(IMainForm)
-    template = Template('../pt/compliance-main.pt')
+    template = Template('../pt/mainform.pt')        # compliance-main
     ignoreContext = True
     reset_page = False
     subform = None
     subform_content = None
     fields = Fields()
-    css_class = 'compliance-form-main'
+    # css_class = 'compliance-form-main'
     session_name = 'session'
 
     main_forms = MAIN_FORMS
+    _is_save = False
 
     def __init__(self, context, request):
         Form.__init__(self, context, request)
+        self.save_handlers = []
+
+    def add_save_handler(self, handler):
+        self.save_handlers.append(handler)
 
     @buttonAndHandler(u'Apply filters', name='continue')
     def handle_continue(self, action):
-        pass
+        self._is_save = True
 
     def get_subform(self):
         if self.subform:
@@ -72,6 +83,7 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
 
     def update(self):
         super(MainAssessmentForm, self).update()
+        print ("===Doing main form update")
         self.data, self.errors = self.extractData()
 
         has_values = self.data.values() and all(self.data.values())
@@ -89,9 +101,13 @@ class MainAssessmentForm(BaseEnhancedForm, Form):
                 # the self.session current session name
                 self.subform_content = self.subform()
 
+        if self._is_save:
+            for handler in self.save_handlers:
+                handler()
+
 
 class MainFormWrapper(BaseFormWrapper):
-    index = Template('../pt/compliance-layout.pt')
+    index = Template('../pt/layout.pt')     # compliance-
 
 
 class IMemberState(Interface):
@@ -105,6 +121,7 @@ class IMemberState(Interface):
 class NationalDescriptorForm(MainAssessmentForm):
     assessment_topic = 'GES Descriptor (see term list)'
     fields = Fields(IMemberState)
+    name="comp-national-descriptor"
 
     # subform_class = GESDescriptorForm
 
@@ -168,24 +185,6 @@ class GESDescriptorForm(EmbededForm):
         return ArticleForm(self, self.request)
 
 
-ASSESSED_ARTICLES = (
-    ('art3', 'Art. 3(1) Marine waters',),
-    ('art4', 'Art. 4/2017 Decision: Marine regions, subregions, '
-     'and subdivisions '),
-    ('art5', '(MRUs)', ),
-    ('art6', 'Art. 6 Regional cooperation', ),
-    ('art7', 'Art. 7 Competent authorities', ),
-    ('art8', 'Art. 8 Initial assessment (and Art. 17 updates)', ),
-    ('art9', 'Art. 9 Determination of GES (and Art. 17 updates) ', ),
-    ('art10', 'Art. 10 Environmental targets (and Art. 17 updates)', ),
-    ('art11', 'Art. 11 Monitoring programmes (and Art. 17 updates)', ),
-    ('art13', 'Art. 13 Programme of measures (and Art. 17 updates)', ),
-    ('art14', 'Art. 14 Exceptions (and Art. 17 updates)', ),
-    ('art18', 'Art. 18 Interim report on programme of measures', ),
-    ('art19', 'Art. 19(3) Access to data', ),
-)
-
-
 class IArticle(Interface):
     article = Choice(
         title=u"Article",
@@ -213,43 +212,35 @@ class ArticleForm(EmbededForm):
         return NationalDescriptorAssessmentForm(self, self.request)
 
 
-class NationalDescriptorAssessmentForm(EmbededForm):
+class NationalDescriptorAssessmentForm(Container):
     """ Form to create and assess a national descriptor overview
     """
-    layout = Template('../pt/compliance-page.pt')
 
-    def get_subform(self):
-        return self.index
+    form_name = "national-descriptor-assessment-form"
+    render = Template('../pt/container.pt')
+    css_class = "left-side-form"
 
-    # report header 2012        - view
-    # report data 2012          - view
+    def update(self):
+        super(NationalDescriptorAssessmentForm, self).update()
 
-    # assessment header 2012    - view
-    # assessment data_2012      - view
+        # a quick hack to allow splitting up the code reusing the concept of
+        # subforms. Some of them are actually views. They're callbables that:
+        # - render themselves
+        # - answer to the save() method?
+        self.subforms = [
+            ReportHeaderForm2018(self, self.request),
+            ReportData2018(self, self.request),
+            AssessmentHeaderForm2018(self, self.request),
+            AssessmentDataForm2018(self, self.request)
+        ]
 
-    # reporting header 2018     - form
-    # reporting data 2018       - view
+        for child in self.subforms:
+            child.update()
 
-    # assessment header 2018    - form
-    # assessment FORM 2018      - form
-
-    # reporting_data_header = Template('../pt/reporting-data-header.pt')
-    # assessment_header = Template('../pt/assessment-header.pt')
-
-# overview = data table with info
-# views needed:
-#   - national descriptor overview, 2012
-#   - national descriptor overview, 2018
-
-
-# - assessment topic
-#     - national descriptors
-#         - choose country
-#             - choose article
-#                 - 2012 data
-#                 - 2018 data
-#             - fill in general data
-#             - choose descriptor
-#     - regional descriptors
-#     - national overviews
-#     - regional overviews
+    # def subform(self):
+    #     out = u''
+    #
+    #     for child in self.children:
+    #         out += child()
+    #
+    #     return out

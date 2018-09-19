@@ -467,9 +467,11 @@
     /*
     * SELECT2 functions
     * */
-    function setupRightSelects2(){
+    function setupRightSelects2(selector){
         var forbiddenIDs = ["form-widgets-member_states-from", "form-widgets-member_states-to" ];
-        $( selectorFormContainer + " select").each(function (ind, selectElement) {
+        var selectorFormCont = selector || selectorFormContainer;
+
+        $( selectorFormCont + " select").each(function (ind, selectElement) {
             var selectedElementID = $(selectElement).attr("id");
             if( forbiddenIDs.indexOf(selectedElementID) !== -1 ){
                 return false;
@@ -478,7 +480,7 @@
             $(selectElement).addClass("js-example-basic-single");
             var lessOptions = $(selectElement).find("option").length < 10;
 
-            var $wise_search_form = $(selectorFormContainer);
+            var $wise_search_form = $(selectorFormCont);
 
             var options = {
                 placeholder: 'Select an option',
@@ -491,7 +493,7 @@
 
             $(selectElement).select2(options);
 
-            $(selectorFormContainer + " #s2id_form-widgets-marine_unit_id").hide();
+            $(selectorFormCont + " #s2id_form-widgets-marine_unit_id").hide();
 
             var removePaginationButtons = function(){
                 $wise_search_form.find("[name='form.buttons.prev']").remove();
@@ -510,7 +512,7 @@
 
                 var self = this;
                 window.setTimeout( function (){
-                    $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click", {'select': self});
+                    $(selectorFormCont + " .formControls #form-buttons-continue").trigger("click", {'select': self});
                 }, 300);
 
             });
@@ -848,9 +850,9 @@
 
         attachSelect2();
 
-        //if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
+        if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
 
-        clickFirstTab();
+        if( undefined !== clickFirstTab && null !== clickFirstTab ) clickFirstTab();
 
         setPaginationButtons();
 

@@ -8,10 +8,11 @@ from wise.content.search import db, interfaces, sql2018
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, ItemDisplayForm
+from .base import EmbededForm, ItemDisplayForm, MarineUnitIDSelectForm
 # from .compliance import ComplianceModule, register_compliance_module
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
-                    pivot_data, register_form_2018)
+                    pivot_data, register_form_2018, BLACKLIST)
+from .sql_extra import MSFD4GeographicalAreaID
 
 
 class Art9Display(ItemDisplayForm):
@@ -20,7 +21,7 @@ class Art9Display(ItemDisplayForm):
     show_extra_data = True
 
     def download_results(self):
-        parent = self.context.context
+        parent = self.context.context.context
         mapper_class = parent.mapper_class
         features_mc = parent.features_mc
         determination_mc = sql2018.ART9GESGESDetermination
@@ -59,13 +60,19 @@ class Art9Display(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        parent = self.context.context
+        parent = self.context.context.context
+
         mapper_class = parent.mapper_class
         features_mc = parent.features_mc
         determination_mc = parent.determination_mc
-        country_codes = parent.data.get('country_code', ())
-        ges_components = parent.data.get('ges_component', ())
-        features = self.context.data.get('feature', ())
+
+        data = self.get_flattened_data(self)
+
+        # import pdb; pdb.set_trace()
+
+        member_states = data.get('member_states', ())
+        ges_components = data.get('ges_component', ())
+        features = data.get('feature', ())
 
         count, id_ges_components = db.get_all_records_join(
             [determination_mc.IdGESComponent,
@@ -77,7 +84,7 @@ class Art9Display(ItemDisplayForm):
         id_ges_components = tuple(set(id_ges_components))
 
         self.condition_ges_component = and_(
-            sql2018.ReportedInformation.CountryCode.in_(country_codes),
+            sql2018.ReportedInformation.CountryCode.in_(member_states),
             mapper_class.GESComponent.in_(ges_components),
             or_(mapper_class.Id.in_(id_ges_components),
                 mapper_class.JustificationDelay.is_(None),
@@ -104,13 +111,13 @@ class Art9Display(ItemDisplayForm):
 
         self.show_extra_data = True
         id_ges_comp = res.Id
-        res = db.get_related_record(
+        cnt, res = db.get_related_record(
             determination_mc,
             'IdGESComponent',
             id_ges_comp
         )
 
-        return res
+        return count, res
 
     def get_extra_data(self):
         if not self.item or not self.show_extra_data:
@@ -127,10 +134,11 @@ class Art9Display(ItemDisplayForm):
 
         res = list()
 
-        if marine_units:
-            res.append(
-                ('Indicators Dataset', {'': marine_units})
-            )
+        res.append(
+            ('Marine Unit IDs', {
+                '': [{'Marine Unit Id': x} for x in marine_units]
+            })
+        )
 
         return res
 
@@ -143,43 +151,67 @@ class A2018Article9(EmbededForm):
     features_mc = sql2018.ART9GESGESDeterminationFeature
     determination_mc = sql2018.ART9GESGESDetermination
 
-    fields = Fields(interfaces.ICountryCodeGESComponents)
-    fields['country_code'].widgetFactory = CheckBoxFieldWidget
+    fields = Fields(interfaces.ICountryCode)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018GesComponentA9(self, self.request)
+
+    # def default_member_states(self):
+    #     return all_values_from_field(self, self.fields['member_states'])
+
+    # def default_ges_component(self):
+    #     return all_values_from_field(self, self.fields['ges_component'])
+
+
+class A2018GesComponentA9(EmbededForm):
+    fields = Fields(interfaces.IGESComponentsA9)
     fields['ges_component'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return A2018FeaturesForm(self, self.request)
+        return A2018FeatureA9(self, self.request)
 
-    def default_country_code(self):
-        return all_values_from_field(self, self.fields['country_code'])
-
-    def default_ges_component(self):
-        return all_values_from_field(self, self.fields['ges_component'])
+    # def default_ges_component(self):
+    #     return all_values_from_field(self, self.fields['ges_component'])
 
 
-class A2018FeaturesForm(EmbededForm):
-
-    fields = Fields(interfaces.IFeatures)
+class A2018FeatureA9(EmbededForm):
+    fields = Fields(interfaces.IFeaturesA9)
     fields['feature'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        klass = self.context.display_klass
+        return Art9Display(self, self.request)
 
-        return klass(self, self.request)
+    # def default_feature(self):
+    #     return all_values_from_field(self, self.fields['feature'])
 
-    def default_feature(self):
-        return all_values_from_field(self, self.fields['feature'])
+
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
 
 
 # @register_compliance_module
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
-    css_class = 'left-side-form'
+    # css_class = 'left-side-form'
     target_ids = tuple()
 
     def download_results(self):
         # mapper_class = self.context.context.mapper_class
-        target_mc = self.context.context.target_mc
+        parent = self.context.context
+        target_mc = parent.target_mc
 
         count, target = db.get_all_records(
             target_mc,
@@ -222,20 +254,24 @@ class A2018Art10Display(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        country_codes = self.context.context.data.get('country_code', [])
-        marine_units = self.context.context.data.get('marine_reporting_unit',
-                                                     [])
-        features = self.context.data.get('feature', [])
-        ges_components = self.context.data.get('ges_component', [])
+        data = self.get_flattened_data(self)
 
-        mapper_class = self.context.context.mapper_class
-        target_mc = self.context.context.target_mc
+        member_states = data.get('member_states')
+        marine_units = (data.get('marine_unit_id'), )
+        if isinstance(marine_units, str):
+            marine_units = (marine_units, )
+        features = data.get('feature')
+        ges_components = data.get('ges_component')
+
+        parent = self.context.context.context.context
+        mapper_class = parent.mapper_class
+        target_mc = parent.target_mc
 
         count, marine_unit_ids = db.get_all_records_outerjoin(
             mapper_class,
             sql2018.ReportedInformation,
             and_(mapper_class.MarineReportingUnit.in_(marine_units),
-                 sql2018.ReportedInformation.CountryCode.in_(country_codes))
+                 sql2018.ReportedInformation.CountryCode.in_(member_states))
         )
 
         marine_unit_ids = [x.Id for x in marine_unit_ids]
@@ -288,7 +324,9 @@ class A2018Art10Display(ItemDisplayForm):
             getattr(mc, column) == target_id
         )
 
-        paremeters = db_objects_to_dict(result)
+        excluded_columns = ('Id', 'IdTarget')
+
+        paremeters = db_objects_to_dict(result, excluded_columns)
         paremeters = pivot_data(paremeters, 'Parameter')
 
         res = [
@@ -296,6 +334,61 @@ class A2018Art10Display(ItemDisplayForm):
         ]
 
         return res
+
+
+class A2018Art10FeaturesForm(EmbededForm):
+    fields = Fields(interfaces.IFeatures)
+    fields['feature'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018Art10GesComponentsForm(self, self.request)
+
+    def get_available_ges_components(self):
+        pass
+
+
+class A2018Art10GesComponentsForm(EmbededForm):
+    fields = Fields(interfaces.IGESComponents)
+    fields['ges_component'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018MarineUnitID(self, self.request)
+
+
+class A2018MarineUnitID(MarineUnitIDSelectForm):
+    mapper_class = MSFD4GeographicalAreaID
+
+    def get_subform(self):
+        klass = self.context.context.context.display_klass
+
+        return klass(self, self.request)
+
+    def default_marine_unit_id(self):
+        return all_values_from_field(self,
+                                     self.fields['marine_unit_id'])
+
+    def get_available_marine_unit_ids(self):
+        # TODO filter by feature, ges component
+        data = self.get_flattened_data(self)
+
+        mapper_class = sql2018.ART10TargetsMarineUnit
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
+
+        if 'member_states' in data:
+            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+
+        count, res = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+
+        res = tuple(set([x.MarineReportingUnit for x in res]))
+
+        sorted_ = sorted(res)
+
+        return len(res), sorted_
 
 
 @register_form_2018
@@ -310,45 +403,42 @@ class A2018Article10(EmbededForm):
     ges_components_mc = sql2018.ART10TargetsTargetGESComponent
     ges_components_relation_column = 'IdTarget'
 
-    fields = Fields(interfaces.ICountryCodeMarineReportingUnits)
-    fields['country_code'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_reporting_unit'].widgetFactory = CheckBoxFieldWidget
+    fields = Fields(interfaces.ICountryCode)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return A2018FeaturesGESComponentsForm(self, self.request)
+        return A2018Art10FeaturesForm(self, self.request)
 
-    def default_country_code(self):
-        return all_values_from_field(self, self.fields['country_code'])
+    # def default_member_states(self):
+    #     return all_values_from_field(self, self.fields['member_states'])
 
-    def default_marine_reporting_unit(self):
-        return all_values_from_field(self,
-                                     self.fields['marine_reporting_unit'])
+    def get_available_features(self):
+        pass
 
 
-class A2018FeaturesGESComponentsForm(EmbededForm):
-    fields = Fields(interfaces.IFeaturesGESComponents)
-    fields['feature'].widgetFactory = CheckBoxFieldWidget
-    fields['ges_component'].widgetFactory = CheckBoxFieldWidget
-
-    def get_subform(self):
-        klass = self.context.display_klass
-
-        return klass(self, self.request)
-
-    def default_feature(self):
-        return all_values_from_field(self, self.fields['feature'])
-
-    def default_ges_component(self):
-        return all_values_from_field(self, self.fields['ges_component'])
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
 
 
 class A2018Art81abDisplay(ItemDisplayForm):
-    css_class = 'left-side-form'
+    # css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     def download_results(self):
-        # mapper_class = self.context.context.mapper_class
-        overall_status_mc = self.context.context.features_mc
+        parent = self.context.context.context
+        overall_status_mc = parent.features_mc
 
         count, overall_status = db.get_all_records(
             overall_status_mc,
@@ -418,12 +508,16 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        countries = self.context.context.data.get('country_code', [])
-        mrus = self.context.context.data.get('marine_reporting_unit', [])
-        features = self.context.data.get('feature', [])
-        ges_components = self.context.data.get('ges_component', [])
-        mapper_class = self.context.context.mapper_class
-        overall_status_mc = self.context.context.features_mc
+        data = self.get_flattened_data(self)
+        parent = self.context.context.context.context
+
+        countries = data.get('member_states', [])
+        mrus = (data.get('marine_unit_id'), )
+        features = data.get('feature', [])
+        ges_components = data.get('ges_component', [])
+
+        mapper_class = parent.mapper_class
+        overall_status_mc = parent.features_mc
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
@@ -462,8 +556,9 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         id_overall = self.item.Id
 
-        # excluded_columns = ('Id', 'IdOverallStatus')
-        excluded_columns = ()
+        excluded_columns = ('Id', 'IdOverallStatus', 'IdElementStatus',
+                            'IdCriteriaStatus', 'IdCriteriaValues')
+        # excluded_columns = BLACKLIST
 
         pressure_codes = db.get_unique_from_mapper(
             sql2018.ART8GESOverallStatusPressure,
@@ -543,38 +638,32 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         res = list()
 
-        if pressure_codes:
-            res.append(
-                ('Pressure code(s)', {
-                    '': [{'PressureCode': x} for x in pressure_codes]
-                }))
+        res.append(
+            ('Pressure code(s)', {
+                '': [{'PressureCode': x} for x in pressure_codes]
+            }))
 
-        if target_codes:
-            res.append(
-                ('Target code(s)', {
-                    '': [{'TargetCode': x} for x in target_codes]
-                }))
+        res.append(
+            ('Target code(s)', {
+                '': [{'TargetCode': x} for x in target_codes]
+            }))
 
-        if element_status_pivot:
-            res.append(
-                ('Element Status', element_status_pivot)
-            )
+        res.append(
+            ('Element Status', element_status_pivot)
+        )
 
-        if criteria_status:
-            res.append(
-                ('Criteria Status', criteria_status)
-            )
+        res.append(
+            ('Criteria Status', criteria_status)
+        )
 
-        if criteria_value:
-            res.append(
-                ('Criteria Value', criteria_value)
-            )
+        res.append(
+            ('Criteria Value', criteria_value)
+        )
 
-        if criteria_value_ind:
-            res.append(
-                ('Criteria Value Indicator', {
-                    '': [{'IndicatorCode': x} for x in criteria_value_ind]
-                }))
+        res.append(
+            ('Criteria Value Indicator', {
+                '': [{'IndicatorCode': x} for x in criteria_value_ind]
+            }))
 
         return res
 
@@ -590,23 +679,80 @@ class A2018Article81ab(EmbededForm):
     ges_components_mc = sql2018.ART8GESOverallStatu
     ges_components_relation_column = 'Id'
 
-    fields = Fields(interfaces.ICountryCodeMarineReportingUnits)
-    fields['country_code'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_reporting_unit'].widgetFactory = CheckBoxFieldWidget
+    fields = Fields(interfaces.ICountryCode)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return A2018FeaturesGESComponentsForm(self, self.request)
+        return A2018Art81abFeatures(self, self.request)
 
-    def default_country_code(self):
-        return all_values_from_field(self, self.fields['country_code'])
+    # def default_member_states(self):
+    #     return all_values_from_field(self, self.fields['member_states'])
 
-    def default_marine_reporting_unit(self):
+    def default_marine_unit_id(self):
         return all_values_from_field(self,
-                                     self.fields['marine_reporting_unit'])
+                                     self.fields['marine_unit_id'])
+
+
+class A2018Art81abFeatures(EmbededForm):
+    fields = Fields(interfaces.IFeatures)
+    fields['feature'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018Art81abGesComponents(self, self.request)
+
+
+class A2018Art81abGesComponents(EmbededForm):
+    fields = Fields(interfaces.IGESComponents)
+    fields['ges_component'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018Art81abMarineUnitID(self, self.request)
+
+
+class A2018Art81abMarineUnitID(MarineUnitIDSelectForm):
+    mapper_class = MSFD4GeographicalAreaID
+
+    def get_subform(self):
+        return A2018Art81abDisplay(self, self.request)
+
+    def default_marine_unit_id(self):
+        return all_values_from_field(self,
+                                     self.fields['marine_unit_id'])
+
+    def get_available_marine_unit_ids(self):
+        # TODO filter by feature, ges component
+        data = self.get_flattened_data(self)
+
+        mapper_class = sql2018.ART8GESMarineUnit
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
+
+        if 'member_states' in data:
+            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+
+        count, res = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+
+        res = tuple(set([x.MarineReportingUnit for x in res]))
+
+        sorted_ = sorted(res)
+
+        return len(res), sorted_
+
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
 
 
 class A2018Art81cDisplay(ItemDisplayForm):
-    css_class = 'left-side-form'
+    # css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     id_marine_units = list()
 
@@ -697,11 +843,15 @@ class A2018Art81cDisplay(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        countries = self.context.context.data.get('country_code', ())
-        features = self.context.data.get('feature', ())
-        mrus = self.context.data.get('marine_reporting_unit', ())
-        mapper_class = self.context.context.mapper_class
-        features_mc = self.context.context.features_mc
+        data = self.get_flattened_data(self)
+        parent = self.context.context.context
+
+        countries = data.get('member_states', ())
+        features = data.get('feature', ())
+        mrus = (data.get('marine_unit_id', ()), )
+
+        mapper_class = parent.mapper_class
+        features_mc = parent.features_mc
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
@@ -853,12 +1003,44 @@ class A2018Features81cForm(EmbededForm):
     fields['feature'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        klass = self.context.display_klass
+        return A2018Art81cMarineUnitId(self, self.request)
 
-        return klass(self, self.request)
+    # def default_feature(self):
+    #     return all_values_from_field(self, self.fields['feature'])
 
-    def default_feature(self):
-        return all_values_from_field(self, self.fields['feature'])
+
+class A2018Art81cMarineUnitId(MarineUnitIDSelectForm):
+    mapper_class = MSFD4GeographicalAreaID
+
+    def get_subform(self):
+        return A2018Art81cDisplay(self, self.request)
+
+    def default_marine_unit_id(self):
+        return all_values_from_field(self,
+                                     self.fields['marine_unit_id'])
+
+    def get_available_marine_unit_ids(self):
+        # TODO filter by feature, ges component
+        data = self.get_flattened_data(self)
+
+        mapper_class = sql2018.ART8ESAMarineUnit
+        mc_countries = sql2018.ReportedInformation
+        conditions = []
+
+        if 'member_states' in data:
+            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+
+        count, res = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+
+        res = tuple(set([x.MarineReportingUnit for x in res]))
+
+        sorted_ = sorted(res)
+
+        return len(res), sorted_
 
 
 @register_form_2018
@@ -869,45 +1051,124 @@ class A2018Article81c(EmbededForm):
     display_klass = A2018Art81cDisplay
     features_mc = sql2018.ART8ESAFeature
 
-    fields = Fields(interfaces.ICountryCodeMarineReportingUnits)
-    fields['country_code'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_reporting_unit'].widgetFactory = CheckBoxFieldWidget
+    fields = Fields(interfaces.ICountryCode)
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
         return A2018Features81cForm(self, self.request)
 
-    def default_country_code(self):
-        return all_values_from_field(self, self.fields['country_code'])
+    # def default_member_states(self):
+    #     return all_values_from_field(self, self.fields['member_states'])
 
-    def default_marine_reporting_unit(self):
+    def default_marine_unit_id(self):
         return all_values_from_field(self,
-                                     self.fields['marine_reporting_unit'])
+                                     self.fields['marine_unit_id'])
 
 
-class A2018IndicatorsGESFeatureMRUForm(EmbededForm):
-    fields = Fields(interfaces.IIndicatorsGESFeatureMRU)
+#################################################################################3
+#################################################################################3
+#################################################################################3
+#################################################################################3
+#################################################################################3
+#################################################################################3
+#################################################################################3
+
+class A2018IndicatorsGesComponent(EmbededForm):
+    fields = Fields(interfaces.IIndicatorsGesComponent)
     fields['ges_component'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018IndicatorsFeature(self, self.request)
+
+
+class A2018IndicatorsFeature(EmbededForm):
+    fields = Fields(interfaces.IIndicatorsFeature)
     fields['feature'].widgetFactory = CheckBoxFieldWidget
-    fields['marine_reporting_unit'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
+        return A2018IndicatorsMarineUnitId(self, self.request)
+
+    # def default_ges_component(self):
+    #     return all_values_from_field(self, self.fields['ges_component'])
+
+    # def default_feature(self):
+    #     return all_values_from_field(self, self.fields['feature'])
+
+    # def default_marine_unit_id(self):
+    #     return all_values_from_field(self,
+    #                                  self.fields['marine_unit_id'])
+
+
+class A2018IndicatorsMarineUnitId(MarineUnitIDSelectForm):
 
     def get_subform(self):
         return A2018IndicatorsDisplay(self, self.request)
 
-    def default_ges_component(self):
-        return all_values_from_field(self, self.fields['ges_component'])
-
-    def default_feature(self):
-        return all_values_from_field(self, self.fields['feature'])
-
-    def default_marine_reporting_unit(self):
+    def default_marine_unit_id(self):
         return all_values_from_field(self,
-                                     self.fields['marine_reporting_unit'])
+                                     self.fields['marine_unit_id'])
+
+    def get_available_marine_unit_ids(self):
+        # TODO filter by feature, ges component
+        parent = self.context.context.context
+        data = self.get_flattened_data(self)
+
+        mapper_class = parent.mapper_class
+        ges_comp_mc = parent.ges_components_mc
+        features_mc = parent.features_mc
+        marine_mc = parent.marine_mc
+
+        countries = data.get('member_states')
+        ges_components = data.get('ges_component')
+        features = data.get('feature')
+
+        mc_countries = sql2018.ReportedInformation
+
+        conditions = []
+
+        if countries:
+            conditions.append(mc_countries.CountryCode.in_(countries))
+
+        count, ids_indicator = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            *conditions
+        )
+        ids_indicator = [int(x.Id) for x in ids_indicator]
+
+        conditions = list()
+
+        if features:
+            conditions.append(features_mc.Feature.in_(features))
+
+        if ges_components:
+            conditions.append(ges_comp_mc.GESComponent.in_(ges_components))
+        count, ids_ind_ass = db.get_all_records_outerjoin(
+            ges_comp_mc,
+            features_mc,
+            *conditions
+        )
+        ids_ind_ass = [int(x.IdIndicatorAssessment) for x in ids_ind_ass]
+
+        ids_indicator = tuple(set(ids_indicator) & set(ids_ind_ass))
+
+        count, marine_units = db.get_all_records_join(
+            [mapper_class.Id, marine_mc.MarineReportingUnit],
+            marine_mc,
+            mapper_class.Id.in_(ids_indicator),
+        )
+        res = [x.MarineReportingUnit for x in marine_units]
+        res = tuple(set(res))
+
+        sorted_ = sorted(res)
+
+        return len(res), sorted_
 
 
 class A2018IndicatorsDisplay(ItemDisplayForm):
     title = "Indicator Display Form"
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
-    css_class = 'left-side-form'
+    # css_class = 'left-side-form'
 
     conditions_ind_assess = list()
 
@@ -960,14 +1221,18 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
 
     def get_db_results(self):
         page = self.get_page()
-        countries = self.context.context.data.get('country_code', ())
-        ges_components = self.context.data.get('ges_component', ())
-        features = self.context.data.get('feature', ())
-        mrus = self.context.data.get('marine_reporting_unit', ())
-        mapper_class = self.context.context.mapper_class
-        features_mc = self.context.context.features_mc
-        ges_components_mc = self.context.context.ges_components_mc
-        marine_mc = self.context.context.marine_mc
+        data = self.get_flattened_data(self)
+        parent = self.context.context.context.context
+
+        countries = data.get('member_states', ())
+        ges_components = data.get('ges_component', ())
+        features = data.get('feature', ())
+        mrus = (data.get('marine_unit_id', ()), )
+
+        mapper_class = parent.mapper_class
+        features_mc = parent.features_mc
+        ges_components_mc = parent.ges_components_mc
+        marine_mc = parent.marine_mc
         mc_countries = sql2018.ReportedInformation
 
         conditions = list()
@@ -1039,6 +1304,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
             mc.IdIndicatorAssessment == id_indicator_assessment
         )
         excluded_columns = ('Id', 'IdIndicatorAssessment')
+        # excluded_columns = BLACKLIST
         indicators_dataset = db_objects_to_dict(indicators_dataset,
                                                 excluded_columns)
 
@@ -1061,10 +1327,10 @@ class A2018ArticleIndicators(EmbededForm):
     marine_mc = sql2018.IndicatorsMarineUnit
 
     fields = Fields(interfaces.ICountryCode)
-    fields['country_code'].widgetFactory = CheckBoxFieldWidget
+    fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        return A2018IndicatorsGESFeatureMRUForm(self, self.request)
+        return A2018IndicatorsGesComponent(self, self.request)
 
-    def default_country_code(self):
-        return all_values_from_field(self, self.fields['country_code'])
+    # def default_member_states(self):
+    #     return all_values_from_field(self, self.fields['member_states'])

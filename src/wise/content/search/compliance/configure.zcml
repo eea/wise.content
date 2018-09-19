@@ -9,7 +9,7 @@
     for="*"
     name="comp-start"
     class=".main.StartComplianceView"
-    template="../pt/compliance-start.pt"
+    template="../pt/start.pt"
     permission="zope2.View"
     />
 
@@ -19,23 +19,5 @@
     class=".main.NationalDescriptorFormView"
     permission="zope2.View"
     />
-
-  <browser:page
-    for="*"
-    name="deter"
-    class=".nat_desc.DeterminationOfGES2012"
-    template='../pt/determination.pt'
-    permission="zope2.View"
-    />
-
-  <!-- <utility -->
-  <!--   component=".compliance.compliance_countries" -->
-  <!--   name="compliance_countries" -->
-  <!--   /> -->
-  <!--  -->
-  <!-- <utility -->
-  <!--   component=".compliance.compliance_report_types" -->
-  <!--   name="compliance_report_types" -->
-  <!--   /> -->
 
 </configure>

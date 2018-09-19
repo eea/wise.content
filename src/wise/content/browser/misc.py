@@ -12,7 +12,9 @@ from wise.content import _
 from zope.component import adapts
 from zope.interface import Interface, implements
 from zope.schema import TextLine
-
+from plone.memoize.view import memoize
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
 
 class FixCheckout(BrowserView):
     """ A view to fix getBaseline error when the original item was deleted

@@ -353,25 +353,70 @@ class ART9GESMarineUnit(Base):
     ART9_GES_GESDetermination = relationship(u'ART9GESGESDetermination')
 
 
-class AssessmentsComment(Base):
-    __tablename__ = 'Assessments_comments'
+class COMAssessment(Base):
+    __tablename__ = 'COM_Assessments'
 
     Id = Column(Integer, primary_key=True)
-    COM_assessmentsId = Column(ForeignKey(u'COM_assessments.Id'), nullable=False)
+    COM_GeneralId = Column(ForeignKey(u'COM_General.Id'), nullable=False)
+    MSFDArticle = Column(Unicode(20))
+    MarineUnit = Column(Unicode(50))
+    Feature = Column(Unicode(200))
+    GESComponent_Target = Column(Unicode(15))
+    AssessmentCriteria = Column(Unicode(25))
+    AssessedInformation = Column(Unicode(50))
+    Evidence = Column(Unicode(150))
+    Description_Summary = Column(Unicode)
+    Conclusion = Column(Unicode(50))
+    Score = Column(Numeric(8, 5))
+    AssessmentChangeArt9 = Column(Integer)
+    RecommendationsArt9 = Column(Unicode)
+
+    COM_General = relationship(u'COMGeneral')
+
+
+t_COM_Assessments_2012 = Table(
+    'COM_Assessments_2012', metadata,
+    Column('CountryCode', Unicode(255)),
+    Column('Subregion', Unicode(255)),
+    Column('Country', Unicode(255)),
+    Column('Descriptor', Unicode(255)),
+    Column('AssessmentCriteria', Unicode(255)),
+    Column('MSFDArticle', Unicode(255)),
+    Column('Assessment', Unicode),
+    Column('Conclusions', Unicode),
+    Column('Criteria', Unicode),
+    Column('OverallScore', Float(53)),
+    Column('OverallAssessment', Unicode(255))
+)
+
+
+class COMAssessmentsComment(Base):
+    __tablename__ = 'COM_Assessments_comments'
+
+    Id = Column(Integer, primary_key=True)
+    COM_AssessmentsId = Column(ForeignKey(u'COM_Assessments.Id'), nullable=False)
     Organisation = Column(Unicode(50))
     Comment = Column(Unicode)
 
-    COM_assessment = relationship(u'COMAssessment')
+    COM_Assessment = relationship(u'COMAssessment')
 
 
-class COMAssessment(Base):
-    __tablename__ = 'COM_assessments'
+class COMGeneral(Base):
+    __tablename__ = 'COM_General'
 
     Id = Column(Integer, primary_key=True)
     Reporting_historyId = Column(ForeignKey(u'Reporting_history.Id'), nullable=False)
-    Article = Column(Unicode(100))
-    GEScomponent = Column(Unicode(100))
-    Feature = Column(Unicode(200))
+    CountryCode = Column(Unicode(2))
+    RegionSubregion = Column(Unicode(20))
+    AssessmentTopic = Column(Unicode(200))
+    MSFDArticle = Column(Unicode(20))
+    DateReportDue = Column(Date)
+    ReportBy = Column(Unicode(20))
+    SourceFile = Column(Unicode(500))
+    DateReported = Column(Date)
+    DateAssessed = Column(Date)
+    Assessors = Column(Unicode(500))
+    CommissionReport = Column(Unicode(500))
 
     Reporting_history = relationship(u'ReportingHistory')
 
@@ -525,11 +570,53 @@ class IndicatorsMarineUnit(Base):
     Indicators_IndicatorAssessment = relationship(u'IndicatorsIndicatorAssessment')
 
 
+class LAssessedInformation(Base):
+    __tablename__ = 'L_AssessedInformations'
+
+    Id = Column(Integer, primary_key=True)
+    AssessedInformation = Column(Unicode(50), nullable=False)
+
+
+class LAssessmentCriteria(Base):
+    __tablename__ = 'L_AssessmentCriterias'
+
+    Id = Column(Integer, primary_key=True)
+    AssessmentCriteria = Column(Unicode(25), nullable=False)
+
+
+class LAssessmentTopic(Base):
+    __tablename__ = 'L_AssessmentTopics'
+
+    Id = Column(Integer, primary_key=True)
+    AssessmentTopic = Column(Unicode(200), nullable=False)
+
+
+class LConclusion(Base):
+    __tablename__ = 'L_Conclusions'
+
+    Id = Column(Integer, primary_key=True)
+    Conclusion = Column(Unicode(50), nullable=False)
+
+
 class LCountry(Base):
     __tablename__ = 'L_Countries'
 
     Code = Column(Unicode(2), primary_key=True)
     Country = Column(Unicode(50), nullable=False)
+
+
+class LDateReportDue(Base):
+    __tablename__ = 'L_DateReportDues'
+
+    Id = Column(Integer, primary_key=True)
+    DateReportDue = Column(Date, nullable=False)
+
+
+class LEvidence(Base):
+    __tablename__ = 'L_Evidences'
+
+    Id = Column(Integer, primary_key=True)
+    Evidence = Column(Unicode(150), nullable=False)
 
 
 class LFeature(Base):
@@ -558,6 +645,13 @@ class LIntegrationRule(Base):
     Label = Column(Unicode(50))
     Type = Column(Unicode(50))
     Description = Column(Unicode(1000))
+
+
+class LMSFDArticle(Base):
+    __tablename__ = 'L_MSFDArticles'
+
+    Id = Column(Integer, primary_key=True)
+    MSFDArticle = Column(Unicode(20), nullable=False)
 
 
 class LNACECode(Base):
@@ -596,6 +690,7 @@ class MarineReportingUnit(Base):
     MarineReportingUnitId = Column(Unicode(50), nullable=False)
     Region = Column(Unicode(20))
     Description = Column(Unicode(255))
+    Area = Column(Float(53))
     SHAPE = Column(NullType)
     localId = Column(Unicode(254))
     namespace = Column(Unicode(254))
@@ -673,6 +768,38 @@ class ReportingHistory(Base):
     ReportType = Column(Unicode(50))
 
 
+t_V_CriteriaStatus2018 = Table(
+    'V_CriteriaStatus2018', metadata,
+    Column('CountryCode', Unicode(2), nullable=False),
+    Column('Country', Unicode(50), nullable=False),
+    Column('Region', Unicode(20)),
+    Column('MRU', Unicode(50), nullable=False),
+    Column('MRUDescription', Unicode(255)),
+    Column('MRUArea', Float(53)),
+    Column('Feature', Unicode(250), nullable=False),
+    Column('GESComponent', Unicode(50), nullable=False),
+    Column('Element', Unicode(250)),
+    Column('Criteria', Unicode(50), nullable=False),
+    Column('CriteriaStatus', Unicode(50), nullable=False)
+)
+
+
+t_V_ElementStatus2018 = Table(
+    'V_ElementStatus2018', metadata,
+    Column('CountryCode', Unicode(2), nullable=False),
+    Column('Country', Unicode(50), nullable=False),
+    Column('Region', Unicode(20)),
+    Column('MRU', Unicode(50), nullable=False),
+    Column('MRUDescription', Unicode(255)),
+    Column('MRUArea', Float(53)),
+    Column('Feature', Unicode(250), nullable=False),
+    Column('GESComponent', Unicode(50), nullable=False),
+    Column('Element', Unicode(250)),
+    Column('Element2', Unicode(250)),
+    Column('ElementStatus', Unicode(50))
+)
+
+
 t_V_EnvelopeAnalytics = Table(
     'V_EnvelopeAnalytics', metadata,
     Column('EnvelopeImportID', BigInteger, nullable=False),
@@ -724,6 +851,41 @@ t_V_EnvelopeAnalyticsOtherEnvelopes = Table(
     Column('PenultimateWorkItem', Unicode(50)),
     Column('Feedback', UnicodeText(1073741823)),
     Column('deleted', SmallInteger)
+)
+
+
+t_V_OverallStatus2018 = Table(
+    'V_OverallStatus2018', metadata,
+    Column('CountryCode', Unicode(2), nullable=False),
+    Column('Country', Unicode(50), nullable=False),
+    Column('Region', Unicode(20)),
+    Column('MRU', Unicode(50), nullable=False),
+    Column('MRUDescription', Unicode(255)),
+    Column('MRUArea', Float(53)),
+    Column('Feature', Unicode(250), nullable=False),
+    Column('GESComponent', Unicode(50), nullable=False),
+    Column('GESAchieved', Unicode(50), nullable=False),
+    Column('GESExtentAchieved', Numeric(8, 5)),
+    Column('GESExtentUnit', Unicode(250)),
+    Column('GESExtentThreshold', Numeric(8, 5))
+)
+
+
+t_V_Parameters2018 = Table(
+    'V_Parameters2018', metadata,
+    Column('CountryCode', Unicode(2), nullable=False),
+    Column('Country', Unicode(50), nullable=False),
+    Column('Region', Unicode(20)),
+    Column('MRU', Unicode(50), nullable=False),
+    Column('MRUDescription', Unicode(255)),
+    Column('MRUArea', Float(53)),
+    Column('Feature', Unicode(250), nullable=False),
+    Column('GESComponent', Unicode(50), nullable=False),
+    Column('Element', Unicode(250)),
+    Column('Criteria', Unicode(50), nullable=False),
+    Column('Parameter', Unicode(50), nullable=False),
+    Column('ParameterAchieved', Unicode(50), nullable=False),
+    Column('Trend', Unicode(50), nullable=False)
 )
 
 

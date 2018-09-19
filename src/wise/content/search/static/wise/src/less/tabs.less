@@ -1,7 +1,9 @@
 @import "./bootstrap/variables.less";
 @import "variables.less";
 
-#tabs-wrapper {
+#mainform-tabs,
+#tabs-wrapper
+{
 
   .tab-content {
     padding-top: 10px;
@@ -49,24 +51,109 @@
            border-bottom-right-radius: 0;
 
            &:hover {
-            background: @dark-theme-color;
             color: white;
            }
 
-            >span {
-            display: block;
-            white-space: normal;
+           &:focus {
+             background: @dark-theme-color;
+           }
+
+           >span {
+              display: block;
+              white-space: normal;
             }
 
-            > span:first-child {
-            font-weight: 800;
-            font-size: 1.3rem;
+           > span:first-child {
+              font-weight: 800;
+              font-size: 1.3rem;
             }
 
-            > span:nth-child(2){
-            font-size: 1.2rem;
-            line-height: 1em;
+           > span:nth-child(2){
+              font-size: 1.2rem;
+              line-height: 1em;
             }
+        }
+
+        &:hover {
+          background-color: #006699;
+          border-right: none;
+          color:white;
+          cursor: pointer;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          transition: background-color 0.5s ease-in;
+          -webkit-transition: background-color 0.5 ease-in;
+          -moz-transition: background-color 0.5s ease-in;
+          -o-transition: background-color 0.5s ease-in;
+
+          a {
+            margin: 0 auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+          }
+        }
+
+        &.active {
+          background-color: #337ab7;
+
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+
+          &:hover {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+
+          a {
+            background-color: transparent;
+            border-left: none;
+            border-right: none;
+            color: white;
+            border-top: none;
+            font-weight: 700;
+
+            &:hover {
+              color: white;
+              background-color: transparent;
+              border-left: none;
+              border-right: none;
+              border-top: none;
+            }
+          }
+        }
+
+        a:hover {
+          background-color: transparent;
+          color: white;
+        }
+
+      }
+    }
+
+    &.nav {
+      list-style-type: none !important;
+      display: inline-block;
+
+      overflow: hidden;
+      margin-left: 0;
+      width: 100%;
+
+      li {
+        text-align: center;
+
+        a {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         &:hover {
@@ -131,7 +218,6 @@
           background-color: transparent;
           color: white;
         }
-
       }
     }
 
@@ -149,13 +235,10 @@
 
 }
 
-#wise-compliance-form-top #tabs-wrapper
-{
-  .topnav li {
-    margin-right: 1%;
-  }
+.tab-content {
+  padding-top: 10px;
 }
 
-.mobile-select-article {
+#mobile-select-article {
   margin-top: 2rem;
 }
