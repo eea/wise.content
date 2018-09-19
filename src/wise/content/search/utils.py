@@ -21,7 +21,7 @@ FORMS = {}                         # main chapter 1 article form classes
 SUBFORMS = defaultdict(set)        # store subform references
 ITEM_DISPLAYS = defaultdict(set)   # store registration for item displays
 LABELS = {}                        # vocabulary of labels
-
+BLACKLIST = ['ID', 'Import', 'Id']
 
 def class_id(obj):
     if type(obj) is type:
@@ -224,7 +224,6 @@ def data_to_xls(data):
 def get_obj_fields(obj, use_blacklist=True, whitelist=None):
     whitelist = whitelist or []
     whitelist = getattr(obj, 'whitelist', whitelist)
-    BLACKLIST = ['ID', 'Import', 'Id']
 
     mapper = inspect(obj)
 
@@ -291,8 +290,9 @@ def db_objects_to_dict(data, excluded_columns=()):
         d = OrderedDict()
 
         for col in columns:
+            # import pdb; pdb.set_trace()
             if col not in excluded_columns:
-                d.update({col: getattr(row, col)})
+                    d.update({col: getattr(row, col)})
         out.append(d)
 
     return out
@@ -304,7 +304,7 @@ def pivot_data(data, pivot):
     count_distinct_values = len(set(row.get(pivot, '') for row in data))
 
     for row in data:
-        d = dict(row)
+        d = OrderedDict(row)
         p = d.pop(pivot) if count_distinct_values > 1 else d[pivot]
 
         if any(d.values()):
