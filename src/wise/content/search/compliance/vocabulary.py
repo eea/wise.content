@@ -138,4 +138,4 @@ def vocab_from_list(values):
 
 
 descriptors_vocabulary = vocab_from_pairs(GES_DESCRIPTORS)
-vocab_from_pairs(ASSESSED_ARTICLES)
+articles_vocabulary = vocab_from_pairs(ASSESSED_ARTICLES)
