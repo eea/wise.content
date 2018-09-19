@@ -22,7 +22,7 @@
           </select>
 
         </div>
-
+        <p tal:condition="python: not section">No data</p>
         <div class="tabs-wrapper" >
           <div class="tab-content">
             <tal:section tal:repeat="tab_title section">
@@ -33,7 +33,9 @@
                 id python: view.title_as_id(utitle);"
                       role="tabpanel"
               >
+
                 <tal:def define="section_data python:section[tab_title]">
+                  <p tal:condition="python: not section_data">No data</p>
                   <table class="listing" tal:condition="section_data">
                     <!-- tal:condition="section_data" -->
                     <thead>
@@ -49,6 +51,7 @@
                       </tr>
                     </tbody>
                   </table>
+                  <!--<p tal:condition="python: not section_data">No data</p>-->
                 </tal:def>
               </div>
             </tal:section>

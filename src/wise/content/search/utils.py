@@ -182,7 +182,7 @@ def data_to_xls(data):
         is_tuple = isinstance(row0, tuple)
 
         if not is_tuple:
-            fields = sorted(get_obj_fields(row0, False))
+            fields = get_obj_fields(row0, False)
         else:
             fields = row0._fields
 
@@ -230,22 +230,22 @@ def get_obj_fields(obj, use_blacklist=True, whitelist=None):
     fields = []
     keys = [c.key for c in mapper.attrs]        # forgo sorted use
 
-    if not use_blacklist:
-        return keys
+    if use_blacklist:
+        for key in keys:
+            if key in whitelist:
+                fields.append(key)
 
-    for key in keys:
-        if key in whitelist:
-            fields.append(key)
+                continue
+            flag = False
 
-            continue
-        flag = False
+            for bit in BLACKLIST:
+                if bit in key:
+                    flag = True
 
-        for bit in BLACKLIST:
-            if bit in key:
-                flag = True
-
-        if not flag:
-            fields.append(key)
+            if not flag:
+                fields.append(key)
+    else:
+        fields = keys
 
     # this is a hack to return a sorted list of fields, according to the order
     # of their definition. this is default behaviour in python 3.6+, but not in

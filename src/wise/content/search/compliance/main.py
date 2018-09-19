@@ -2,7 +2,6 @@
 # from zope.component import getMultiAdapter
 from zope.interface import Interface, implements
 from zope.schema import Choice
-from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
@@ -18,7 +17,7 @@ from ..interfaces import IMainForm
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
                        ReportData2018, ReportHeaderForm2018)
-from .vocabulary import ASSESSED_ARTICLES
+from .vocabulary import articles_vocabulary, descriptors_vocabulary
 
 MAIN_FORMS = [
     # view name, (title, explanation)
@@ -121,9 +120,13 @@ class IMemberState(Interface):
 class NationalDescriptorForm(MainAssessmentForm):
     assessment_topic = 'GES Descriptor (see term list)'
     fields = Fields(IMemberState)
-    name="comp-national-descriptor"
+    name = "comp-national-descriptor"
 
-    # subform_class = GESDescriptorForm
+    form_id = 'wise-compliance-form'
+
+    form_id_top = 'wise-compliance-form-top'
+
+    form_container_class = 'wise-compliance-form-container'
 
     def get_subform(self):
         return GESDescriptorForm(self, self.request)
@@ -131,48 +134,11 @@ class NationalDescriptorForm(MainAssessmentForm):
 
 NationalDescriptorFormView = wrap_form(NationalDescriptorForm, MainFormWrapper)
 
-# TODO: sort this vocabulary (somehow)
-GES_DESCRIPTORS = (
-    ('D1', 'D1 Biodiversity'),
-    ('D1 Birds', 'D1 Biodiversity – birds'),
-    ('D1 Cephalopods', 'D1 Biodiversity –  cephalopods'),
-    ('D1 Fish', 'D1 Biodiversity – fish'),
-    ('D1 Mammals', 'D1 Biodiversity – mammals'),
-    ('D1 Pelagic habitats', 'D1 Biodiversity – pelagic habitats'),
-    ('D1 Reptiles', 'D1 Biodiversity – reptiles'),
-    ('D2', 'D2 Non-indigenous species'),
-    ('D3', 'D3 Commercial fish and shellfish'),
-    ('D4/D1', 'D4 Food webs/D1 Biodiversity - ecosystems'),
-    ('D5', 'D5 Eutrophication'),
-    ('D6/D1', 'D6 Sea-floor integrity/D1 Biodiversity - benthic habitats'),
-    ('D7', 'D7 Hydrographical changes'),
-    ('D8', 'D8 Contaminants'),
-    ('D9', 'D9 Contaminants in seafood'),
-    ('D10', 'D10 Marine litter'),
-    ('D11', 'D11 Energy, incl. underwater noise'),
-)
-
-
-def vocab_from_pairs(pairs):
-    """ Build a zope.schema vocabulary from pairs of (value(token), title)
-    """
-    terms = []
-
-    for val, title in pairs:
-        term = SimpleTerm(val, val, title)
-        terms.append(term)
-
-    return SimpleVocabulary(terms)
-
-
-def vocab_from_list(values):
-    return SimpleVocabulary([SimpleTerm(x, x, x) for x in values])
-
 
 class IGESDescriptor(Interface):
     descriptor = Choice(
         title=u"Descriptor",
-        vocabulary=vocab_from_pairs(GES_DESCRIPTORS),
+        vocabulary=descriptors_vocabulary,
         required=False,
         default='D5'
     )
@@ -188,7 +154,7 @@ class GESDescriptorForm(EmbededForm):
 class IArticle(Interface):
     article = Choice(
         title=u"Article",
-        vocabulary=vocab_from_pairs(ASSESSED_ARTICLES),
+        vocabulary=articles_vocabulary,
         required=False,
     )
 
@@ -236,11 +202,3 @@ class NationalDescriptorAssessmentForm(Container):
 
         for child in self.subforms:
             child.update()
-
-    # def subform(self):
-    #     out = u''
-    #
-    #     for child in self.children:
-    #         out += child()
-    #
-    #     return out

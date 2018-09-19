@@ -4,20 +4,23 @@ from collections import defaultdict
 
 from sqlalchemy import and_, or_
 from zope.interface import Interface
-from zope.schema import Choice, Text, TextLine
+from zope.schema import Choice, Text
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql  # , sql2018
 from z3c.form.field import Fields
+from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
 from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from ..features import features_vocabulary
+from ..gescomponents import get_ges_criterions
 from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
-from .vocabulary import ASSESSED_ARTICLES, form_structure
+from .vocabulary import form_structure
 
 
 def row_to_dict(table, row):
@@ -298,14 +301,15 @@ class AssessmentDataForm2018(Container, BaseUtil):
             data.update(form.data)
 
         print data
-        # import pdb; pdb.set_trace()
 
     def _build_subforms(self, tree):
         """ Build a form of options from a tree of options
         """
         base_name = tree.name
         # TODO: get list of descriptors?
-        descriptor_criterions = ['D4C1', 'D5C2']
+        data = self.get_flattened_data(self)
+        descriptor = data['descriptor']
+        descriptor_criterions = get_ges_criterions(descriptor)
 
         forms = []
 
@@ -318,8 +322,10 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.title = '{}: {}'.format(base_name, row_name)
 
             for crit in descriptor_criterions:
-                field_title = u'{} {}: {}'.format(base_name, row_name, crit)
-                field_name = '{}_{}_{}'.format(base_name, row_name, crit)
+                print crit
+                field_title = u'{} {}: {}'.format(base_name, row_name,
+                                                  crit.title)
+                field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
                 choices = [''] + [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
                 field = Choice(
@@ -369,16 +375,16 @@ class IBasicAssessmentData2018(Interface):
     """ The basic fields for the assessment data for 2018
     """
     # TODO: this needs a select box?
-    feature_reported = TextLine(title=u'Feature reported')
+    feature_reported = Choice(title=u'Feature reported',
+                              vocabulary=features_vocabulary)
 
 
 class BasicAssessmentDataForm2018(EmbededForm):
     """
     """
-    def __init__(self, context, request):
-        super(BasicAssessmentDataForm2018, self).__init__(context, request)
-        fields = [IBasicAssessmentData2018]
-        self.fields = Fields(*fields)
+
+    fields = Fields(IBasicAssessmentData2018)
+    fields['feature_reported'].widgetFactory = OptgroupFieldWidget
 
 
 class ISummaryAssessmentData2018(Interface):
