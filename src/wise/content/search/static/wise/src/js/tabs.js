@@ -46,35 +46,42 @@ setupTabs = function (tabswrapper) {
         } */
 
         var renderTopTabs = function () {
-            var nrTabs = $( " ul.topnav li").length || 0;
+            var nrTabs = $( tabsWrapper + " ul.topnav li").length || 0;
 
             if(nrTabs === 0){
                 return false;
             }
 
-            var tabWidth = (100/nrTabs) - 1;
+            var totalLength = 100;
 
-            var rest = 100 - (tabWidth * nrTabs) - 1;
+            var tabSpaces  = nrTabs - 1;
 
-            var tabSpace = rest/nrTabs;
+            var tabWidth = (totalLength - tabSpaces) / nrTabs ;
+
+            var rest = totalLength - (tabWidth * nrTabs);
+
+            var tabSpace = rest / (nrTabs-1);
 
             $( ".topnav li").css({
                 "width": tabWidth  + "%",
                 "margin-right": tabSpace + "%"
             });
+            $( ".topnav li:last-child").css({
+               "margin-right" : "0"
+            });
         };
 
-        if( $( tabswrapper + " ul li").length === 1 ){
+        if( $( tabsWrapper + " ul li").length === 1 ){
             $("#tabContents").removeClass("tab-content");
-            $( tabswrapper + " ul").attr("class", "");
-            $( tabswrapper + " ul li").css({
+            $( tabsWrapper + " ul").attr("class", "");
+            $( tabsWrapper + " ul li").css({
                 "background-color": "transparent",
                 "float" : "none"
             });
-            var lt = $( tabswrapper + " ul li a").text();
-            $( tabswrapper + " ul li").append("<h4>" + lt + "</h4>");
-            $( tabswrapper + " ul li a").remove();
-            $( tabswrapper + " .tab-pane").removeClass("fade");
+            var lt = $( tabsWrapper + " ul li a").text();
+            $( tabsWrapper + " ul li").append("<h4>" + lt + "</h4>");
+            $( tabsWrapper + " ul li a").remove();
+            $( tabsWrapper + " .tab-pane").removeClass("fade");
         }
         renderTopTabs();
     }
