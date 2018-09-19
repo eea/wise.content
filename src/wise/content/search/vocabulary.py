@@ -769,8 +769,8 @@ def a2018_feature_art9(context):
     features_mc = parent.features_mc
     determination_mc = parent.determination_mc
 
-    countries = parent.get('member_states')
-    ges_components = context.get('ges_component')
+    countries = parent.data.get('member_states')
+    ges_components = context.data.get('ges_component')
 
     mc_countries = sql2018.ReportedInformation
     conditions = list()

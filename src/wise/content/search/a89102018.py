@@ -16,7 +16,7 @@ from .sql_extra import MSFD4GeographicalAreaID
 
 
 class Art9Display(ItemDisplayForm):
-    # css_class = 'left-side-form'
+    css_class = 'left-side-form'
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
     show_extra_data = True
 
@@ -68,6 +68,8 @@ class Art9Display(ItemDisplayForm):
 
         data = self.get_flattened_data(self)
 
+        # import pdb; pdb.set_trace()
+
         member_states = data.get('member_states', ())
         ges_components = data.get('ges_component', ())
         features = data.get('feature', ())
@@ -109,13 +111,13 @@ class Art9Display(ItemDisplayForm):
 
         self.show_extra_data = True
         id_ges_comp = res.Id
-        res = db.get_related_record(
+        cnt, res = db.get_related_record(
             determination_mc,
             'IdGESComponent',
             id_ges_comp
         )
 
-        return res
+        return count, res
 
     def get_extra_data(self):
         if not self.item or not self.show_extra_data:
@@ -132,10 +134,11 @@ class Art9Display(ItemDisplayForm):
 
         res = list()
 
-        if marine_units:
-            res.append(
-                ('Indicators Dataset', {'': marine_units})
-            )
+        res.append(
+            ('Marine Unit IDs', {
+                '': [{'Marine Unit Id': x} for x in marine_units]
+            })
+        )
 
         return res
 
@@ -177,9 +180,7 @@ class A2018FeatureA9(EmbededForm):
     fields['feature'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
-        klass = self.context.display_klass
-
-        return klass(self, self.request)
+        return Art9Display(self, self.request)
 
     # def default_feature(self):
     #     return all_values_from_field(self, self.fields['feature'])
@@ -323,7 +324,9 @@ class A2018Art10Display(ItemDisplayForm):
             getattr(mc, column) == target_id
         )
 
-        paremeters = db_objects_to_dict(result, BLACKLIST)
+        excluded_columns = ('Id', 'IdTarget')
+
+        paremeters = db_objects_to_dict(result, excluded_columns)
         paremeters = pivot_data(paremeters, 'Parameter')
 
         res = [
@@ -553,7 +556,8 @@ class A2018Art81abDisplay(ItemDisplayForm):
 
         id_overall = self.item.Id
 
-        excluded_columns = ('Id', 'IdOverallStatus', 'IdElementStatus')
+        excluded_columns = ('Id', 'IdOverallStatus', 'IdElementStatus',
+                            'IdCriteriaStatus', 'IdCriteriaValues')
         # excluded_columns = BLACKLIST
 
         pressure_codes = db.get_unique_from_mapper(
