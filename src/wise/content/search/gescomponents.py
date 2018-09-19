@@ -18,27 +18,6 @@
 # B - GES descriptor	D10	D10 Marine litter
 # B - GES descriptor	D11	D11 Energy, incl. underwater noise
 
-
-GES_DESCRIPTORS = (
-    ('D1', 'D1 Biodiversity'),
-    ('D1 Birds', 'D1 Biodiversity – birds'),
-    ('D1 Mammals', 'D1 Biodiversity – mammals'),
-    ('D1 Reptiles', 'D1 Biodiversity – reptiles'),
-    ('D1 Fish', 'D1 Biodiversity – fish'),
-    ('D1 Cephalopods', 'D1 Biodiversity –  cephalopods'),
-    ('D1 Pelagic habitats', 'D1 Biodiversity – pelagic habitats'),
-    ('D2', 'D2 Non-indigenous species'),
-    ('D3', 'D3 Commercial fish and shellfish'),
-    ('D4/D1', 'D4 Food webs/D1 Biodiversity - ecosystems'),
-    ('D5', 'D5 Eutrophication'),
-    ('D6/D1', 'D6 Sea-floor integrity/D1 Biodiversity - benthic habitats'),
-    ('D7', 'D7 Hydrographical changes'),
-    ('D8', 'D8 Contaminants'),
-    ('D9', 'D9 Contaminants in seafood'),
-    ('D10', 'D10 Marine litter'),
-    ('D11', 'D11 Energy, incl. underwater noise'),
-)
-
 # GES criterias have been used in 2010/2012 reports and then revamped for 2018
 # reports. As such, some exist in 2010 that didn't exist in 2018, some exist
 # for 2018 that didn't exist for 2010 and they have changed their ids between
