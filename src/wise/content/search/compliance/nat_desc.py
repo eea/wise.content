@@ -326,13 +326,15 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
-                choices = [''] + [x.name for x in row.children]
+                # choices = [''] + [x.name for x in row.children]
+                choices = [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
                 field = Choice(
                     title=field_title,
                     __name__=field_name,
                     vocabulary=SimpleVocabulary(terms),
-                    default=''      # TODO: set the default
+                    required=False,
+                    # default=''      # TODO: set the default
                 )
                 fields.append(field)
 
@@ -343,7 +345,11 @@ class AssessmentDataForm2018(Container, BaseUtil):
         return forms
 
     def build_forms(self):
-        article = form_structure['Art9']
+        article = self.get_flattened_data(self)['article'].capitalize()
+        try:
+            article = form_structure[article]
+        except KeyError:    # article is not in form structure yet
+            return
         assessment_criterias = article.children
 
         for criteria in assessment_criterias:

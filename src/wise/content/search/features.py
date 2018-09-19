@@ -36,6 +36,9 @@ def get_feature_terms():
     seen = []
 
     for group_name, features in FEATURES.items():
+        if 'activity' in group_name.lower():
+            continue
+
         for (key, title) in features:
             if key in seen:
                 continue
