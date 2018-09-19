@@ -18,7 +18,8 @@ module.exports = {
               '<%= path.src %>/less/tabs.less',
               '<%= path.src %>/less/select2-override.less',
               '<%= path.src %>/less/select2-top-override.less'
-          ]
+          ],
+          '<%= path.dest %>/css/compliance.css': '<%= path.src %>/less/compliance.less'
       }
 
     }

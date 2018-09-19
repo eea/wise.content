@@ -11,4 +11,12 @@
         bundle="default" cacheable="True" compression="safe" conditionalcomment=""
         cookable="True" enabled="on" id="++resource++static_css/tabs.css" media="screen"
         rel="stylesheet" rendering="link"/>
+
+    <stylesheet title="compliance" applyPrefix="False" authenticated="False"
+        bundle="default" cacheable="True" compression="safe" conditionalcomment=""
+        cookable="True" enabled="on" expression="python: '@@comp' in request.URL0"
+        id="++resource++static_css/compliance.css" media="screen"
+        insert-after="++theme++wise/css/search-style.css"
+        rel="stylesheet" rendering="link"/>
+
 </object>
