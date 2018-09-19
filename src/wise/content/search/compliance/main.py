@@ -121,6 +121,7 @@ class IMemberState(Interface):
 class NationalDescriptorForm(MainAssessmentForm):
     assessment_topic = 'GES Descriptor (see term list)'
     fields = Fields(IMemberState)
+    name="comp-national-descriptor"
 
     # subform_class = GESDescriptorForm
 
