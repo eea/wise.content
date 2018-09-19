@@ -4,21 +4,23 @@ from collections import defaultdict
 
 from sqlalchemy import and_, or_
 from zope.interface import Interface
-from zope.schema import Choice, Text, TextLine
+from zope.schema import Choice, Text
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql  # , sql2018
 from z3c.form.field import Fields
+from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
 from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from ..features import features_vocabulary
 from ..gescomponents import get_ges_criterions
 from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
-from .vocabulary import ASSESSED_ARTICLES, form_structure
+from .vocabulary import form_structure
 
 
 def row_to_dict(table, row):
@@ -373,16 +375,16 @@ class IBasicAssessmentData2018(Interface):
     """ The basic fields for the assessment data for 2018
     """
     # TODO: this needs a select box?
-    feature_reported = TextLine(title=u'Feature reported')
+    feature_reported = Choice(title=u'Feature reported',
+                              vocabulary=features_vocabulary)
 
 
 class BasicAssessmentDataForm2018(EmbededForm):
     """
     """
-    def __init__(self, context, request):
-        super(BasicAssessmentDataForm2018, self).__init__(context, request)
-        fields = [IBasicAssessmentData2018]
-        self.fields = Fields(*fields)
+
+    fields = Fields(IBasicAssessmentData2018)
+    fields['feature_reported'].widgetFactory = OptgroupFieldWidget
 
 
 class ISummaryAssessmentData2018(Interface):
