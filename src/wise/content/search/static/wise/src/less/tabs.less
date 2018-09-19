@@ -56,6 +56,7 @@
 
            &:focus {
              background: @dark-theme-color;
+             color: white;
            }
 
            >span {
@@ -139,7 +140,7 @@
       }
     }
 
-    &.nav {
+    &.nav:not(.topnav) {
       list-style-type: none !important;
       display: inline-block;
 
@@ -149,8 +150,16 @@
 
       li {
         text-align: center;
+        list-style: none;
+        margin-bottom: 0;
+        background-color: #eeeeee;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
 
         a {
+          border: none;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
