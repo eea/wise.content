@@ -12,7 +12,7 @@ function clickFirstTab(){
 * TABS END
 * */
 
-setupTabs = function () {
+setupTabs = function (tabswrapper) {
     function setupInnerTabs(tabsW) {
     var t = $("ul.nav:not(.topnav) > li");
     // tabs width calculation
@@ -60,15 +60,11 @@ setupTabs = function () {
                 return false;
             }
 
-            var tabWidth = Math.floor(100/nrTabs) - 1;
+            var tabWidth = (100/nrTabs) - 1;
 
             var rest = 100 - (tabWidth * nrTabs) - 1;
 
-            var tabSpace = Math.floor(rest/nrTabs);
-
-            if(tabSpace < 1){
-                tabSpace = rest/nrTabs;
-            }
+            var tabSpace = rest/nrTabs;
 
             $( ".topnav li").css({
                 "width": tabWidth  + "%",
@@ -93,7 +89,7 @@ setupTabs = function () {
 
     }
 
-    setupTabsInit();
+    setupTabsInit(tabswrapper);
     clickFirstTab();
 }
 

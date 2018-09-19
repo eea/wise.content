@@ -51,23 +51,26 @@
            border-bottom-right-radius: 0;
 
            &:hover {
-            /*background: @dark-theme-color;*/
             color: white;
            }
 
-            >span {
-            display: block;
-            white-space: normal;
+           &:focus {
+             background: @dark-theme-color;
+           }
+
+           >span {
+              display: block;
+              white-space: normal;
             }
 
-            > span:first-child {
-            font-weight: 800;
-            font-size: 1.3rem;
+           > span:first-child {
+              font-weight: 800;
+              font-size: 1.3rem;
             }
 
-            > span:nth-child(2){
-            font-size: 1.2rem;
-            line-height: 1em;
+           > span:nth-child(2){
+              font-size: 1.2rem;
+              line-height: 1em;
             }
         }
 
@@ -75,6 +78,7 @@
           background-color: #006699;
           border-right: none;
           color:white;
+          cursor: pointer;
 
           border-top-left-radius: 10px;
           border-top-right-radius: 10px;
@@ -87,10 +91,10 @@
 
           a {
             margin: 0 auto;
-
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: white;
           }
         }
 
@@ -103,8 +107,6 @@
           border-bottom-right-radius: 0;
 
           &:hover {
-            //background-color: #337ab7;
-
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             border-bottom-left-radius: 0;
@@ -219,30 +221,6 @@
       }
     }
 
-    li {
-      list-style-type: none !important;
-      display: inline-block;
-      float: left;
-      border: none;
-      background-color: #eeeeee;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-
-      transition: background-color 0.5s ease-in;
-      -webkit-transition: background-color 0.5 ease-out;
-      -moz-transition: background-color 0.5s ease-out;
-      -o-transition: background-color 0.5s ease-out;
-
-      padding-bottom: 99999px;
-      margin-bottom: -99999px;
-
-      &:not(:first-child){
-        margin-left: 2px;
-      }
-    }
-
   }
 
   & > ul.topnav li.tab-active,
@@ -256,13 +234,6 @@
   }
 
 }
-/*
-#wise-compliance-form-top #mainform-tabs
-{
-  .topnav li {
-    margin-right: 1%;
-  }
-}*/
 
 .tab-content {
   padding-top: 10px;
