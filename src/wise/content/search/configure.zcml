@@ -75,5 +75,9 @@
      file="./static/wise/dist/js/tabs.js"
   />
 
+  <browser:resource
+     name="compliance.js"
+     file="./static/wise/dist/js/compliance.js"
+  />
 
 </configure>

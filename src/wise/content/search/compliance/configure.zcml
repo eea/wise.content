@@ -9,7 +9,7 @@
     for="*"
     name="comp-start"
     class=".main.StartComplianceView"
-    template="../pt/compliance-start.pt"
+    template="../pt/start.pt"
     permission="zope2.View"
     />
 
