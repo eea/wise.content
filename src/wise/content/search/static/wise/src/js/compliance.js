@@ -1,5 +1,6 @@
 (function(window, document, $){
     var selectorFormContainer = ".wise-search-form-container";
+    var exceptVal = ["all", "none", "invert", "apply"];
     /*
     * SELECT2 functions
     * */
@@ -34,6 +35,7 @@
 
     function initStyling(){
         //$("#form-buttons-continue").hide("fast");
+        $(".page-body").addClass("fullwidth");
         $(".button-field").addClass("btn");
     }
 
@@ -336,7 +338,7 @@
 
         var par = $(this).parent().parent();
 
-        window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
+        //window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
 
         par.find(".apply-filters").show();
         var rest = filterInvalidCheckboxes($(par).find("[type='checkbox']"));
@@ -356,7 +358,7 @@
         par.find(".apply-filters").show();
         var rest = filterInvalidCheckboxes($(par).find("[type='checkbox']"));
 
-        window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
+        //window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
 
         $.each(rest, function (idx) {
             $(rest[idx]).prop("checked", false);
@@ -373,7 +375,7 @@
         var par = $(this).parent().parent();
         par.find(".apply-filters").show();
 
-        window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
+        //window.WISE.blocks.push( $(this).parentsUntil(".field").parent().attr("id") );
 
         var rest = filterInvalidCheckboxes($(par).find("[type='checkbox']"));
 
