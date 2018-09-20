@@ -106,6 +106,7 @@
         var count = $fieldsnr;
         $fields.each(function(indx, field){
             var $field = $(field);
+
             var cheks = $field.find(".option");
             var allcheckboxes = cheks.find("input[type='checkbox']");
             var hasChecks = allcheckboxes.length > 0;
@@ -113,7 +114,9 @@
             // has checkboxes
             if(hasChecks){
                 var fieldId = $field.attr("id");
-
+                $field.css({
+                    "width" : "50%"
+                });
                 //fieldAutoSubmitSetup(fieldId, $field);
 
                 // add "controls"
@@ -426,7 +429,7 @@
             if( window.WISE.blocks.indexOf( $(this).parentsUntil(".field").parent().attr("id") ) !== -1  ){
                 //return false;
             } else {
-               triggerClick(checkboxV, ev);
+               //triggerClick(checkboxV, ev);
             }
         });
     }
