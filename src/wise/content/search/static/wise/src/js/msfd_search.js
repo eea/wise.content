@@ -1266,4 +1266,5 @@
             });
 
     });
+
 }(window, document, jQuery));
