@@ -347,6 +347,15 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 )
                 fields.append(field)
 
+            summary_title = u'{}: {} Summary'.format(base_name, row_name)
+            summary_name = '{}_{}'.format(base_name, row_name)
+            summary_field = Text(
+                title=summary_title,
+                __name__=summary_name,
+            )
+
+            fields.append(summary_field)
+
             form.fields = Fields(*fields)
 
             forms.append(form)
