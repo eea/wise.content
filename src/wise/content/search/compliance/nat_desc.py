@@ -320,6 +320,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
             row_name = row.name
 
             form = EmbededForm(self, self.request)
+
+            form.form_name = 'form' + row_name
             fields = []
 
             form.title = '{}: {}'.format(base_name, row_name)
@@ -368,6 +370,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
         for form in self.subforms:
             out += form()
+
+        out = '<div class="collapsed-container">{}</div>'.format(out)
 
         return out
 
