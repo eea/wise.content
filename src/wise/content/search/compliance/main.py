@@ -7,13 +7,15 @@ from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import \
     ViewPageTemplateFile as Template
+from wise.content.search import db
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
 from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
-from ..interfaces import IMainForm
+from ..interfaces import IMainForm, IMarineUnitIDsSelect
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
                        ReportData2018, ReportHeaderForm2018)
@@ -163,18 +165,23 @@ class ArticleForm(EmbededForm):
     fields = Fields(IArticle)
 
     def get_subform(self):
-        # def data(k):
-        #     return self.get_form_data_by_key(self, k)
-        #
-        # self.request.form['country'] = data('member_state')
-        # self.request.form['article'] = data('article')
+        return MarineUnitIDsForm(self, self.request)
 
-        # self.request.form['report_type'] = descriptor
-        # TODO: misssing?
-        # descriptor = self.get_form_data_by_key(self, 'descriptor')
+    def get_available_marine_unit_ids(self):
+        # marine_unit_ids = self.data.get('marine_unit_ids')
 
-        # return getMultiAdapter((self, self.request), name='deter')
+        # TODO: should also do the request form reading
+        data = self.get_flattened_data(self)
+        country = data['member_state']
 
+        return db.get_marine_unit_ids(member_states=[country])
+
+
+class MarineUnitIDsForm(EmbededForm):
+    fields = Fields(IMarineUnitIDsSelect)
+    # fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
         return NationalDescriptorAssessmentForm(self, self.request)
 
 

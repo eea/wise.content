@@ -34,14 +34,14 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
-    art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    # art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
     art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
     art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
     art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
-        self.descriptor = request.form.get('report_type', 'D5')
+        self.descriptor = request.form.get('descriptor', 'D5')
         self.article_template = request.form.get('article', 'art9')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
@@ -265,11 +265,15 @@ class ReportData2018(BrowserView):
         pass
 
 
-class ReportHeaderForm2018(EmbededForm):
+class ReportHeaderForm2018(BrowserView):
     """ TODO: get code in this
     """
+
     def __call__(self):
         return 'report header form 2018'
+
+    def update(self):
+        pass
 
 
 class AssessmentHeaderForm2018(BrowserView):

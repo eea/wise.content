@@ -595,3 +595,14 @@ class ComplianceAssessment(EmbededForm):
             # l2 = l2 or L(criteria)
             # l1 = l1 or L(article)
 
+        # def data(k):
+        #     return self.get_form_data_by_key(self, k)
+        #
+        # self.request.form['country'] = data('member_state')
+        # self.request.form['article'] = data('article')
+
+        # self.request.form['report_type'] = descriptor
+        # TODO: misssing?
+        # descriptor = self.get_form_data_by_key(self, 'descriptor')
+
+        # return getMultiAdapter((self, self.request), name='deter')
