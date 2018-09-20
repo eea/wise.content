@@ -174,10 +174,9 @@ jQuery(document).ready(function($){
 
     mobileSelect(w,daw);
 
-    window.onresize = function(w,daw) {
+    $(window).on('resize', function(){
         mobileSelect(w,daw);
         setupTabs();
-    }
-
+    });
 
 });

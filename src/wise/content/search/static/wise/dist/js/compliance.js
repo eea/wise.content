@@ -61,7 +61,7 @@
 
     }
 
-    function setupFormToggle(){
+    function setupFormToggle2(){
         var $formToCollapse = $("#comp-national-descriptor");
 
         $formToCollapse.before("<div id='slide-up-form' data-toggle='collapse'" +
@@ -103,6 +103,20 @@
 
         $formToCollapse.collapse('show');
 
+    }
+
+    function setupFormToggle(){
+        var accordeons = $("[data-toggle='collapse']");
+
+        $.each(accordeons , function(idx, accordion){
+            var target = $(accordion).attr("data-target");
+            //$(target).on("")
+            $(accordion).on("click", function (ev) {
+                ev.preventDefault();
+                $(target).collapse();
+            });
+
+        });
     }
 
     $(document).ready(function($){

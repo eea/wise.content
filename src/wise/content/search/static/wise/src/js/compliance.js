@@ -61,7 +61,7 @@
 
     }
 
-    function setupFormToggle(){
+    function setupFormToggle2(){
         var $formToCollapse = $("#comp-national-descriptor");
 
         $formToCollapse.before("<div id='slide-up-form' data-toggle='collapse'" +
@@ -105,11 +105,48 @@
 
     }
 
+    function setupFormToggle(){
+        var accordeons = $("[data-toggle='collapse']");
+
+        $.each(accordeons , function(idx, accordion){
+            var target = $(accordion).attr("data-target");
+            var $target = $(target);
+            var $accordion = $(accordion);
+
+            $(accordion).on("click", function (ev) {
+                ev.preventDefault();
+                $target.collapse();
+            });
+            var isCollapsed = function(){
+                $accordion.removeClass("form-collapsed");
+                $accordion.text("Show form");
+            };
+
+            var notCollapsed = function(){
+                $accordion.addClass("form-collapsed");
+
+                $accordion.text("Hide form");
+                $accordion.css({
+                    "border-top-left-radius" : "0",
+                    "border-top-right-radius" : "0"
+                });
+            };
+
+            $formToCollapse.on("hidden.bs.collapse",function(){
+                isCollapsed();
+            });
+            $formToCollapse.on("show.bs.collapse",function(){
+                notCollapsed();
+            });
+
+        });
+    }
+
     $(document).ready(function($){
         initStyling();
         setupRightSelects2();
 
-        setupFormToggle();
+        //setupFormToggle();
 
     });
 }(window, document, $));
