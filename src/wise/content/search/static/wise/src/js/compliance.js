@@ -61,8 +61,55 @@
 
     }
 
+    function setupFormToggle(){
+        var $formToCollapse = $("#comp-national-descriptor");
+
+        $formToCollapse.before("<div id='slide-up-form' data-toggle='collapse'" +
+            " data-target='" + ".comp-national-descriptor-collapse" +
+            "' class='panel-heading panel-title'>Show form</div>");
+
+        $("#comp-national-descriptor")
+            .addClass( "comp-national-descriptor-collapse")
+            .addClass("collapse")
+            .addClass("panel")
+            .addClass("panel-default");
+
+        var isCollapsed = function(){
+            $("#slide-up-form").removeClass("form-collapsed");
+            $("#slide-up-form").text("Show form");
+        };
+
+        var notCollapsed = function(){
+            $("#slide-up-form").addClass("form-collapsed");
+
+            $("#slide-up-form").text("Hide form");
+            $formToCollapse.css({
+                "border-top-left-radius" : "0",
+                "border-top-right-radius" : "0"
+            });
+        };
+
+        $("#slide-up-form").on("click", function (ev) {
+            $formToCollapse.collapse();
+
+        });
+
+        $formToCollapse.on("hidden.bs.collapse",function(){
+            isCollapsed();
+        });
+        $formToCollapse.on("show.bs.collapse",function(){
+            notCollapsed();
+        });
+
+        $formToCollapse.collapse('show');
+
+    }
+
     $(document).ready(function($){
         initStyling();
         setupRightSelects2();
+
+        setupFormToggle();
+
     });
 }(window, document, $));

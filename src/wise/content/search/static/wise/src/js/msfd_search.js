@@ -341,7 +341,6 @@
                 if(cheks.length < 4) {
                     $field.find(".controls a").hide();
                     $field.find(".controls").html("").css("height" ,"1px").css("padding", 0);
-
                 } else {
                     addCheckboxPanel($field, fieldId, cheks  );
 
@@ -1267,4 +1266,5 @@
             });
 
     });
+
 }(window, document, jQuery));

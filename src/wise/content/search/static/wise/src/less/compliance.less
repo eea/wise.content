@@ -1,3 +1,38 @@
+@import "variables.less";
+
 .wise-search-form-container div.formControls {
   margin: 0;
+}
+
+#comp-national-descriptor {
+  padding: 1rem;
+}
+
+#slide-up-form {
+  position: relative;
+  background: @dark-theme-color;
+  border-radius: 10px;
+  margin-top: 1rem;
+  cursor: pointer;
+  color: white;
+
+  &:after {
+    transition: content .8s;
+    content: "\f078";
+    font-family: FontAwesome;
+    font-weight: 700;
+    float: right;
+    color: white;
+  }
+
+  &.form-collapsed {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: @grey-theme-color;
+    color: grey;
+    &:after {
+        content: "\f077";
+        color: grey;
+      }
+  }
 }

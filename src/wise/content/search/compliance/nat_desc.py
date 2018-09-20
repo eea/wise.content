@@ -4,21 +4,23 @@ from collections import defaultdict
 
 from sqlalchemy import and_, or_
 from zope.interface import Interface
-from zope.schema import Choice, Text, TextLine
+from zope.schema import Choice, Text
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql  # , sql2018
 from z3c.form.field import Fields
+from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
 from ..base import BaseUtil, EmbededForm
 from ..db import switch_session, threadlocals
+from ..features import features_vocabulary
 from ..gescomponents import get_ges_criterions
 from .base import Container
 from .nd_A8 import Article8
 from .nd_A10 import Article10
-from .vocabulary import ASSESSED_ARTICLES, form_structure
+from .vocabulary import form_structure
 
 
 def row_to_dict(table, row):
@@ -32,14 +34,14 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     """ WIP on compliance tables
     """
 
-    art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    # art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
     art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
     art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
     art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     def __init__(self, context, request):
         self.country = request.form.get('country', 'LV')
-        self.descriptor = request.form.get('report_type', 'D5')
+        self.descriptor = request.form.get('descriptor', 'D5')
         self.article_template = request.form.get('article', 'art9')
         super(DeterminationOfGES2012, self).__init__(context, request)
 
@@ -263,11 +265,15 @@ class ReportData2018(BrowserView):
         pass
 
 
-class ReportHeaderForm2018(EmbededForm):
+class ReportHeaderForm2018(BrowserView):
     """ TODO: get code in this
     """
+
     def __call__(self):
         return 'report header form 2018'
+
+    def update(self):
+        pass
 
 
 class AssessmentHeaderForm2018(BrowserView):
@@ -320,17 +326,19 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.title = '{}: {}'.format(base_name, row_name)
 
             for crit in descriptor_criterions:
-                print crit
+                # print crit
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
-                choices = [''] + [x.name for x in row.children]
+                # choices = [''] + [x.name for x in row.children]
+                choices = [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
                 field = Choice(
                     title=field_title,
                     __name__=field_name,
                     vocabulary=SimpleVocabulary(terms),
-                    default=''      # TODO: set the default
+                    required=False,
+                    # default=''      # TODO: set the default
                 )
                 fields.append(field)
 
@@ -338,10 +346,16 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
             forms.append(form)
 
+        # print 'Forms', forms
+
         return forms
 
     def build_forms(self):
-        article = form_structure['Art9']
+        article = self.get_flattened_data(self)['article'].capitalize()
+        try:
+            article = form_structure[article]
+        except KeyError:    # article is not in form structure yet
+            return
         assessment_criterias = article.children
 
         for criteria in assessment_criterias:
@@ -373,16 +387,16 @@ class IBasicAssessmentData2018(Interface):
     """ The basic fields for the assessment data for 2018
     """
     # TODO: this needs a select box?
-    feature_reported = TextLine(title=u'Feature reported')
+    feature_reported = Choice(title=u'Feature reported',
+                              vocabulary=features_vocabulary)
 
 
 class BasicAssessmentDataForm2018(EmbededForm):
     """
     """
-    def __init__(self, context, request):
-        super(BasicAssessmentDataForm2018, self).__init__(context, request)
-        fields = [IBasicAssessmentData2018]
-        self.fields = Fields(*fields)
+
+    fields = Fields(IBasicAssessmentData2018)
+    fields['feature_reported'].widgetFactory = OptgroupFieldWidget
 
 
 class ISummaryAssessmentData2018(Interface):

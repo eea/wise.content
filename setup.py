@@ -44,6 +44,8 @@ setup(
         'pymssql',
         'xlsxwriter',
         # 'pyodbc',
+
+        'z3c.formwidget.optgroup',  # used in compliance select lists
     ],
     extras_require={
         'test': [
