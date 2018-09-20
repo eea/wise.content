@@ -35,7 +35,6 @@
 
     function initStyling(){
         //$("#form-buttons-continue").hide("fast");
-        $(".page-body").addClass("fullwidth");
         $(".button-field").addClass("btn");
     }
 
@@ -45,6 +44,10 @@
         $.each(accordeons , function(idx, accordion){
             var $accordion = $(accordion);
             var subforms = $accordion.find(".subform");
+
+            if(subforms.length === 0){
+                return false;
+            }
 
             $accordion.prepend("<div class='collapsed-header' " +
                 "data-toggle='collapse' data-target='#"+ "collapsed-container" + idx
