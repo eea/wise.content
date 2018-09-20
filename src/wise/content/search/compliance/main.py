@@ -8,7 +8,7 @@ from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import \
     ViewPageTemplateFile as Template
 from wise.content.search import db
-# from z3c.form.browser.checkbox import CheckBoxFieldWidget
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
@@ -182,7 +182,7 @@ class ArticleForm(EmbededForm):
 
 class MarineUnitIDsForm(EmbededForm):
     fields = Fields(IMarineUnitIDsSelect)
-    # fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
+    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
         return NationalDescriptorAssessmentForm(self, self.request)
