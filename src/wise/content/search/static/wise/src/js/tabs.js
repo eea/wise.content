@@ -52,23 +52,48 @@ setupTabs = function (tabswrapper) {
                 return false;
             }
 
-            var totalLength = 100;
+            var PERCENT = false;
 
-            var tabSpaces  = nrTabs - 1;
+            if(PERCENT){
+                var totalLength = 100;
 
-            var tabWidth = (totalLength - tabSpaces) / nrTabs ;
+                var tabSpaces  = nrTabs - 1;
 
-            var rest = totalLength - (tabWidth * nrTabs);
+                var tabWidth = (totalLength - tabSpaces) / nrTabs ;
 
-            var tabSpace = rest / (nrTabs-1);
+                var rest = totalLength - (tabWidth * nrTabs);
 
-            $( ".topnav li").css({
-                "width": tabWidth  + "%",
-                "margin-right": tabSpace + "%"
-            });
-            $( ".topnav li:last-child").css({
-               "margin-right" : "0"
-            });
+                var tabSpace = rest / (nrTabs-1);
+
+                /*$( ".topnav li").css({
+                    "width": tabWidth  + "%",
+                    "margin-right": tabSpace + "%"
+                });
+                $( ".topnav li:last-child").css({
+                   "margin-right" : "0"
+                });*/
+            } else {
+                var totalLength = $( tabsWrapper + " ul.topnav").outerWidth();
+
+                var tabSpaceWidth = 10;
+
+                var tabSpaces = (nrTabs - 1)*tabSpaceWidth;
+
+                var tabWidth = (totalLength - tabSpaces) / nrTabs ;
+
+                var rest = totalLength - (tabWidth * nrTabs);
+
+                var tabSpace = rest / (nrTabs-1);
+
+                $( ".topnav li").css({
+                    "width": tabWidth  + "px",
+                    "margin-right": tabSpace + "px"
+                });
+                $( ".topnav li:last-child").css({
+                   "margin-right" : "0"
+                });
+            }
+
         };
 
         if( $( tabsWrapper + " ul li").length === 1 ){
@@ -101,49 +126,58 @@ jQuery(document).ready(function($){
     var w = "auto";
     var daw = true;
 
-    if (window.matchMedia("(max-width: 967px)").matches){
-        w = false;
-        daw = false;
-
-        function formatArticle (article) {
-            var el = $(article.element[0]);
-            var subtitle = el.attr("data-subtitle") !== "" ? "(" + el.attr("data-subtitle")  + ")" : '';
-            return '<span style="font-size: 1.5rem; font-weight: bold;color: #337ab7">' + el.attr("data-maintitle")+ '</span> '+
-                '<span style="color: #337ab7;font-size: 1.3rem;">'+ subtitle +'</span>';
-        }
-
-        var moptions = {
-            placeholder: 'Select an option',
-            closeOnSelect: true,
-            dropdownAutoWidth : daw,
-            width: w,
-            theme: "flat",
-            minimumResultsForSearch: 20,
-            formatSelection: formatArticle,
-            formatResult: formatArticle,
-            containerCssClass : "mobile-select-article"
-        };
-
-        if($.fn.select2 !== undefined){
-            if($("#mobile-select-article option[selected='selected']").length == 0 ){
-                $("#mobile-select-article").prepend('<option selected="selected" value="choose" ' +
-                    'data-maintitle="Choose..." data-subtitle="">Choose section</option>');
-            }
-
-            $("#mobile-select-article").select2(moptions);
-
-            $("#mobile-select-article").one("select2-selecting", function (ev){
-                document.location.href =  ev.choice.id;
-            });
-
-            $("#mobile-select-article").on("select2-open", function (ev){
-                if($("#mobile-select-article option[selected='selected']").length == 0 ){
-                    $(".select2-highlighted").css({
-                        "background": "transparent",
-                    });
-                }
-            });
-        }
-
+    function formatArticle (article) {
+        var el = $(article.element[0]);
+        var subtitle = el.attr("data-subtitle") !== "" ? "(" + el.attr("data-subtitle")  + ")" : '';
+        return '<span style="font-size: 1.5rem; font-weight: bold;color: #337ab7">' + el.attr("data-maintitle")+ '</span> '+
+            '<span style="color: #337ab7;font-size: 1.3rem;">'+ subtitle +'</span>';
     }
+
+    function mobileSelect(w,daw) {
+        if (window.matchMedia("(max-width: 967px)").matches) {
+            w = false;
+            daw = false;
+            var moptions = {
+                placeholder: 'Select an option',
+                closeOnSelect: true,
+                dropdownAutoWidth: daw,
+                width: w,
+                theme: "flat",
+                minimumResultsForSearch: 20,
+                formatSelection: formatArticle,
+                formatResult: formatArticle,
+                containerCssClass: "mobile-select-article"
+            };
+
+            if ($.fn.select2 !== undefined) {
+                if ($("#mobile-select-article option[selected='selected']").length == 0) {
+                    $("#mobile-select-article").prepend('<option selected="selected" value="choose" ' +
+                        'data-maintitle="Choose..." data-subtitle="">Choose section</option>');
+                }
+
+                $("#mobile-select-article").select2(moptions);
+
+                $("#mobile-select-article").one("select2-selecting", function (ev) {
+                    document.location.href = ev.choice.id;
+                });
+
+                $("#mobile-select-article").on("select2-open", function (ev) {
+                    if ($("#mobile-select-article option[selected='selected']").length == 0) {
+                        $(".select2-highlighted").css({
+                            "background": "transparent",
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    mobileSelect(w,daw);
+
+    window.onresize = function(w,daw) {
+        mobileSelect(w,daw);
+        setupTabs();
+    }
+
+
 });
