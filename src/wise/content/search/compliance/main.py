@@ -8,7 +8,7 @@ from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import \
     ViewPageTemplateFile as Template
 from wise.content.search import db
-from z3c.form.browser.checkbox import CheckBoxFieldWidget
+# from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
@@ -18,7 +18,7 @@ from ..base import BaseEnhancedForm, EmbededForm
 from ..interfaces import IMainForm, IMarineUnitIDsSelect
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
-                       ReportData2018, ReportHeaderForm2018)
+                       Report2012, ReportData2018, ReportHeaderForm2018)
 from .vocabulary import articles_vocabulary, descriptors_vocabulary
 
 MAIN_FORMS = [
@@ -201,6 +201,8 @@ class NationalDescriptorAssessmentForm(Container):
         # - render themselves
         # - answer to the save() method?
         self.subforms = [
+            Report2012(self, self.request),
+
             ReportHeaderForm2018(self, self.request),
             ReportData2018(self, self.request),
             AssessmentHeaderForm2018(self, self.request),
@@ -208,4 +210,5 @@ class NationalDescriptorAssessmentForm(Container):
         ]
 
         for child in self.subforms:
-            child.update()
+            if hasattr(child, 'update'):
+                child.update()
