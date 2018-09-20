@@ -258,7 +258,9 @@ class Report2012(BrowserView, Article8, Article10, BaseUtil):
 
         print "Will render report for ", self.article
 
-        return getattr(self, self.article)()
+        template = getattr(self, self.article, None)
+
+        return template and template() or ""
 
 
 class ReportData2018(BrowserView):

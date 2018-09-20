@@ -174,7 +174,10 @@ class ArticleForm(EmbededForm):
         data = self.get_flattened_data(self)
         country = data['member_state']
 
-        return db.get_marine_unit_ids(member_states=[country])
+        if country:
+            return db.get_marine_unit_ids(member_states=[country])
+        else:
+            return []
 
 
 class MarineUnitIDsForm(EmbededForm):

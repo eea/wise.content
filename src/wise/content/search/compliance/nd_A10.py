@@ -16,4 +16,5 @@ class Article10(object):
             )
         )
 
-        return res[0]
+        if res:
+            return res[0]
