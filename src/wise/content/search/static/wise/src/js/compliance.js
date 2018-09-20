@@ -29,29 +29,9 @@
 
             $(selectElement).select2(options);
 
-            $(selectorFormCont + " #s2id_form-widgets-marine_unit_id").hide();
+            /*$(selectElement).on("select2-selecting", function(ev) {
 
-            var removePaginationButtons = function(){
-                $wise_search_form.find("[name='form.buttons.prev']").remove();
-                $wise_search_form.find("[name='form.buttons.next']").remove();
-                $wise_search_form.find("[name='form.widgets.page']").remove();
-            };
-
-            $(selectElement).on("select2-selecting", function(ev) {
-                // remove results following form-widgets-article select element
-                // as we want to reset each facet to it's initial value if we change form
-                if( $(this).attr("id") === "form-widgets-article" ) {
-                    $(ev.target).closest(".form-right-side").next().remove();
-                }
-
-                removePaginationButtons()
-
-                var self = this;
-                window.setTimeout( function (){
-                    $(selectorFormCont + " .formControls #form-buttons-continue").trigger("click", {'select': self});
-                }, 300);
-
-            });
+            });*/
         });
     }
 
