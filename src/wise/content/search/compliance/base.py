@@ -32,7 +32,7 @@ class Leaf(object):
 
     children = ()
 
-    def __str__(self):
+    def __repr__(self):
         return "<Leaf '%s'>" % self.name
 
     def __init__(self, name, children=None):
@@ -48,3 +48,7 @@ class Leaf(object):
     def __setitem__(self, name, v):
         v.name = name
         self.children.append(v)
+
+    def add(self, item):
+        if item not in self.children:
+            self.children.append(item)
