@@ -371,7 +371,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
         for form in self.subforms:
             out += form()
 
-        out = '<div class="collapsed-container">{}</div>'.format(out)
+        out = u'<div class="collapsed-container">{}</div>'.format(out)
 
         return out
 
