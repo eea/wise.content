@@ -26,3 +26,9 @@
 
 - ce inseamna "Feature(s) reported" din Assessment 2018 pt Art 8? Are impact
   asupra selectiei de GES descriptors?
+
+- articolul 8 si 10, avem nevoie de ajutor ca sa intelegem cum generam anumite
+  liste de campuri si criterii dupa care ne uitam dupa date in baza de date.
+
+- includem numai coloanele care contin date, sau le includem pe toate,
+  indiferent daca au date sau nu?

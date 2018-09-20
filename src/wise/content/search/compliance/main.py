@@ -24,20 +24,20 @@ from .vocabulary import articles_vocabulary, descriptors_vocabulary
 MAIN_FORMS = [
     # view name, (title, explanation)
     ('comp-national-descriptor',
-     ('National descriptor assessment',
-      'National descriptor MS reports and Commission assessments'),
+     ('National descriptors',
+      'Member states reports and Commission assessments'),
      ),
     ('comp-regional-descriptor',
-     ('Regional descriptor assessments',
-      'Regional descriptor MS reports and Commission assessments'),
+     ('Regional descriptors',
+      'Member states reports and Commission assessments'),
      ),
     ('comp-national-overviews',
      ('National overviews',
-      'National overview for an MS'),
+      'Overview for a Member state'),
      ),
     ('comp-regional-overviews',
      ('Regional overviews',
-      'Regional overview for all MS in a region',),
+      'Overview for all Member states in a region',),
      ),
 ]
 

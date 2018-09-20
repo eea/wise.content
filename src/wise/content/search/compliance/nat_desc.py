@@ -275,6 +275,8 @@ class ReportHeaderForm2018(BrowserView):
     """
 
     def __call__(self):
+        return ''
+
         return 'report header form 2018'
 
 
@@ -282,6 +284,8 @@ class AssessmentHeaderForm2018(BrowserView):
     """ TODO: get code in this
     """
     def __call__(self):
+        return ''
+
         return 'assessment header form 2018'
 
 
