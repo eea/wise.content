@@ -45,119 +45,25 @@ def parse_forms_file():
                 continue
             article, criteria, information, evidence = row
 
-            l4 = L(evidence)
+            l4 = L(evidence)    # always last level, we can safely create it
 
-            if l3 is None or l3.name != information:
-                l3 = L(information, [l4])
-            else:
-                l3.children.append(l4)
+            if (l3 is None) or (l3.name != information):
+                l3 = L(information)
+            l3.add(l4)
 
-            if l2 is None or l2.name != criteria:
-                l2 = L(criteria, [l3])
-            else:
-                l2.children.append(l3)
+            if (l2 is None) or (l2.name != criteria):
+                l2 = L(criteria)
+            l2.add(l3)
 
-            if l1 is None or l1.name != article:
-                l1 = L(article, [l2])
-                res.children.append(l1)
-            else:
-                l1.children.append(l2)
-
-    print res.children
+            if (l1 is None) or (l1.name != article):
+                l1 = L(article)
+                res.add(l1)
+            l1.add(l2)
 
     return res
 
 
 form_structure = parse_forms_file()
-
-# form_structure = L(
-#     'articles', [
-#         L('Art4', [
-#             L('Adequacy', [
-#                 L('MRUscales2017Decision', [
-#                     L('Follow scales in 2017 Decision'),
-#                     L('Partially follow scales in 2017 Decision'),
-#                     L('Do not follow scales in 2017 Decision'),
-#                     L('Not relevant'),
-#                 ]),
-#             ]),
-#             L('Consistency', [
-#             ]),
-#             L('Coherence', [
-#             ]),
-#         ]),
-#         L('Art8'),
-#         L('Art9', [
-#             L('Adequacy', [
-#                 L('CriteriaUsed', [
-#                     L('Primary criterion used'),
-#                     L('Primary criterion replaced with secondary criterion'),
-#                     L('Primary criterion not used'),
-#                     L('Secondary criterion used'),
-#                     L('Secondary criterion used instead of primary criterion'),
-#                     L('Secondary criterion not used'),
-#                     L('2010 criterion/indicator used'),
-#                     L('2010 criterion/indicator not used'),
-#                     L('Other criterion (indicator) used'),
-#                     L('Not relevant'),
-#                 ]),
-#                 L('GESQualitative', [
-#                     L('Adapted from Annex I definition'),
-#                     L('Adapted from 2017 Decision'),
-#                     L('Adapted from 2010 Decision'),
-#                     L('Not relevant'),
-#                 ]),
-#                 L('GESQuantitative', [
-#                     L('Threshold values per MRU'),
-#                     L('No threshold values'),
-#                     L('Not relevant'),
-#                 ]),
-#                 L('GESAmbition', [
-#                     L('No GES extent threshold defined'),
-#                     L('Proportion value per MRU set'),
-#                     L('No proportion value set'),
-#                 ]),
-#             ]),
-#             L('Coherence', [
-#                 L('CriteriaUsed', [
-#                     L('Criterion used by all MS in region'),
-#                     L('Criterion used by ≥75% MS in region'),
-#                     L('Criterion used by ≥50% MS in region'),
-#                     L('Criterion used by ≥25% MS in region'),
-#                     L('Criterion used by ≤25% MS in region'),
-#                     L('Criterion used by all MS in subregion'),
-#                 ]),
-#                 L('GESQualitative', [
-#                     L('High'),
-#                     L('Moderate'),
-#                     L('Poor'),
-#                     L('Not relevant'),
-#                 ]),
-#                 L('GESQuantitative', [
-#                     L('All MS in region use EU (Directive, Regulation or Decision) values'),
-#                     L('All MS in region use regional (RSC) values'),
-#                     L('All MS in region use EU (WFD coastal) and regional (RSC offshore) values'),
-#                     L('All MS in region use EU (WFD coastal); and national (offshore) values'),
-#                     L('All MS in region use national values'),
-#                     L('Some MS in region use EU (Directive, Regulation or Decision) values and some MS use national values'),
-#                     L('Some MS in region use regional (RSC) values and some MS use national values'),
-#                     L('Not relevant'),
-#                 ]),
-#                 L('GESAmbition', [
-#                     L('GES extent value same/similar for all MS in region'),
-#                     L('GES extent value varies between MS in region'),
-#                     L('GES extent threshold varies markedly between MS'),
-#                     L('GES extent threshold not reported'),
-#                     L('GES proportion value same/similar for all MS in region'),
-#                     L('GES proportion value varies between MS in region'),
-#                     L('GES proportion value varies markedly between MS'),
-#                     L('GES proportion value not reported'),
-#                     L('Not relevant'),
-#                 ]),
-#             ]),
-#         ]),
-#         L('Art10'),
-#     ])
 
 
 # TODO: sort this vocabulary (somehow)

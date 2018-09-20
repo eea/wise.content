@@ -322,7 +322,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.title = '{}: {}'.format(base_name, row_name)
 
             for crit in descriptor_criterions:
-                print crit
+                # print crit
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
@@ -341,6 +341,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.fields = Fields(*fields)
 
             forms.append(form)
+
+        # print 'Forms', forms
 
         return forms
 
