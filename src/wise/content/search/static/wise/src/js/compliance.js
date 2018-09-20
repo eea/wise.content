@@ -117,7 +117,6 @@
                 /*$field.css({
                     "width" : "50%"
                 });*/
-
                 //fieldAutoSubmitSetup(fieldId, $field);
 
                 // add "controls"
