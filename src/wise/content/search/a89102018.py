@@ -209,35 +209,52 @@ class A2018Art10Display(ItemDisplayForm):
 
     def download_results(self):
         # mapper_class = self.context.context.mapper_class
+        data = self.get_flattened_data(self)
+
         parent = self.context.context.context.context
+        mapper_class = parent.mapper_class
         target_mc = parent.target_mc
 
-        count, target = db.get_all_records(
-            target_mc,
-            target_mc.Id.in_(self.target_ids)
-        )
-        id_marine_units = [x.IdMarineUnit for x in target]
-
-        count, marine_unit = db.get_all_records(
-            sql2018.ART10TargetsMarineUnit,
-            sql2018.ART10TargetsMarineUnit.Id.in_(id_marine_units)
-        )
+        marine_units = self.context.get_available_marine_unit_ids()[1]
 
         count, target_feature = db.get_all_records(
             sql2018.ART10TargetsTargetFeature,
-            sql2018.ART10TargetsTargetFeature.IdTarget.in_(self.target_ids)
+            sql2018.ART10TargetsTargetFeature.Feature.in_(data['feature'])
         )
+        feature_id_target = [x.IdTarget for x in target_feature]
 
         s = sql2018.ART10TargetsTargetGESComponent
         count, target_ges = db.get_all_records(
             s,
-            s.IdTarget.in_(self.target_ids)
+            s.GESComponent.in_(data['ges_component'])
+        )
+        ges_id_target = [x.IdTarget for x in target_ges]
+
+        count, marine_unit_ids = db.get_all_records_outerjoin(
+            mapper_class,
+            sql2018.ReportedInformation,
+            and_(mapper_class.MarineReportingUnit.in_(marine_units),
+                 sql2018.ReportedInformation.CountryCode.in_(data['member_states']))
+        )
+        marine_unit_ids = [x.Id for x in marine_unit_ids]
+
+        count, target = db.get_all_records(
+            target_mc,
+            and_(target_mc.IdMarineUnit.in_(marine_unit_ids),
+                 target_mc.Id.in_(set(feature_id_target) & set(ges_id_target)))
+        )
+        target_ids = [x.Id for x in target]
+        marine_unit_ids = [x.IdMarineUnit for x in target]
+
+        count, marine_unit = db.get_all_records(
+            mapper_class,
+            mapper_class.Id.in_(marine_unit_ids)
         )
 
         s = sql2018.ART10TargetsProgressAssessment
         count, target_progress = db.get_all_records(
             s,
-            s.IdTarget.in_(self.target_ids)
+            s.IdTarget.in_(target_ids)
         )
 
         xlsdata = [
@@ -297,14 +314,14 @@ class A2018Art10Display(ItemDisplayForm):
         )
         ges_components_ids = map(int, ges_components_ids)
 
-        self.target_ids = tuple(set(target_ids)
-                                & set(features_ids)
-                                & set(ges_components_ids))
+        target_ids_all = tuple(set(target_ids)
+                               & set(features_ids)
+                               & set(ges_components_ids))
 
         res = db.get_item_by_conditions(
             target_mc,
             'Id',
-            target_mc.Id.in_(self.target_ids),
+            target_mc.Id.in_(target_ids_all),
             page=page
         )
 
@@ -459,19 +476,39 @@ class A2018Art81abDisplay(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
 
     def download_results(self):
+        data = self.get_flattened_data(self)
         parent = self.context.context.context.context
+
+        mc_countries = sql2018.ReportedInformation
         overall_status_mc = parent.features_mc
+        mapper_class = sql2018.ART8GESMarineUnit
+
+        marine_units = self.context.get_available_marine_unit_ids()[1]
+        member_states = data.get('member_states')
+        features = data.get('feature')
+        ges_components = data.get('ges_component')
+
+        count, marine_unit = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            and_(mapper_class.MarineReportingUnit.in_(marine_units),
+                 mc_countries.CountryCode.in_(member_states)
+                 )
+        )
+        id_marine_units = [x.Id for x in marine_unit]
 
         count, overall_status = db.get_all_records(
             overall_status_mc,
-            self.conditions_overall_status
+            overall_status_mc.Feature.in_(features),
+            overall_status_mc.GESComponent.in_(ges_components),
+            overall_status_mc.IdMarineUnit.in_(id_marine_units)
         )
-        id_marine_unit = [x.IdMarineUnit for x in overall_status]
         id_overall_status = [x.Id for x in overall_status]
+        id_marine_units = [x.IdMarineUnit for x in overall_status]
 
         count, marine_unit = db.get_all_records(
-            sql2018.ART8GESMarineUnit,
-            sql2018.ART8GESMarineUnit.Id.in_(id_marine_unit)
+            mapper_class,
+            mapper_class.Id.in_(id_marine_units)
         )
 
         mc = sql2018.ART8GESOverallStatusPressure
@@ -496,8 +533,8 @@ class A2018Art81abDisplay(ItemDisplayForm):
         mc = sql2018.ART8GESCriteriaStatu
         count, criteria_status = db.get_all_records(
             mc,
-            and_(mc.IdOverallStatus.in_(id_overall_status),
-                 mc.IdElementStatus.in_(id_element_status))
+            or_(mc.IdOverallStatus.in_(id_overall_status),
+                mc.IdElementStatus.in_(id_element_status))
         )
         id_criteria_status = [x.Id for x in criteria_status]
 
@@ -517,11 +554,11 @@ class A2018Art81abDisplay(ItemDisplayForm):
         xlsdata = [
             # worksheet title, row data
             ('ART8GESMarineUnit', marine_unit),
-            ('ART8GESOverallStatu', overall_status),
+            ('ART8GESOverallStatus', overall_status),
             ('ART8GESOverallStatusPressure', overall_status_pressure),
             ('ART8GESOverallStatusTarget', overall_status_target),
-            ('ART8GESElementStatu', element_status),
-            ('ART8GESCriteriaStatu', criteria_status),
+            ('ART8GESElementStatus', element_status),
+            ('ART8GESCriteriaStatus', criteria_status),
             ('ART8GESCriteriaValue', criteria_value),
             ('ART8GESCriteriaValuesIndicator', criteria_value_ind),
         ]
@@ -557,16 +594,19 @@ class A2018Art81abDisplay(ItemDisplayForm):
         )
         id_marine_units = [int(x.Id) for x in id_marine_units]
 
-        self.conditions_overall_status = and_(
+        conditions_overall_status = and_(
             overall_status_mc.Feature.in_(features),
             overall_status_mc.GESComponent.in_(ges_components),
             overall_status_mc.IdMarineUnit.in_(id_marine_units)
         )
 
+        self.features = features
+        self.ges_components = ges_components
+
         res = db.get_item_by_conditions(
             overall_status_mc,
             'Id',
-            self.conditions_overall_status,
+            conditions_overall_status,
             page=page
         )
 
@@ -793,12 +833,26 @@ class A2018Art81cDisplay(ItemDisplayForm):
         data = self.get_flattened_data(self)
         parent = self.context.context.context
 
+        mc_countries = sql2018.ReportedInformation
         mapper_class = parent.mapper_class
         features_mc = parent.features_mc
         features = data.get('feature', ())
+        member_states = data.get('member_states')
+        marine_units = self.context.get_available_marine_unit_ids()[1]
+
+        # import pdb; pdb.set_trace()
+
+        count, marine_unit = db.get_all_records_outerjoin(
+            mapper_class,
+            mc_countries,
+            and_(mapper_class.MarineReportingUnit.in_(marine_units),
+                 mc_countries.CountryCode.in_(member_states)
+                 )
+        )
+        id_marine_units = [x.Id for x in marine_unit]
 
         conditions = list()
-        conditions.append(features_mc.IdMarineUnit.in_(self.id_marine_units))
+        conditions.append(features_mc.IdMarineUnit.in_(id_marine_units))
 
         if features:
             conditions.append(features_mc.Feature.in_(features))
@@ -807,8 +861,8 @@ class A2018Art81cDisplay(ItemDisplayForm):
             features_mc,
             *conditions
         )
-        id_marine_units = [x.IdMarineUnit for x in feature]
         id_feature = [x.Id for x in feature]
+        id_marine_units = [x.IdMarineUnit for x in feature]
 
         count, marine_unit = db.get_all_records(
             mapper_class,
@@ -1223,8 +1277,8 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
 
         count, indicator_assessment = db.get_all_records(
             mapper_class,
-            # mapper_class.Id.in_(ids_needed)
-            *self.conditions_ind_assess
+            mapper_class.Id.in_(ids_needed)
+            # *self.conditions_ind_assess
         )
 
         ids_indicator = [x.Id for x in indicator_assessment]
@@ -1319,7 +1373,7 @@ class A2018IndicatorsDisplay(ItemDisplayForm):
         if ids_ind_ass_ges:
             conditions.append(mapper_class.Id.in_(ids_ind_ass_ges))
 
-        self.conditions_ind_assess = conditions
+        # self.conditions_ind_assess = conditions
         self.ids_indicator_main = ids_indicator_main
         self.ids_ind_ass_ges = ids_ind_ass_ges
 
