@@ -14,7 +14,7 @@ env = os.environ.get
 DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
 DBS = {
     'session': env('MSFD_db_default', 'MarineDB'),
-    'session_2018': env('MSFD_db_2018', 'MSFD2018_test')
+    'session_2018': env('MSFD_db_2018', 'MSFD2018_sandbox')
 }
 
 # DBS = {

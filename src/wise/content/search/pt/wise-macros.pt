@@ -39,3 +39,17 @@
     </div>
   </div>
 </metal:macro>
+
+<metal:macro define-macro="form-collapse">
+    <tal:def define="dataTarget string: .${formid}-collapse">
+        <div data-toggle='collapse' tal:attributes="data-target dataTarget">
+            <div metal:define-slot="header" tal:content="dataTarget">
+            </div>
+        </div>
+        <div tal:attributes="class string: ${formid}-collapse">
+            <div metal:define-slot="content">
+            </div>
+        </div>
+    </tal:def>
+
+</metal:macro>

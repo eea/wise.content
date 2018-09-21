@@ -7,35 +7,37 @@ from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import \
     ViewPageTemplateFile as Template
+from wise.content.search import db
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
 
 from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
-from ..interfaces import IMainForm
+from ..interfaces import IMainForm, IMarineUnitIDsSelect
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
-                       ReportData2018, ReportHeaderForm2018)
+                       Report2012, ReportData2018, ReportHeaderForm2018)
 from .vocabulary import articles_vocabulary, descriptors_vocabulary
 
 MAIN_FORMS = [
     # view name, (title, explanation)
     ('comp-national-descriptor',
-     ('National descriptor assessment',
-      'National descriptor MS reports and Commission assessments'),
+     ('National descriptors',
+      'Member states reports and Commission assessments'),
      ),
     ('comp-regional-descriptor',
-     ('Regional descriptor assessments',
-      'Regional descriptor MS reports and Commission assessments'),
+     ('Regional descriptors',
+      'Member states reports and Commission assessments'),
      ),
     ('comp-national-overviews',
      ('National overviews',
-      'National overview for an MS'),
+      'Overview for a Member state'),
      ),
     ('comp-regional-overviews',
      ('Regional overviews',
-      'Regional overview for all MS in a region',),
+      'Overview for all Member states in a region',),
      ),
 ]
 
@@ -163,18 +165,26 @@ class ArticleForm(EmbededForm):
     fields = Fields(IArticle)
 
     def get_subform(self):
-        # def data(k):
-        #     return self.get_form_data_by_key(self, k)
-        #
-        # self.request.form['country'] = data('member_state')
-        # self.request.form['article'] = data('article')
+        return MarineUnitIDsForm(self, self.request)
 
-        # self.request.form['report_type'] = descriptor
-        # TODO: misssing?
-        # descriptor = self.get_form_data_by_key(self, 'descriptor')
+    def get_available_marine_unit_ids(self):
+        # marine_unit_ids = self.data.get('marine_unit_ids')
 
-        # return getMultiAdapter((self, self.request), name='deter')
+        # TODO: should also do the request form reading
+        data = self.get_flattened_data(self)
+        country = data['member_state']
 
+        if country:
+            return db.get_marine_unit_ids(member_states=[country])
+        else:
+            return []
+
+
+class MarineUnitIDsForm(EmbededForm):
+    fields = Fields(IMarineUnitIDsSelect)
+    fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
+
+    def get_subform(self):
         return NationalDescriptorAssessmentForm(self, self.request)
 
 
@@ -194,6 +204,8 @@ class NationalDescriptorAssessmentForm(Container):
         # - render themselves
         # - answer to the save() method?
         self.subforms = [
+            Report2012(self, self.request),
+
             ReportHeaderForm2018(self, self.request),
             ReportData2018(self, self.request),
             AssessmentHeaderForm2018(self, self.request),
@@ -201,4 +213,5 @@ class NationalDescriptorAssessmentForm(Container):
         ]
 
         for child in self.subforms:
-            child.update()
+            if hasattr(child, 'update'):
+                child.update()

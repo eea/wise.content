@@ -30,20 +30,18 @@ def row_to_dict(table, row):
     return res
 
 
-class DeterminationOfGES2012(BrowserView, Article8, Article10):
+class Report2012(BrowserView, Article8, Article10, BaseUtil):
+
     """ WIP on compliance tables
     """
 
-    art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    # art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
     art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
     art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
     art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
-    def __init__(self, context, request):
-        self.country = request.form.get('country', 'LV')
-        self.descriptor = request.form.get('report_type', 'D5')
-        self.article_template = request.form.get('article', 'art9')
-        super(DeterminationOfGES2012, self).__init__(context, request)
+    # def __init__(self, context, request):
+    #     super(Report2012, self).__init__(context, request)
 
     def get_country_name(self):
         count, obj = db.get_item_by_conditions(
@@ -183,6 +181,15 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
     def __call__(self):
         threadlocals.session_name = 'session'
 
+        data = self.get_flattened_data(self)
+
+        self.country = data.get('member_state')
+        self.descriptor = data.get('descriptor')
+        self.article = data.get('article')
+
+        if not self.country:
+            return ''
+
         # descriptor = 'D5'
         # descriptor_prefix = descriptor[1:]
 
@@ -249,26 +256,27 @@ class DeterminationOfGES2012(BrowserView, Article8, Article10):
         # self.art8data = self.get_data_reported('BAL- LV- AA- 001',
         # self.descriptor)
 
-        template = getattr(self, self.article_template)
+        print "Will render report for ", self.article
 
-        return template
+        template = getattr(self, self.article, None)
+
+        return template and template() or ""
 
 
 class ReportData2018(BrowserView):
     """ TODO: get code in this
     """
 
-    def __call__(self):
-        return 'report data 2018'
-
-    def update(self):
-        pass
+    __call__ = ViewPageTemplateFile('../pt/report-header-display.pt')
 
 
-class ReportHeaderForm2018(EmbededForm):
+class ReportHeaderForm2018(BrowserView):
     """ TODO: get code in this
     """
+
     def __call__(self):
+        return ''
+
         return 'report header form 2018'
 
 
@@ -276,10 +284,9 @@ class AssessmentHeaderForm2018(BrowserView):
     """ TODO: get code in this
     """
     def __call__(self):
-        return 'assessment header form 2018'
+        return ''
 
-    def update(self):
-        pass
+        return 'assessment header form 2018'
 
 
 class AssessmentDataForm2018(Container, BaseUtil):
@@ -317,6 +324,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
             row_name = row.name
 
             form = EmbededForm(self, self.request)
+
+            form.form_name = 'form' + row_name
             fields = []
 
             form.title = '{}: {}'.format(base_name, row_name)
@@ -337,6 +346,15 @@ class AssessmentDataForm2018(Container, BaseUtil):
                     # default=''      # TODO: set the default
                 )
                 fields.append(field)
+
+            summary_title = u'{}: {} Summary'.format(base_name, row_name)
+            summary_name = '{}_{}'.format(base_name, row_name)
+            summary_field = Text(
+                title=summary_title,
+                __name__=summary_name,
+            )
+
+            fields.append(summary_field)
 
             form.fields = Fields(*fields)
 
@@ -365,6 +383,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
         for form in self.subforms:
             out += form()
+
+        out = u'<div class="collapsed-container">{}</div>'.format(out)
 
         return out
 

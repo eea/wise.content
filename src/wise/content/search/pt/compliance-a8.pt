@@ -40,8 +40,8 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
+<div class="overflow-table">
+  <div class="">
     <h5>2012 Member State Report</h5>
     <table tal:repeat="muid view/muids" class="table table-bordered">
     <tal:block tal:define="art8data python: view.get_data_reported(muid, view.descriptor);
