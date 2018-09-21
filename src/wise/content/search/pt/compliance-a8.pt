@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <h4>Article 8: Initial assessment - 2012</h4>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
       <tr>
         <td>Article reported</td>
         <td tal:attributes="colspan view/colspan">
@@ -43,7 +43,7 @@
 <div class="overflow-table">
   <div class="">
     <h5>2012 Member State Report</h5>
-    <table tal:repeat="muid view/muids" class="table table-bordered">
+    <table tal:repeat="muid view/muids" class="table table-bordered table-striped">
     <tal:block tal:define="art8data python: view.get_data_reported(muid, view.descriptor);
             topic_assessment python: view.get_topic_assessment(muid, view.descriptor);
             criterias python: view.get_criterias_list(view.descriptor);
