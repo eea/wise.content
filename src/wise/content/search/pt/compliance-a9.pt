@@ -73,8 +73,8 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
+<div class="">
+  <div class="overflow-table">
     <h4>2012 Member State report</h4>
     <table class='table table-bordered' style='width: 100%; overflow:auto'
       tal:define="criterias python: view.get_criterias_list(view.descriptor);">
