@@ -1,4 +1,6 @@
+@import "bootstrap/variables.less";
 @import "variables.less";
+
 
 .vendor-prefix(@prop; @val) {
     @{prop}: @val;
@@ -10,6 +12,11 @@
 
 .wise-search-form-container div.formControls {
   margin: 0;
+}
+
+#wise-compliance-form-top
+{
+    opacity: 0;
 }
 
 #comp-national-descriptor {
@@ -426,8 +433,6 @@
 
 }
 
-
-
 .fullwidth {
   .center-section {
     width: 100%;
@@ -437,4 +442,59 @@
   .side-section {
     display: none;
   }
+}
+
+@media (max-width: @screen-sm-min){
+    #comp-national-descriptor {
+        .toggle-sidebar {
+            display: none;
+        }
+
+        /*.table {
+          display: flex;
+          flex-flow: row wrap;
+          td {
+
+          }
+        }*/
+
+        .first-table {
+          display: block;
+          border: none;
+
+          thead, tbody, th, td, tr {
+            display: block;
+          }
+
+          .table {
+            td {
+              /* Behave  like a "row" */
+              border: none;
+              border-bottom: 1px solid #eee;
+              position: relative;
+            }
+          }
+
+          td:before {
+              /* Now like a table header */
+              position: absolute;
+              /* Top/left values mimic padding */
+              top: 6px;
+              left: 6px;
+              width: 45%;
+              padding-right: 10px;
+              white-space: nowrap;
+          }
+
+          tr {
+            margin-bottom: 1rem;
+          }
+
+          .link-external {
+            word-break: break-all;
+          }
+        }
+
+
+    }
 }

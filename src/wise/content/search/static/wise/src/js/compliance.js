@@ -435,6 +435,11 @@
         });
     }
 
+    // fade the content in
+    $(document).on("page-ready", function (ev) {
+       $("#wise-compliance-form-top,#comp-national-descriptor").animate({"opacity" : 1}, 500);
+    });
+
     $(document).ready(function($){
         initStyling();
 
@@ -443,14 +448,18 @@
             generateCheckboxes( $fields, $fields.length );
         }
 
-        $("#comp-national-descriptor").animate({"opacity" : 1}, 1000);
-
         addCheckboxHandlers( $("#comp-national-descriptor") );
 
         addCheckboxLabelHandlers();
 
         setupRightSelects2();
 
+        if (window.matchMedia("(max-width: 768px)").matches) {
+            $(".overflow-table h5").width( $(".overflow-table table").width() );
+        }
+
         setupFormToggle();
+
+        $(document).trigger("page-ready");
     });
 }(window, document, $));
