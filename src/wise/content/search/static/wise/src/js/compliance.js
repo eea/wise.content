@@ -5,7 +5,7 @@
     * SELECT2 functions
     * */
     function setupRightSelects2(selector){
-        var forbiddenIDs = ["form-widgets-member_states-from", "form-widgets-member_states-to" ];
+        var forbiddenIDs = [ ];
         var selectorFormCont = selector || selectorFormContainer;
 
         $( selectorFormCont + " select").each(function (ind, selectElement) {
@@ -16,8 +16,6 @@
 
             $(selectElement).addClass("js-example-basic-single");
             var lessOptions = $(selectElement).find("option").length < 10;
-
-            var $wise_search_form = $(selectorFormCont);
 
             var options = {
                 placeholder: 'Select an option',
@@ -416,7 +414,7 @@
         });
     }
 
-     function addCheckboxLabelHandlers(){
+    function addCheckboxLabelHandlers(){
         var allch = $( "#comp-national-descriptor" ).find("[data-fieldname]");
 
         var triggerClick = function (chV, ev){

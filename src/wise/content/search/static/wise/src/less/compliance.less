@@ -379,11 +379,21 @@
 
     &:nth-of-type(even){
       background-color: rgba(255,255,255,0.6);
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
     }
 
     .field {
       margin-bottom: 2rem;
+
+
+      &:first-child {
+        margin-top: 2rem;
+      }
+
+      .select2-container {
+        width: auto;
+      }
+
     }
   }
 
