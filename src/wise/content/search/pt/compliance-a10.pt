@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <h4>Article 10: Environmental targets - 2012</h4>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
       <tr>
         <td>Article reported</td>
         <td tal:attributes="colspan view/colspan"
