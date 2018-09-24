@@ -1,5 +1,6 @@
 import os
 import threading
+import transaction
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -389,3 +390,18 @@ def compliance_art8_join(columns, mc_join1, mc_join2, *conditions):
     q = [x for x in q]
 
     return [count, q]
+
+
+@switch_session
+def save_record(mapper_class, **data):
+    threadlocals.session_name = 'session_2018'
+
+    sess = session()
+    mc = mapper_class(**data)
+    sess.add(mc)
+
+    import pdb; pdb.set_trace()
+
+    transaction.commit()
+
+    return
