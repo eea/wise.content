@@ -97,8 +97,8 @@ populate_labels()
 
 
 def vocab_from_values(values):
-    if not values:
-        values = (u'No data', )
+    # if not values:
+    #     values = (u' - (No data)', )
     terms = [SimpleTerm(x, x, LABELS.get(x, x)) for x in values]
     # TODO fix UnicodeDecodeError
     # Article Indicators, country Lithuania

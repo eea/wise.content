@@ -8,20 +8,20 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 from .base import Leaf as L
 
 ASSESSED_ARTICLES = (
-    ('art3', 'Art. 3(1) Marine waters',),
-    ('art4', 'Art. 4/2017 Decision: Marine regions, subregions, '
+    ('Art3', 'Art. 3(1) Marine waters',),
+    ('Art4', 'Art. 4/2017 Decision: Marine regions, subregions, '
      'and subdivisions '),
-    ('art5', '(MRUs)', ),
-    ('art6', 'Art. 6 Regional cooperation', ),
-    ('art7', 'Art. 7 Competent authorities', ),
-    ('art8', 'Art. 8 Initial assessment (and Art. 17 updates)', ),
-    ('art9', 'Art. 9 Determination of GES (and Art. 17 updates) ', ),
-    ('art10', 'Art. 10 Environmental targets (and Art. 17 updates)', ),
-    ('art11', 'Art. 11 Monitoring programmes (and Art. 17 updates)', ),
-    ('art13', 'Art. 13 Programme of measures (and Art. 17 updates)', ),
-    ('art14', 'Art. 14 Exceptions (and Art. 17 updates)', ),
-    ('art18', 'Art. 18 Interim report on programme of measures', ),
-    ('art19', 'Art. 19(3) Access to data', ),
+    ('Art5', '(MRUs)', ),
+    ('Art6', 'Art. 6 Regional cooperation', ),
+    ('Art7', 'Art. 7 Competent authorities', ),
+    ('Art8', 'Art. 8 Initial assessment (and Art. 17 updates)', ),
+    ('Art9', 'Art. 9 Determination of GES (and Art. 17 updates) ', ),
+    ('Art10', 'Art. 10 Environmental targets (and Art. 17 updates)', ),
+    ('Art11', 'Art. 11 Monitoring programmes (and Art. 17 updates)', ),
+    ('Art13', 'Art. 13 Programme of measures (and Art. 17 updates)', ),
+    ('Art14', 'Art. 14 Exceptions (and Art. 17 updates)', ),
+    ('Art18', 'Art. 18 Interim report on programme of measures', ),
+    ('Art19_3', 'Art. 19(3) Access to data', ),
 )
 
 

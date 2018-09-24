@@ -9,7 +9,7 @@ from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from wise.content.search import db, sql  # , sql2018
+from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
 from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
@@ -303,11 +303,46 @@ class AssessmentDataForm2018(Container, BaseUtil):
         # TODO: build records from the subforms
         print "Saving assessment form data"
         data = {}
+        child_data = {}
+        parent_data = self.get_flattened_data(self)
 
         for form in self.subforms:
             data.update(form.data)
 
+        for children in self.children:
+            if hasattr(children, 'data'):
+                child_data.update(children.data)
+
+        for k, v in data.items():
+            if not v:
+                continue
+
+            # dict for COM_Assessment
+            d = {}
+
+            d['COM_GeneralId'] = 1
+            d['AssessmentCriteria'], d['AssessedInformation'], \
+                d['GESComponent_Target'] = k.split('_')
+            d['Evidence'] = v
+            d['Conclusion'] = u'Partially adequate'
+            d['MSFDArticle'] = parent_data['article']
+            d['Feature'] = child_data['feature_reported']
+
+            # TODO
+            # 1 - create separate entry in COM_Assessments table for
+            #   every Marine Unit ID ??????
+            # 2 - save records one by one, or many at once
+            for mru in parent_data['marine_unit_ids']:
+                d['MarineUnit'] = mru
+
+                # import pdb; pdb.set_trace()
+
+                # db.save_record(sql2018.COMAssessment, **d)
+
+
         print data
+        print child_data
+        print parent_data
 
     def _build_subforms(self, tree):
         """ Build a form of options from a tree of options
@@ -332,6 +367,8 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
             for crit in descriptor_criterions:
                 # print crit
+                import pdb; pdb.set_trace()
+
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
