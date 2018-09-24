@@ -289,6 +289,10 @@ class AssessmentHeaderForm2018(BrowserView):
         return 'assessment header form 2018'
 
 
+def get_default_assessment_value():
+    return None
+
+
 class AssessmentDataForm2018(Container, BaseUtil):
     """ The assessment form for 2018
     """
@@ -332,13 +336,13 @@ class AssessmentDataForm2018(Container, BaseUtil):
             # 1 - create separate entry in COM_Assessments table for
             #   every Marine Unit ID ??????
             # 2 - save records one by one, or many at once
+
             for mru in parent_data['marine_unit_ids']:
                 d['MarineUnit'] = mru
 
                 # import pdb; pdb.set_trace()
 
                 # db.save_record(sql2018.COMAssessment, **d)
-
 
         print data
         print child_data
@@ -375,12 +379,16 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 # choices = [''] + [x.name for x in row.children]
                 choices = [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
+                default = get_default_assessment_value(
+                    # article,
+                    # marine_unit_ids,
+                )
                 field = Choice(
                     title=field_title,
                     __name__=field_name,
                     vocabulary=SimpleVocabulary(terms),
                     required=False,
-                    # default=''      # TODO: set the default
+                    default=default,
                 )
                 fields.append(field)
 
