@@ -1057,12 +1057,8 @@
             $(selectorFormContainer).fadeIn("fast", function () {
                 $( selectorLeftForm + " #wise-search-form-top").siblings().fadeIn("fast");
             });
-        } else {
-            //initPageElems();
-            if ($('#mySelect2').hasClass("select2-hidden-accessible")) {
-                // Select2 has been initialized
-            }
         }
+
         $(selectorFormContainer).find("[name='form.buttons.prev']").remove();
         $(selectorFormContainer).find("[name='form.buttons.next']").remove();
 
