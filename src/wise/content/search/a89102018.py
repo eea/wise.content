@@ -9,9 +9,9 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
 from .base import EmbededForm, ItemDisplayForm, MarineUnitIDSelectForm
+from .sql_extra import MSFD4GeographicalAreaID
 from .utils import (all_values_from_field, data_to_xls, db_objects_to_dict,
                     pivot_data, register_form_2018)
-from .sql_extra import MSFD4GeographicalAreaID
 
 
 class Art9Display(ItemDisplayForm):
@@ -185,22 +185,6 @@ class A2018FeatureA9(EmbededForm):
     #     return all_values_from_field(self, self.fields['feature'])
 
 
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-
-
 # @register_compliance_module
 class A2018Art10Display(ItemDisplayForm):
     extra_data_template = ViewPageTemplateFile('pt/extra-data-pivot.pt')
@@ -234,7 +218,8 @@ class A2018Art10Display(ItemDisplayForm):
             mapper_class,
             sql2018.ReportedInformation,
             and_(mapper_class.MarineReportingUnit.in_(marine_units),
-                 sql2018.ReportedInformation.CountryCode.in_(data['member_states']))
+                 sql2018.ReportedInformation.CountryCode.in_(
+                     data['member_states']))
         )
         marine_unit_ids = [x.Id for x in marine_unit_ids]
 
@@ -274,6 +259,7 @@ class A2018Art10Display(ItemDisplayForm):
 
         member_states = data.get('member_states')
         marine_units = (data.get('marine_unit_id'), )
+
         if isinstance(marine_units, str):
             marine_units = (marine_units, )
         features = data.get('feature')
@@ -415,7 +401,8 @@ class A2018MarineUnitID(MarineUnitIDSelectForm):
             conditions.append(mapper_class.Id.in_(id_marine_units))
 
         if 'member_states' in data:
-            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+            conditions.append(mc_countries.CountryCode.in_(
+                data['member_states']))
 
         count, res = db.get_all_records_outerjoin(
             mapper_class,
@@ -455,21 +442,7 @@ class A2018Article10(EmbededForm):
         pass
 
 
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-
+###############################################################################
 
 class A2018Art81abDisplay(ItemDisplayForm):
     # css_class = 'left-side-form'
@@ -643,8 +616,9 @@ class A2018Art81abDisplay(ItemDisplayForm):
         element_status_pivot = list()
 
         for x in element_status:
-            element = x.pop('Element', None)
-            element2 = x.pop('Element2', None)
+            element = x.pop('Element', '') or ''
+            element2 = x.pop('Element2', '') or ''
+
             x['Element / Element2'] = ' / '.join((element, element2))
             element_status_pivot.append(x)
 
@@ -697,7 +671,7 @@ class A2018Art81abDisplay(ItemDisplayForm):
             s.IdCriteriaValues.in_(id_criteria_value)
         )
 
-        res = list()
+        res = []
 
         res.append(
             ('Pressure code(s)', {
@@ -801,7 +775,8 @@ class A2018Art81abMarineUnitID(MarineUnitIDSelectForm):
             conditions.append(mapper_class.Id.in_(id_marine_units))
 
         if 'member_states' in data:
-            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+            conditions.append(mc_countries.CountryCode.in_(
+                data['member_states']))
 
         count, res = db.get_all_records_outerjoin(
             mapper_class,
@@ -815,13 +790,7 @@ class A2018Art81abMarineUnitID(MarineUnitIDSelectForm):
 
         return len(res), sorted_
 
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
-###################################################################################
+###############################################################################
 
 
 class A2018Art81cDisplay(ItemDisplayForm):
@@ -1121,7 +1090,8 @@ class A2018Art81cMarineUnitId(MarineUnitIDSelectForm):
             conditions.append(mapper_class.Id.in_(id_marine_units))
 
         if 'member_states' in data:
-            conditions.append(mc_countries.CountryCode.in_(data['member_states']))
+            conditions.append(mc_countries.CountryCode.in_(
+                data['member_states']))
 
         count, res = db.get_all_records_outerjoin(
             mapper_class,
@@ -1158,13 +1128,8 @@ class A2018Article81c(EmbededForm):
                                      self.fields['marine_unit_id'])
 
 
-#################################################################################3
-#################################################################################3
-#################################################################################3
-#################################################################################3
-#################################################################################3
-#################################################################################3
-#################################################################################3
+##############################################################################
+
 
 class A2018IndicatorsGesComponent(EmbededForm):
     fields = Fields(interfaces.IIndicatorsGesComponent)
