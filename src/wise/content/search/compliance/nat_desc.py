@@ -367,7 +367,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
             for crit in descriptor_criterions:
                 # print crit
-                import pdb; pdb.set_trace()
+                # import pdb; pdb.set_trace()
 
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
