@@ -397,11 +397,21 @@ def save_record(mapper_class, **data):
     threadlocals.session_name = 'session_2018'
 
     sess = session()
+
+    id_primary_key = data.pop('Id', None)
     mc = mapper_class(**data)
-    sess.add(mc)
 
-    import pdb; pdb.set_trace()
+    if not id_primary_key:
+        sess.add(mc)
+    else:
+        sess.query(mapper_class).filter(mapper_class.Id == id_primary_key).update(data)
 
-    transaction.commit()
+    try:
+        transaction.commit()
+    except:
+        sess.rollback()
 
-    return
+    if not id_primary_key:
+        id_primary_key = mc.Id
+
+    return id_primary_key

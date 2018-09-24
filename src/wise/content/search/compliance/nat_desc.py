@@ -289,8 +289,28 @@ class AssessmentHeaderForm2018(BrowserView):
         return 'assessment header form 2018'
 
 
-def get_default_assessment_value():
-    return None
+def get_default_assessment_value(
+        data_assess,
+        article,
+        # feature,
+        assess_crit,
+        assess_info,
+        ges_comp
+        ):
+    if not data_assess:
+        return None
+
+    val = [
+        x.Evidence
+        for x in data_assess
+        if x.MSFDArticle == article and
+            # x.Feature == feature and
+            x.AssessmentCriteria == assess_crit and
+            x.AssessedInformation == assess_info and
+            x.GESComponent_Target == ges_comp
+    ]
+
+    return val
 
 
 class AssessmentDataForm2018(Container, BaseUtil):
@@ -317,14 +337,45 @@ class AssessmentDataForm2018(Container, BaseUtil):
             if hasattr(children, 'data'):
                 child_data.update(children.data)
 
+        # save in COM_General
+        d_general = {}
+
+        # TODO get Reporting_historyId
+        d_general['Reporting_historyId'] = 48
+        d_general['CountryCode'] = parent_data['member_state']
+
+        # TODO get AssessmentTopic
+        d_general['AssessmentTopic'] = u'National summary'
+        d_general['MSFDArticle'] = parent_data['article']
+
+        # TODO get DateReportDue, ReportBy etc...
+        d_general['DateReportDue'] = u'2011-01-15'
+        d_general['ReportBy'] = u'Commission'
+        d_general['SourceFile'] = ''
+        d_general['DateReported'] = ''
+        d_general['DateAssessed'] = ''
+        d_general['Assessors'] = ''
+        d_general['CommissionReport'] = ''
+
+        # import pdb; pdb.set_trace()
+        mc = sql2018.COMGeneral
+        if self.general_id:
+            d_general['Id'] = self.general_id
+        self.general_id = db.save_record(mc, **d_general)
+
+        # import pdb; pdb.set_trace()
+
+        # save in COM_Assessment
         for k, v in data.items():
             if not v:
                 continue
 
-            # dict for COM_Assessment
             d = {}
 
-            d['COM_GeneralId'] = 1
+            # TODO get COM_GeneralId
+            # d['COM_GeneralId'] = 12
+            d['COM_GeneralId'] = self.general_id
+
             d['AssessmentCriteria'], d['AssessedInformation'], \
                 d['GESComponent_Target'] = k.split('_')
             d['Evidence'] = v
@@ -339,8 +390,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
             for mru in parent_data['marine_unit_ids']:
                 d['MarineUnit'] = mru
-
-                # import pdb; pdb.set_trace()
 
                 # db.save_record(sql2018.COMAssessment, **d)
 
@@ -359,6 +408,30 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
         forms = []
 
+        # check if article was already assessed
+        @switch_session
+        def func():
+            threadlocals.session_name = 'session_2018'
+
+            mc = sql2018.COMGeneral
+            conditions = []
+            conditions.append(mc.CountryCode == data['member_state'])
+            conditions.append(mc.AssessmentTopic == u'National summary')
+            conditions.append(mc.MSFDArticle == data['article'])
+            count, res = db.get_all_records(
+                mc,
+                *conditions
+            )
+            if not count:
+                return [], None
+            else:
+                return db.get_all_records(
+                    sql2018.COMAssessment,
+                    sql2018.COMAssessment.COM_GeneralId == res[0].Id
+                )[1], res[0].Id
+
+        data_assess, self.general_id = func()
+
         for row in tree.children:
             row_name = row.name
 
@@ -371,7 +444,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
             for crit in descriptor_criterions:
                 # print crit
-                # import pdb; pdb.set_trace()
 
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
@@ -379,10 +451,18 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 # choices = [''] + [x.name for x in row.children]
                 choices = [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
+
                 default = get_default_assessment_value(
-                    # article,
-                    # marine_unit_ids,
+                    data_assess,
+                    data['article'],  # MSFDArticle
+                    # data['feature'],  # Feature
+                    base_name,  # AssessmentCriteria
+                    row_name,  # AssessedInformation
+                    crit.id  # GESComponent_Target
                 )
+
+                # import pdb; pdb.set_trace()
+
                 field = Choice(
                     title=field_title,
                     __name__=field_name,
