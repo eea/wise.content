@@ -48,4 +48,3 @@
     GESOther in Nutrient Assessment Criteria.
   - But in the terms list mapping, 1.6 corresponds to D6C5, which is not a D5
     descriptor
-
