@@ -504,7 +504,7 @@
                 // remove results following form-widgets-article select element
                 // as we want to reset each facet to it's initial value if we change form
                 if( $(this).attr("id") === "form-widgets-article" ) {
-                    $(ev.target).closest(".form-right-side").next().remove();
+                    //$(ev.target).closest(".form-right-side").next().remove();
                 }
 
                 removePaginationButtons()
@@ -515,12 +515,15 @@
                 }, 300);
 
             });
+
         });
     }
 
     function setupLeftSelect2(){
         var marineUnitTriggerSelector = "#marine-unit-trigger";
-
+        if(  ($( selectorLeftForm + " select:not(.notselect)").hasClass("js-example-basic-single")) ){
+            return false;
+        }
         $( selectorLeftForm + " select:not(.notselect)").addClass("js-example-basic-single").each(function (ind, selectElement) {
             var options = {
                 placeholder: 'Select an option',
@@ -1054,6 +1057,11 @@
             $(selectorFormContainer).fadeIn("fast", function () {
                 $( selectorLeftForm + " #wise-search-form-top").siblings().fadeIn("fast");
             });
+        } else {
+            //initPageElems();
+            if ($('#mySelect2').hasClass("select2-hidden-accessible")) {
+                // Select2 has been initialized
+            }
         }
         $(selectorFormContainer).find("[name='form.buttons.prev']").remove();
         $(selectorFormContainer).find("[name='form.buttons.next']").remove();
@@ -1067,7 +1075,6 @@
         //if($( selectorLeftForm + " select").val() === "--NOVALUE--" ) $( selectorLeftForm + " select").val(window.WISE.marineUnit).trigger("change.select2");
         if ( $(selectorLeftForm + ' select').hasClass("js-example-basic-single")) {
             // Select2 has been initialized
-
             if( ( $( selectorLeftForm + " .select2-choice").width()/2 ) <= $( selectorLeftForm + " #select2-chosen-3").width() ){
                 $( selectorLeftForm + " .select2-choice").css("width", "50%");
             } else if ( 2*( $( selectorLeftForm + " .select2-choice").width()/3 ) <= $( selectorLeftForm + " #select2-chosen-3").width() ) {
@@ -1097,7 +1104,7 @@
     }
 
     function formAjaxError(req, status, error){
-        if(window.WISE.formData.length > 0){
+        /*if(window.WISE.formData.length > 0){
             var data = $($(window.WISE.formData)[0]).find(".field");
             $.each( data , function (indx, $field) {
                 var chk = $($field).find(".option input[type='checkbox']:checked");
@@ -1106,7 +1113,7 @@
                 }
 
             });
-        }
+        }*/
 
         $("#wise-search-form-top").find(".alert").remove();
         $("#wise-search-form-top").append('<div class="alert alert-danger alert-dismissible show" style="margin-top: 2rem;" role="alert">' +
