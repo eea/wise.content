@@ -34,6 +34,9 @@
     function initStyling(){
         //$("#form-buttons-continue").hide("fast");
         $(".button-field").addClass("btn");
+
+        // mobile hide .toggle-sidebar
+        $(".toggle-sidebar").hide();
     }
 
     function setupFormToggle(){

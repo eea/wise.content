@@ -971,7 +971,6 @@
      * or the td text content
      *
      */
-
     function sortabledataclass(cell){
         var re, matches;
 
