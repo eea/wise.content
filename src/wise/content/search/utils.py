@@ -128,10 +128,12 @@ def print_value(value):
         return value
 
     if isinstance(value, string_types):
+
         if value in LABELS:
             tmpl = '<span title="{}">{}</span>'
             try:
-                ret = tmpl.format(value, LABELS[value])
+                html = convertWebIntelligentPlainTextToHtml(LABELS[value])
+                ret = tmpl.format(value, html)
             except UnicodeEncodeError as e:
                 ret = tmpl.format(value, LABELS[value].encode('utf-8'))
             except Exception as e:
