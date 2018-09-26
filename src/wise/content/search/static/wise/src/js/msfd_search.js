@@ -1096,7 +1096,7 @@
             .click(sort);
         $('table.listing:not(.nosort) tbody').each(setoddeven);
 
-        if (undefined !== scanforlinks) jQuery(scanforlinks);
+        if ( typeof scanforlinks !== "undefined") jQuery(scanforlinks);
     }
 
     function formAjaxError(req, status, error){
@@ -1264,9 +1264,17 @@
                     complete:formAjaxComplete,
                     error:formAjaxError
                 });
-
             });
 
+        /*var form =  $( selectorFormContainer ).find("form");
+        //form.attr("autocomplete", "off");
+        var strContent = $.getMultipartData("#" + form.attr("id"));
+        console.log(strContent);
+
+        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");*/
     });
+
+
+
 
 }(window, document, jQuery));
