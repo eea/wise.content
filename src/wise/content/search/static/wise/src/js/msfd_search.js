@@ -920,6 +920,20 @@
         loading = true;
     }
 
+    function storeFormtoLocalStorage() {
+        var form =  $( selectorFormContainer ).find("form");
+        //form.attr("autocomplete", "off");
+        var strContent = $.getMultipartData("#" + form.attr("id"));
+
+        if(typeof LZString !== "undefined"){
+            var compressed = LZString.compressToEncodedURIComponent(strContent[1]);
+
+            if (typeof Storage !== 'undefined') { // We have local storage support
+                localStorage.form = compressed; // to save to local storage
+            }
+        }
+    }
+
     function formSuccess(data, status, req) {
         $( selectorLeftForm + " #wise-search-form-top").siblings().html("");
         $( selectorLeftForm + " #wise-search-form-top").siblings().fadeOut("fast");
@@ -962,7 +976,9 @@
 
         $("[name='marine.buttons.prev']").prop("disabled" , false);
         $("[name='marine.buttons.next']").prop("disabled" , false);
-         $("#wise-search-form-top").find(".alert").remove();
+        $("#wise-search-form-top").find(".alert").remove();
+
+        storeFormtoLocalStorage();
     }
 
      /* - table_sorter.js - */
@@ -1134,6 +1150,10 @@
         $("[name='marine.buttons.prev']").prop("disabled" , true);
         $("[name='marine.buttons.next']").prop("disabled" , true);
 
+        if (typeof Storage !== 'undefined') {
+            localStorage.removeItem("form")
+        }
+
         loading = false;
     }
 
@@ -1266,15 +1286,26 @@
                 });
             });
 
-        /*var form =  $( selectorFormContainer ).find("form");
-        //form.attr("autocomplete", "off");
-        var strContent = $.getMultipartData("#" + form.attr("id"));
-        console.log(strContent);
+        if (typeof Storage !== 'undefined') {
+            if(localStorage.form !== undefined){
+                if(typeof LZString !== "undefined"){
+                    var dec = LZString.decompressFromEncodedURIComponent(localStorage.form);
 
-        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");*/
+                    var form =  $( selectorFormContainer ).find("form");
+
+                    var strContent = $.getMultipartData("#" + form.attr("id"));
+                    if(dec !== strContent[1] ){
+                        console.log("different data");
+                        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
+                    } else {
+                        console.log("same data");
+                    }
+
+                    localStorage.removeItem("form");
+                }
+            }
+        }
+
     });
-
-
-
 
 }(window, document, jQuery));
