@@ -118,8 +118,8 @@ window.setupTabs = function (tabswrapper) {
 }
 
 jQuery(document).ready(function($){
-    if(typeof setupTabs !== "undefined") {
-        setupTabs();
+    if ("undefined" !== typeof window.setupTabs) {
+        window.setupTabs();
     }
 
     /* mobile select setup
@@ -178,7 +178,9 @@ jQuery(document).ready(function($){
 
     $(window).on('resize', function(){
         mobileSelect(w,daw);
-        setupTabs();
+        if ("undefined" !== typeof window.setupTabs) {
+    window.setupTabs();
+}
     });
 
 });
