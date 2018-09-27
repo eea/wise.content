@@ -84,7 +84,6 @@ def use_db_session(session_name):
     return wrapped
 
 
-
 def _make_session(dsn):
     engine = create_engine(dsn, pool_recycle=1800)
     Session = scoped_session(sessionmaker(bind=engine))
@@ -421,9 +420,6 @@ def save_record(mapper_class, **data):
     threadlocals.session_name = 'session_2018'
 
     sess = session()
-    # reset transaction, dont get the following error
-    # ResourceClosedError('This transaction is closed', )
-    # sess.rollback()
 
     id_primary_key = data.pop('Id', [])
     mc = mapper_class(**data)
@@ -431,11 +427,15 @@ def save_record(mapper_class, **data):
     # import pdb; pdb.set_trace()
     len_ids = len(id_primary_key)
 
+    # insert into db if no Id provided
     if len_ids < 1:
         sess.add(mc)
+    # update the row(s) based on the Id(s)
     else:
         condition = []
 
+        # due to a bug??, if only one Id is provided
+        # because of the "in_" operator we get an error
         if len_ids > 1:
             condition.append(mapper_class.Id.in_(id_primary_key))
         else:
