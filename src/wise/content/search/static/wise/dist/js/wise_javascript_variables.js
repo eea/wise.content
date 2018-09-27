@@ -1,2 +1,2 @@
-var external_links_open_new_window="true",mark_special_links="true",setupTabs="undefined"!=typeof setupTabs?setupTabs:null,clickFirstTab="undefined"!=typeof clickFirstTab?clickFirstTab:null;
+var external_links_open_new_window="true",mark_special_links="true";
 //# sourceMappingURL=wise_javascript_variables.js.map
