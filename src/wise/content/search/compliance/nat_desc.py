@@ -13,7 +13,7 @@ from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
 
 from ..base import BaseUtil, EmbededForm
-from ..db import switch_session, threadlocals, use_db_session
+from ..db import use_db_session
 from ..gescomponents import get_ges_criterions
 from .base import Container
 from .nd_A8 import Article8
@@ -287,6 +287,31 @@ class AssessmentHeaderForm2018(BrowserView):
         return 'assessment header form 2018'
 
 
+def get_default_additional_field_value(
+        data_assess,
+        article,
+        feature,
+        assess_crit,
+        assess_info,
+        field_name
+        ):
+
+    if not data_assess:
+        return None
+
+    for x in data_assess:
+        field_data = getattr(x, field_name)
+        if x.MSFDArticle == article and \
+           x.Feature == feature and \
+           x.AssessmentCriteria == assess_crit and \
+           x.AssessedInformation == assess_info and \
+           field_data:
+
+            return field_data
+
+    return None
+
+
 def get_default_assessment_value(
         data_assess,
         article,
@@ -299,20 +324,14 @@ def get_default_assessment_value(
     if not data_assess:
         return None
 
-    val = [
-        x.Evidence
+    for x in data_assess:
+        if x.MSFDArticle == article and \
+           x.Feature == feature and \
+           x.AssessmentCriteria == assess_crit and \
+           x.AssessedInformation == assess_info and \
+           x.GESComponent_Target == ges_comp:
 
-        for x in data_assess
-
-        if x.MSFDArticle == article and
-            x.Feature == feature and
-            x.AssessmentCriteria == assess_crit and
-            x.AssessedInformation == assess_info and
-            x.GESComponent_Target == ges_comp
-    ]
-
-    if val:
-        return val[0]
+            return x.Evidence
 
     return None
 
@@ -351,113 +370,136 @@ class AssessmentDataForm2018(Container, BaseUtil):
         for children in self.main_assessment_data_forms:
             child_data.update(children.data)
 
-        self._save(data)
+        self._save(data, parent_data, child_data)
 
-        return
+    def _save(self, data, parent_data, child_data):
 
-    def _save(self, data):
+        # save COM_General data
+        if not self.general_id:
+            self.general_id = self.save_general(parent_data)
 
-        return
-    # def _save(self):
-    #     # save in COM_General
-    #     d_general = {}
-    #
-    #     # TODO get Reporting_historyId
-    #     d_general['Reporting_historyId'] = 48
-    #     d_general['CountryCode'] = parent_data['member_state']
-    #
-    #     d_general['AssessmentTopic'] = self.context.assessment_topic
-    #     d_general['MSFDArticle'] = parent_data['article']
-    #
-    #     # TODO get DateReportDue, ReportBy etc...
-    #     d_general['DateReportDue'] = u'2011-01-15'
-    #     d_general['ReportBy'] = u'Commission'
-    #     d_general['SourceFile'] = ''
-    #     d_general['DateReported'] = ''
-    #     d_general['DateAssessed'] = ''
-    #     d_general['Assessors'] = ''
-    #     d_general['CommissionReport'] = ''
-    #
-    #     mc = sql2018.COMGeneral
-    #
-    #     if self.general_id:
-    #         d_general['Id'] = [unicode(self.general_id)]
-    #     self.general_id = db.save_record(mc, **d_general)
-    #
-    #     # get COM_assessments data
-    #     all_features_reported = parent_data['feature_reported']
-    #
-    #     @switch_session
-    #     def _get_assessment_data(feature_reported):
-    #         threadlocals.session_name = 'session_2018'
-    #
-    #         count, res = db.get_all_records(
-    #             sql2018.COMAssessment,
-    #             and_(sql2018.COMAssessment.COM_GeneralId == self.general_id,
-    #                  sql2018.COMAssessment.Feature == feature_reported)
-    #         )
-    #
-    #         return res
-    #
-    #     for feature_reported in all_features_reported:
-    #
-    #         assessment_data = _get_assessment_data(feature_reported)
-    #
-    #         # save in COM_Assessment
-    #
-    #         for k, v in data.items():
-    #             if not v:
-    #                 continue
-    #
-    #             d = {}
-    #
-    #             # TODO get COM_GeneralId
-    #             # d['COM_GeneralId'] = 12
-    #             d['COM_GeneralId'] = self.general_id
-    #             d['MSFDArticle'] = parent_data['article']
-    #             d['Feature'] = feature_reported
-    #
-    #             d['AssessmentCriteria'], d['AssessedInformation'], \
-    #                 d['GESComponent_Target'] = k.split('_')
-    #
-    #             if d['GESComponent_Target'] in additional_fields.keys():
-    #                 field_name = d.pop('GESComponent_Target')
-    #                 d[additional_fields[field_name]] = v
-    #             else:
-    #                 field_name = 'GESComponent_Target'
-    #                 d['Evidence'] = v
-    #
-    #             # TODO
-    #             # 1 - create separate entry in COM_Assessments table for
-    #             #   every Marine Unit ID ??????
-    #             # 2 - save records one by one, or many at once
-    #
-    #             for mru in parent_data['marine_unit_ids']:
-    #                 d['MarineUnit'] = mru
-    #
-    #                 id_assess = []
-    #
-    #                 for x in assessment_data:
-    #                     if x.MarineUnit != mru:
-    #                         continue
-    #
-    #                     if (x.AssessedInformation != d['AssessedInformation']):
-    #                         continue
-    #
-    #                     if (x.AssessmentCriteria != d['AssessmentCriteria']):
-    #                         continue
-    #
-    #                     if (getattr(x, field_name) == d.get(field_name)):
-    #                         id_assess.append(x.Id)
-    #
-    #                 if id_assess:
-    #                     d['Id'] = id_assess
-    #                 # import pdb; pdb.set_trace()
-    #                 db.save_record(sql2018.COMAssessment, **d)
-    #
-    #     print data
-    #     print child_data
-    #     print parent_data
+        # save COM_Assessment data
+        self.save_assessment(data, parent_data)
+
+        print data
+
+    def save_general(self, parent_data):
+        d_general = {}
+
+        # TODO get Reporting_historyId
+        d_general['Reporting_historyId'] = 48
+        d_general['CountryCode'] = parent_data['member_state']
+
+        d_general['AssessmentTopic'] = self.context.assessment_topic
+        d_general['MSFDArticle'] = parent_data['article']
+
+        # TODO get DateReportDue, ReportBy etc...
+        d_general['DateReportDue'] = u'2011-01-15'
+        d_general['ReportBy'] = u'Commission'
+        d_general['SourceFile'] = ''
+        d_general['DateReported'] = ''
+        d_general['DateAssessed'] = ''
+        d_general['Assessors'] = ''
+        d_general['CommissionReport'] = ''
+
+        mc = sql2018.COMGeneral
+
+        if self.general_id:
+            d_general['Id'] = [unicode(self.general_id)]
+        general_id = db.save_record(mc, **d_general)
+
+        return general_id
+
+    def save_assessment(self, data, parent_data):
+        # get COM_assessments data
+        all_features_reported = parent_data['feature_reported']
+
+        # get data from COM_assessments to be able to decide if the
+        # form data will be inserted of updated
+        @use_db_session('session_2018')
+        def _get_assessment_data(feature_reported):
+            res = self.get_assessment_data(
+                self.general_id,
+                feature_reported
+            )
+
+            return res
+
+        for feature_reported in all_features_reported:
+
+            assessment_data = _get_assessment_data(feature_reported)
+
+            # save in COM_Assessment
+            for k, v in data.items():
+                if not v:
+                    continue
+                print k, v
+
+                d = {}
+
+                d['COM_GeneralId'] = self.general_id
+                d['MSFDArticle'] = parent_data['article']
+                d['Feature'] = feature_reported
+
+                d['AssessmentCriteria'], d['AssessedInformation'], \
+                d['GESComponent_Target'] = k.split('_')
+
+                if d['GESComponent_Target'] in additional_fields.keys():
+                    field_name = d.pop('GESComponent_Target')
+                    field_name = additional_fields.get(field_name)
+                    d[field_name] = v
+                else:
+                    field_name = 'GESComponent_Target'
+                    d['Evidence'] = v
+
+                # TODO
+                # 1 - create separate entry in COM_Assessments table for
+                #   every Marine Unit ID ??????
+                # 2 - save records one by one, or many at once
+
+                for mru in parent_data['marine_unit_ids']:
+                    d['MarineUnit'] = mru
+
+                    id_assess = []
+
+                    # get the Id from assessment_data, if found it will be
+                    # an update, otherwise an insert into db
+                    for x in assessment_data:
+                        if x.MarineUnit != mru:
+                            continue
+
+                        if (x.AssessedInformation != d['AssessedInformation']):
+                            continue
+
+                        if (x.AssessmentCriteria != d['AssessmentCriteria']):
+                            continue
+
+                        if field_name in additional_fields.values():
+                            if getattr(x, field_name):
+                                id_assess.append(x.Id)
+                                break
+
+                        if (getattr(x, field_name) == d.get(field_name)):
+                            id_assess.append(x.Id)
+                            break
+
+                    if id_assess:
+                        d['Id'] = id_assess
+                    # import pdb; pdb.set_trace()
+                    db.save_record(sql2018.COMAssessment, **d)
+
+    def get_assessment_data(self, general_id, feature=None):
+        conditions = []
+        conditions.append(sql2018.COMAssessment.COM_GeneralId == general_id)
+        if feature:
+            conditions.append(sql2018.COMAssessment.Feature == feature)
+
+        cnt, assess_data = db.get_all_records(
+            sql2018.COMAssessment,
+            *conditions
+        )
+
+        return assess_data
 
     def _build_subforms(self, tree):
         """ Build a form of options from a tree of options
@@ -494,10 +536,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 return [], None
             else:
                 general_id = res[0].Id
-                cnt, assess_data = db.get_all_records(
-                    sql2018.COMAssessment,
-                    sql2018.COMAssessment.COM_GeneralId == res[0].Id
-                )
+                assess_data = self.get_assessment_data(general_id)
 
                 return assess_data, general_id
 
@@ -519,7 +558,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)
-                print field_name
                 # choices = [''] + [x.name for x in row.children]
                 choices = [x.name for x in row.children]
                 terms = [SimpleTerm(c, i, c) for i, c in enumerate(choices)]
@@ -527,11 +565,12 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 default = get_default_assessment_value(
                     data_assess,
                     data['article'],  # MSFDArticle
-                    data['feature_reported'],  # Feature
+                    data['feature_reported'][0],  # Feature
                     base_name,  # AssessmentCriteria
                     row_name,  # AssessedInformation
                     crit.id  # GESComponent_Target
                 )
+                # import pdb; pdb.set_trace()
 
                 field = Choice(
                     title=field_title,
@@ -543,13 +582,22 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 fields.append(field)
 
             for f in additional_fields.keys():
+                default = get_default_additional_field_value(
+                    data_assess,
+                    data['article'],  # MSFDArticle
+                    data['feature_reported'][0],  # Feature
+                    base_name,  # AssessmentCriteria
+                    row_name,  # AssessedInformation
+                    additional_fields[f]
+                )
+
                 _title = u'{}: {} {}'.format(base_name, row_name, f)
                 _name = '{}_{}_{}'.format(base_name, row_name, f)
-                print _name
                 _field = Text(
                     title=_title,
                     __name__=_name,
                     required=False,
+                    default=default
                 )
 
                 fields.append(_field)
