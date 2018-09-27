@@ -1,12 +1,12 @@
 import os
 import threading
-import transaction
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.relationships import RelationshipProperty
 from zope.sqlalchemy import register
 
+import transaction
 from eea.cache import cache
 from wise.content.search import sql, sql2018
 from wise.content.search.utils import db_result_key, pivot_query
@@ -59,6 +59,30 @@ def switch_session(func):
         return res
 
     return inner
+
+
+def use_db_session(session_name):
+    """ A decorator factory that will switch the session based on provided name
+    """
+
+    def wrapped(func):
+        """ Decorator to save the session name and switch back after function runs
+        """
+
+        def inner(*args, **kwargs):
+            saved_session = getattr(threadlocals, 'session_name', None)
+
+            threadlocals.session_name = session_name
+            res = func(*args, **kwargs)
+
+            threadlocals.session_name = saved_session
+
+            return res
+
+        return inner
+
+    return wrapped
+
 
 
 def _make_session(dsn):
@@ -411,6 +435,7 @@ def save_record(mapper_class, **data):
         sess.add(mc)
     else:
         condition = []
+
         if len_ids > 1:
             condition.append(mapper_class.Id.in_(id_primary_key))
         else:

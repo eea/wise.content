@@ -293,6 +293,7 @@ def db_objects_to_dict(data, excluded_columns=()):
 
         for col in columns:
             # import pdb; pdb.set_trace()
+
             if col not in excluded_columns:
                     d.update({col: getattr(row, col)})
         out.append(d)
@@ -359,17 +360,20 @@ def all_values_from_field(context, field):
         return default_value_from_field(context, field)
 
     if not isinstance(field.field, List):
+        # TODO: do we use other types of fields?
+
         return None
-
-    name = field.field.value_type.vocabularyName
-
-    # TODO: we need to also use the vocabulary, if available, just like
-    # default_value_from_field does. Edge case not covered here, yet
 
     # we use the parent for the vocabulary because parents usually have the
     # values that we want to filter in the current vocabulary
+
     parent = context.context
-    vocab = getUtility(IVocabularyFactory, name=name)(parent)
+
+    vocab = field.field.value_type.vocabulary
+
+    if not vocab:
+        name = field.field.value_type.vocabularyName
+        vocab = getUtility(IVocabularyFactory, name=name)(parent)
 
     return [term.token for term in vocab._terms]
 
