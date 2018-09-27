@@ -852,9 +852,9 @@
 
         attachSelect2();
 
-        if( typeof window.setupTabs !== "undefined" && null !== window.setupTabs ) window.setupTabs();
+        if("undefined" !== typeof window.setupTabs && null !== window.setupTabs) window.setupTabs();
 
-        if( undefined !== clickFirstTab && null !== clickFirstTab ) clickFirstTab();
+        if( "undefined" !== typeof clickFirstTab && null !== clickFirstTab ) clickFirstTab();
 
         setPaginationButtons();
 

@@ -118,7 +118,7 @@ window.setupTabs = function (tabswrapper) {
 }
 
 jQuery(document).ready(function($){
-    if(typeof window.setupTabs !== "undefined") {
+    if ("undefined" !== typeof window.setupTabs) {
         window.setupTabs();
     }
 
@@ -178,9 +178,9 @@ jQuery(document).ready(function($){
 
     $(window).on('resize', function(){
         mobileSelect(w,daw);
-        if(typeof window.setupTabs !== "undefined") {
-            window.setupTabs();
-        }
+        if ("undefined" !== typeof window.setupTabs) {
+    window.setupTabs();
+}
     });
 
 });
