@@ -920,21 +920,6 @@
         loading = true;
     }
 
-    function storeFormtoLocalStorage() {
-        var form =  $( selectorFormContainer ).find("form");
-        //form.attr("autocomplete", "off");
-        var strContent = $.getMultipartData("#" + form.attr("id"));
-
-        if(typeof LZString !== "undefined"){
-            var compressed = LZString.compressToEncodedURIComponent(strContent[1]);
-
-            if (typeof Storage !== 'undefined') { // We have local storage support
-                localStorage.form = compressed; // to save to local storage
-                localStorage.boundary = strContent[0];
-            }
-        }
-    }
-
     function formSuccess(data, status, req) {
         $( selectorLeftForm + " #wise-search-form-top").siblings().html("");
         $( selectorLeftForm + " #wise-search-form-top").siblings().fadeOut("fast");
@@ -979,7 +964,6 @@
         $("[name='marine.buttons.next']").prop("disabled" , false);
         $("#wise-search-form-top").find(".alert").remove();
 
-        storeFormtoLocalStorage();
     }
 
      /* - table_sorter.js - */
@@ -1152,7 +1136,7 @@
         $("[name='marine.buttons.next']").prop("disabled" , true);
 
         if (typeof Storage !== 'undefined') {
-            localStorage.removeItem("form")
+            sessionStorage.removeItem("form")
         }
 
         loading = false;
@@ -1226,6 +1210,87 @@
         }
     }
 
+    function isSupported(storage) {
+      try {
+        var key = "__some_random_key_you_are_not_going_to_use__";
+        storage.setItem(key, key);
+        storage.removeItem(key);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function storeFormtoLocalStorage(boundary, data) {
+        if(! isSupported(window.sessionStorage)){
+            return false;
+        }
+        //var form =  $( selectorFormContainer ).find("form");
+
+        //var strContent = $.getMultipartData("#" + form.attr("id"));
+
+        if(typeof LZString !== "undefined"){
+            var compressed = LZString.compressToEncodedURIComponent(data);
+
+            if (typeof Storage !== 'undefined') { // We have local storage support
+                sessionStorage.form = compressed; // to save to local storage
+                sessionStorage.boundary = boundary;
+            }
+        }
+    }
+
+    function searchFormAjax(boundary, data, url){
+        $.ajax({
+            type: "POST",
+            contentType: 'multipart/form-data; boundary='+ boundary,
+            cache:false,
+            data: data,
+            dataType: "html",
+            url: url,
+            //processData:false,
+            beforeSend: beforeSendForm,
+            success: function (dataRes, status, req) {
+                storeFormtoLocalStorage(boundary, data);
+                formSuccess(dataRes,status,req);
+            },
+            complete:formAjaxComplete,
+            error:formAjaxError
+        });
+    }
+
+    function refreshFromLocalStorage(){
+        if(! isSupported(window.sessionStorage)){
+            return false;
+        }
+
+        if(typeof  sessionStorage.form === "undefined"){
+            return false;
+        }
+        if ("undefined" === typeof LZString) {
+            console.error("LZString not found");
+            return false;
+        }
+
+        try {
+            var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
+
+            var form = $(selectorFormContainer).find("form");
+
+            var strContent = $.getMultipartData("#" + form.attr("id"));
+            if (dec !== strContent[1]) {
+                var url = form.attr("action");
+                var boundary = sessionStorage.boundary;
+
+                searchFormAjax(boundary, dec, url);
+
+            } else {
+                console.log("same data");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     jQuery(document).ready(function($){
         initPageElems();
 
@@ -1245,6 +1310,7 @@
         window.WISE = {};
         window.WISE.formData = $( selectorFormContainer ).clone(true);
         window.WISE.blocks = [];
+
 
         // ajax form submission
         $( selectorFormContainer )
@@ -1272,63 +1338,10 @@
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
-                $.ajax({
-                    type: "POST",
-                    contentType: 'multipart/form-data; boundary='+strContent[0],
-                    cache:false,
-                    data: strContent[1],
-                    dataType: "html",
-                    url: url,
-                    //processData:false,
-                    beforeSend: beforeSendForm,
-                    success:formSuccess,
-                    complete:formAjaxComplete,
-                    error:formAjaxError
-                });
+                searchFormAjax(strContent[0], strContent[1], url);
             });
 
-        function refreshFromLocalStorage(){
-            if (typeof Storage !== 'undefined') {
-                if(localStorage.form !== undefined){
-                    if(typeof LZString !== "undefined"){
-                        var dec = LZString.decompressFromEncodedURIComponent(localStorage.form);
-
-                        var form =  $( selectorFormContainer ).find("form");
-
-                        var strContent = $.getMultipartData("#" + form.attr("id"));
-                        if(dec !== strContent[1] ){
-                            console.log("different data");
-
-                            var url = form.attr("action");
-                            var boundary = localStorage.boundary;
-
-                            $.ajax({
-                                type: "POST",
-                                contentType: 'multipart/form-data; boundary='+boundary,
-                                cache:false,
-                                data: localStorage.form,
-                                dataType: "html",
-                                url: url,
-                                //processData:false,
-                                beforeSend: beforeSendForm,
-                                success:formSuccess,
-                                complete:formAjaxComplete,
-                                error:formAjaxError
-                            });
-
-                        } else {
-                            console.log("same data");
-                        }
-
-                        localStorage.removeItem("form");
-                    }
-                }
-            }
-        }
-
         refreshFromLocalStorage();
-
-
     });
 
 }(window, document, jQuery));
