@@ -11,9 +11,10 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 from z3c.formwidget.optgroup.widget import OptgroupTerm
 
-from .db import get_all_records, threadlocals, switch_session
+from .db import get_all_records, switch_session, threadlocals
 from .sql import t_MSFD9_Features
 from .vocabulary import LABELS
+
 
 def parse_features_file():
     csv_f = resource_filename('wise.content',
@@ -55,6 +56,10 @@ def get_feature_terms_old():
 
 @switch_session
 def get_feature_terms():
+    # TODO: generate the vocabulary based on the context country, descriptor
+    # TODO: use the 2018 database, this is not for the 2012 data
+
+    # TODO: next line needs to be included in the switch_session decorator
     threadlocals.session_name = 'session'
 
     terms = []
@@ -68,6 +73,7 @@ def get_feature_terms():
     for row in db_res:
         feature = row[4]
         impact = row[2]
+
         if impact in seen or feature is None:
             continue
 
