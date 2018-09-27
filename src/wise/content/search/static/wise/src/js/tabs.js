@@ -6,7 +6,7 @@ function clickFirstTab(){
     $(".tabs-wrapper ul li:first-child a").trigger('click');
 }
 
-setupTabs = function (tabswrapper) {
+window.setupTabs = function (tabswrapper) {
     function setupInnerTabs(tabsW) {
         var t = $("ul.nav:not(.topnav) > li");
         // tabs width calculation
@@ -118,7 +118,9 @@ setupTabs = function (tabswrapper) {
 }
 
 jQuery(document).ready(function($){
-    setupTabs();
+    if(typeof setupTabs !== "undefined") {
+        setupTabs();
+    }
 
     /* mobile select setup
     *
