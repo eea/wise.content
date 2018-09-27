@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # from zope.component import getMultiAdapter
 from zope.interface import Interface, implements
-from zope.schema import Choice
+from zope.schema import Choice, List
 
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
@@ -12,9 +12,11 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 from z3c.form.form import Form
+from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
 from ..base import MainFormWrapper as BaseFormWrapper
 from ..base import BaseEnhancedForm, EmbededForm
+from ..features import features_vocabulary
 from ..interfaces import IMainForm, IMarineUnitIDsSelect
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
@@ -185,13 +187,34 @@ class MarineUnitIDsForm(EmbededForm):
     fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 
     def get_subform(self):
+        return BasicAssessmentDataForm2018(self, self.request)
+
+
+class IBasicAssessmentData2018(Interface):
+    """ The basic fields for the assessment data for 2018
+    """
+    # TODO: this needs a select box?
+    feature_reported = List(
+        title=u'Feature reported',
+        value_type=Choice(vocabulary=features_vocabulary)
+    )
+
+
+class BasicAssessmentDataForm2018(EmbededForm):
+    """
+    """
+
+    fields = Fields(IBasicAssessmentData2018)
+    fields['feature_reported'].widgetFactory = OptgroupFieldWidget
+
+    def get_subform(self):
         return NationalDescriptorAssessmentForm(self, self.request)
 
 
 class NationalDescriptorAssessmentForm(Container):
     """ Form to create and assess a national descriptor overview
     """
-
+    assessment_topic = u'National summary'
     form_name = "national-descriptor-assessment-form"
     render = Template('../pt/container.pt')
     css_class = "left-side-form"

@@ -397,19 +397,33 @@ def save_record(mapper_class, **data):
     threadlocals.session_name = 'session_2018'
 
     sess = session()
+    # reset transaction, dont get the following error
+    # ResourceClosedError('This transaction is closed', )
+    # sess.rollback()
 
-    id_primary_key = data.pop('Id', None)
+    id_primary_key = data.pop('Id', [])
     mc = mapper_class(**data)
 
-    if not id_primary_key:
+    # import pdb; pdb.set_trace()
+    len_ids = len(id_primary_key)
+
+    if len_ids < 1:
         sess.add(mc)
     else:
-        sess.query(mapper_class).filter(mapper_class.Id == id_primary_key).update(data)
+        condition = []
+        if len_ids > 1:
+            condition.append(mapper_class.Id.in_(id_primary_key))
+        else:
+            condition.append(mapper_class.Id == id_primary_key[0])
+
+        sess.query(mapper_class).filter(*condition).update(data)
 
     try:
         transaction.commit()
-    except:
+    except Exception as e:
+        import pdb; pdb.set_trace()
         sess.rollback()
+        # transaction.commit()
 
     if not id_primary_key:
         id_primary_key = mc.Id
