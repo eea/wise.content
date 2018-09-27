@@ -374,68 +374,70 @@ class AssessmentDataForm2018(Container, BaseUtil):
         # import pdb; pdb.set_trace()
 
         # get COM_assessments data
-        feature_reported = parent_data['feature_reported']
+        all_features_reported = parent_data['feature_reported']
 
-        @switch_session
-        def func():
-            threadlocals.session_name = 'session_2018'
+        for feature_reported in all_features_reported:
 
-            count, res = db.get_all_records(
-                sql2018.COMAssessment,
-                and_(sql2018.COMAssessment.COM_GeneralId == self.general_id,
-                     sql2018.COMAssessment.Feature == feature_reported)
-            )
-            return res
+            @switch_session
+            def func():
+                threadlocals.session_name = 'session_2018'
 
-        assessment_data = func()
+                count, res = db.get_all_records(
+                    sql2018.COMAssessment,
+                    and_(sql2018.COMAssessment.COM_GeneralId == self.general_id,
+                         sql2018.COMAssessment.Feature == feature_reported)
+                )
+                return res
 
-        # save in COM_Assessment
-        for k, v in data.items():
-            if not v:
-                continue
+            assessment_data = func()
 
-            d = {}
+            # save in COM_Assessment
+            for k, v in data.items():
+                if not v:
+                    continue
 
-            # TODO get COM_GeneralId
-            # d['COM_GeneralId'] = 12
-            d['COM_GeneralId'] = self.general_id
-            d['MSFDArticle'] = parent_data['article']
-            d['Feature'] = feature_reported
+                d = {}
 
-            d['AssessmentCriteria'], d['AssessedInformation'], \
-                d['GESComponent_Target'] = k.split('_')
+                # TODO get COM_GeneralId
+                # d['COM_GeneralId'] = 12
+                d['COM_GeneralId'] = self.general_id
+                d['MSFDArticle'] = parent_data['article']
+                d['Feature'] = feature_reported
 
-            # import pdb; pdb.set_trace()
+                d['AssessmentCriteria'], d['AssessedInformation'], \
+                    d['GESComponent_Target'] = k.split('_')
 
-            if d['GESComponent_Target'] in additional_fields.keys():
-                import pdb; pdb.set_trace()
-                field_name = d.pop('GESComponent_Target')
-                d[additional_fields[field_name]] = v
-            else:
-                field_name = 'GESComponent_Target'
-                d['Evidence'] = v
-
-            # TODO
-            # 1 - create separate entry in COM_Assessments table for
-            #   every Marine Unit ID ??????
-            # 2 - save records one by one, or many at once
-
-            for mru in parent_data['marine_unit_ids']:
-                d['MarineUnit'] = mru
-
-                id_assess = [
-                    unicode(x.Id)
-                    for x in assessment_data
-                    if x.MarineUnit == mru and
-                       x.AssessedInformation == d['AssessedInformation'] and
-                       x.AssessmentCriteria == d['AssessmentCriteria'] and
-                       getattr(x, field_name) == d.get(field_name)
-                ]
-
-                if id_assess:
-                    d['Id'] = id_assess
                 # import pdb; pdb.set_trace()
-                db.save_record(sql2018.COMAssessment, **d)
+
+                if d['GESComponent_Target'] in additional_fields.keys():
+                    import pdb; pdb.set_trace()
+                    field_name = d.pop('GESComponent_Target')
+                    d[additional_fields[field_name]] = v
+                else:
+                    field_name = 'GESComponent_Target'
+                    d['Evidence'] = v
+
+                # TODO
+                # 1 - create separate entry in COM_Assessments table for
+                #   every Marine Unit ID ??????
+                # 2 - save records one by one, or many at once
+
+                for mru in parent_data['marine_unit_ids']:
+                    d['MarineUnit'] = mru
+
+                    id_assess = [
+                        unicode(x.Id)
+                        for x in assessment_data
+                        if x.MarineUnit == mru and
+                           x.AssessedInformation == d['AssessedInformation'] and
+                           x.AssessmentCriteria == d['AssessmentCriteria'] and
+                           getattr(x, field_name) == d.get(field_name)
+                    ]
+
+                    if id_assess:
+                        d['Id'] = id_assess
+                    # import pdb; pdb.set_trace()
+                    db.save_record(sql2018.COMAssessment, **d)
 
         print data
         print child_data

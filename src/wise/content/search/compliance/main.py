@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # from zope.component import getMultiAdapter
 from zope.interface import Interface, implements
-from zope.schema import Choice
+from zope.schema import Choice, List
 
 from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
@@ -194,8 +194,10 @@ class IBasicAssessmentData2018(Interface):
     """ The basic fields for the assessment data for 2018
     """
     # TODO: this needs a select box?
-    feature_reported = Choice(title=u'Feature reported',
-                              vocabulary=features_vocabulary)
+    feature_reported = List(
+        title=u'Feature reported',
+        value_type=Choice(vocabulary=features_vocabulary)
+    )
 
 
 class BasicAssessmentDataForm2018(EmbededForm):
