@@ -852,7 +852,7 @@
 
         attachSelect2();
 
-        if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
+        if( typeof window.setupTabs !== "undefined" && null !== window.setupTabs ) window.setupTabs();
 
         if( undefined !== clickFirstTab && null !== clickFirstTab ) clickFirstTab();
 
