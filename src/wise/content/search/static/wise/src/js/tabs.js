@@ -6,7 +6,7 @@ function clickFirstTab(){
     $(".tabs-wrapper ul li:first-child a").trigger('click');
 }
 
-setupTabs = function (tabswrapper) {
+window.setupTabs = function (tabswrapper) {
     function setupInnerTabs(tabsW) {
         var t = $("ul.nav:not(.topnav) > li");
         // tabs width calculation
@@ -118,7 +118,9 @@ setupTabs = function (tabswrapper) {
 }
 
 jQuery(document).ready(function($){
-    setupTabs();
+    if ("undefined" !== typeof window.setupTabs) {
+        window.setupTabs();
+    }
 
     /* mobile select setup
     *
@@ -176,7 +178,9 @@ jQuery(document).ready(function($){
 
     $(window).on('resize', function(){
         mobileSelect(w,daw);
-        setupTabs();
+        if ("undefined" !== typeof window.setupTabs) {
+    window.setupTabs();
+}
     });
 
 });

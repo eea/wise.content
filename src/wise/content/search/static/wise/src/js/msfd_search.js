@@ -852,9 +852,9 @@
 
         attachSelect2();
 
-        if( undefined !== setupTabs && null !== setupTabs ) setupTabs();
+        if("undefined" !== typeof window.setupTabs && null !== window.setupTabs) window.setupTabs();
 
-        if( undefined !== clickFirstTab && null !== clickFirstTab ) clickFirstTab();
+        if( "undefined" !== typeof clickFirstTab && null !== clickFirstTab ) clickFirstTab();
 
         setPaginationButtons();
 
@@ -930,6 +930,7 @@
 
             if (typeof Storage !== 'undefined') { // We have local storage support
                 localStorage.form = compressed; // to save to local storage
+                localStorage.boundary = strContent[0];
             }
         }
     }
@@ -1286,25 +1287,47 @@
                 });
             });
 
-        if (typeof Storage !== 'undefined') {
-            if(localStorage.form !== undefined){
-                if(typeof LZString !== "undefined"){
-                    var dec = LZString.decompressFromEncodedURIComponent(localStorage.form);
+        function refreshFromLocalStorage(){
+            if (typeof Storage !== 'undefined') {
+                if(localStorage.form !== undefined){
+                    if(typeof LZString !== "undefined"){
+                        var dec = LZString.decompressFromEncodedURIComponent(localStorage.form);
 
-                    var form =  $( selectorFormContainer ).find("form");
+                        var form =  $( selectorFormContainer ).find("form");
 
-                    var strContent = $.getMultipartData("#" + form.attr("id"));
-                    if(dec !== strContent[1] ){
-                        console.log("different data");
-                        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");
-                    } else {
-                        console.log("same data");
+                        var strContent = $.getMultipartData("#" + form.attr("id"));
+                        if(dec !== strContent[1] ){
+                            console.log("different data");
+
+                            var url = form.attr("action");
+                            var boundary = localStorage.boundary;
+
+                            $.ajax({
+                                type: "POST",
+                                contentType: 'multipart/form-data; boundary='+boundary,
+                                cache:false,
+                                data: localStorage.form,
+                                dataType: "html",
+                                url: url,
+                                //processData:false,
+                                beforeSend: beforeSendForm,
+                                success:formSuccess,
+                                complete:formAjaxComplete,
+                                error:formAjaxError
+                            });
+
+                        } else {
+                            console.log("same data");
+                        }
+
+                        localStorage.removeItem("form");
                     }
-
-                    localStorage.removeItem("form");
                 }
             }
         }
+
+        refreshFromLocalStorage();
+
 
     });
 
