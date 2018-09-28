@@ -23,4 +23,10 @@
     insert-after="faceted_edit.js"
     enabled="True" expression="python: '@@comp' in request.URL0"  inline="False"/>
 
+  <javascript
+    id="++resource++lz-string.js"
+    cacheable="True" compression="safe" cookable="False"
+    insert-after="faceted_edit.js"
+    enabled="True" inline="False"/>
+
 </object>
