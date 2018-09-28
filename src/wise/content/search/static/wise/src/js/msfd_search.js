@@ -1134,6 +1134,14 @@
         $("[name='marine.buttons.prev']").prop("disabled" , true);
         $("[name='marine.buttons.next']").prop("disabled" , true);
 
+        if (typeof Storage !== 'undefined') {
+            sessionStorage.removeItem("form")
+        }
+
+        if (typeof Storage !== 'undefined') {
+            sessionStorage.removeItem("form")
+        }
+
         loading = false;
     }
 
@@ -1205,6 +1213,95 @@
         }
     }
 
+    function isSupported(storage) {
+      try {
+        var key = "__some_random_key_you_are_not_going_to_use__";
+        storage.setItem(key, key);
+        storage.removeItem(key);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function storeFormtoLocalStorage(boundary, data) {
+        if(! isSupported(window.sessionStorage)){
+            return false;
+        }
+        //var form =  $( selectorFormContainer ).find("form");
+
+        //var strContent = $.getMultipartData("#" + form.attr("id"));
+
+        if(typeof LZString !== "undefined"){
+            //var compressed = LZString.compressToEncodedURIComponent(data);
+            var compressed = LZString.compressToEncodedURIComponent(data);
+
+            if (typeof Storage !== 'undefined') { // We have local storage support
+                sessionStorage.form = compressed; // to save to local storage
+                sessionStorage.boundary = boundary;
+
+                // TODO: url shortner
+                //window.location.hash = compressed;
+            }
+        }
+    }
+
+    function searchFormAjax(boundary, data, url){
+        $.ajax({
+            type: "POST",
+            contentType: 'multipart/form-data; boundary='+ boundary,
+            cache:false,
+            data: data,
+            dataType: "html",
+            url: url,
+            //processData:false,
+            beforeSend: beforeSendForm,
+            success: function (dataRes, status, req) {
+                storeFormtoLocalStorage(boundary, data);
+                formSuccess(dataRes,status,req);
+            },
+            complete:formAjaxComplete,
+            error:formAjaxError
+        });
+    }
+
+    function restoreFromSessionStorage(){
+        if(! isSupported(window.sessionStorage)){
+            return false;
+        }
+
+        if(typeof  sessionStorage.form === "undefined"){
+            return false;
+        }
+        if ("undefined" === typeof LZString) {
+            console.error("LZString not found");
+            return false;
+        }
+
+        try {
+            //var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
+            var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
+
+            var form = $(selectorFormContainer).find("form");
+
+            var strContent = $.getMultipartData("#" + form.attr("id"));
+            if (dec !== strContent[1]) {
+                var url = form.attr("action");
+                var boundary = sessionStorage.boundary;
+
+                searchFormAjax(boundary, dec, url);
+
+                // TODO: url shortner
+                //window.location.hash = sessionStorage.form;
+
+            } else {
+                console.log("same data");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     jQuery(document).ready(function($){
         initPageElems();
 
@@ -1224,6 +1321,7 @@
         window.WISE = {};
         window.WISE.formData = $( selectorFormContainer ).clone(true);
         window.WISE.blocks = [];
+
 
         // ajax form submission
         $( selectorFormContainer )
@@ -1251,30 +1349,10 @@
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
-                $.ajax({
-                    type: "POST",
-                    contentType: 'multipart/form-data; boundary='+strContent[0],
-                    cache:false,
-                    data: strContent[1],
-                    dataType: "html",
-                    url: url,
-                    //processData:false,
-                    beforeSend: beforeSendForm,
-                    success:formSuccess,
-                    complete:formAjaxComplete,
-                    error:formAjaxError
-                });
+                searchFormAjax(strContent[0], strContent[1], url);
             });
 
-        /*var form =  $( selectorFormContainer ).find("form");
-        //form.attr("autocomplete", "off");
-        var strContent = $.getMultipartData("#" + form.attr("id"));
-        console.log(strContent);
-
-        $(selectorFormContainer + " .formControls #form-buttons-continue").trigger("click");*/
+        restoreFromSessionStorage();
     });
-
-
-
 
 }(window, document, jQuery));
