@@ -10,6 +10,8 @@
     var selectorFormContainer = ".wise-search-form-container";
     var selectorLeftForm = "#wise-search-form";
 
+    var sessionStore = storageFactory(sessionStorage);
+
     /*
     * Vars and $ plugins
     *
@@ -25,22 +27,9 @@
         return randomstring;
     };
 
-    /*$.getFormDataObject = function(frmName){
-        var formData = $(frmName).serializeArray();
-        var res = [];
-        var vals = {};
-        $.each( formData ,function(indx, val){
-            res.push(val.name);
-            if(!vals[val.name]) vals[val.name] = [];
-            vals[val.name].push(val.value);
-        });
-
-        //var uniqueItems = Array.from(new Set(res));
-    }*/
-
-    $.getMultipartData = function(frmName){
+    $.getMultipartData = function(frmName, newBoundary){
         //Start multipart formatting
-        var initBoundary= $.randomString();
+        var initBoundary= newBoundary || $.randomString();
         var strBoundary = "--" + initBoundary;
         var strMultipartBody = "";
         var strCRLF = "\r\n";
@@ -54,6 +43,9 @@
             return false;
         }
 
+        var res = [];
+        var vals = {};
+
         $.each( formData ,function(indx, val){
             strMultipartBody +=
                 strBoundary
@@ -63,13 +55,18 @@
                 + strCRLF
                 + val.value
                 +strCRLF;
+
+            res.push(val.name);
+            if(!vals[val.name]) vals[val.name] = [];
+            vals[val.name].push(val.value);
         });
 
         //End the body by delimiting it
         strMultipartBody += strBoundary + "--" + strCRLF;
 
         //Return boundary without -- and the multipart content
-        return [initBoundary,strMultipartBody];
+        return [initBoundary,strMultipartBody, vals];
+
     };
 
     var loading = false;
@@ -1147,7 +1144,7 @@
         $("[name='marine.buttons.next']").prop("disabled" , true);
 
         if (typeof Storage !== 'undefined') {
-            sessionStorage.removeItem("form")
+            sessionStore.removeItem("form")
         }
 
         loading = false;
@@ -1221,40 +1218,97 @@
         }
     }
 
-    function isSupported(storage) {
-      try {
-        var key = "__some_random_key_you_are_not_going_to_use__";
-        storage.setItem(key, key);
-        storage.removeItem(key);
-        return true;
-      } catch (e) {
-        return false;
+    function storageFactory(storage){
+      var inMemoryStorage = {};
+
+      var length = 0;
+
+      function isSupported() {
+        try {
+          var testKey = "__some_random_key_you_are_not_going_to_use__";
+          storage.setItem(testKey, testKey);
+          storage.removeItem(testKey);
+          return true;
+        } catch (e) {
+          return false;
+        }
       }
+
+      function clear(){
+        if (isSupported()) {
+          storage.clear();
+        } else {
+          inMemoryStorage = {};
+        }
+      }
+
+      function getItem(name){
+        if (isSupported()) {
+          return storage.getItem(name);
+        }
+        if (inMemoryStorage.hasOwnProperty(name)) {
+          return inMemoryStorage[name];
+        }
+        return null;
+      }
+
+      function key(index){
+        if (isSupported()) {
+          return storage.key(index);
+        } else {
+           return Object.keys(inMemoryStorage)[index] || null;
+        }
+      }
+
+      function removeItem(name){
+        if (isSupported()) {
+          storage.removeItem(name);
+        } else {
+          delete inMemoryStorage[name];
+        }
+      }
+
+      function setItem(name,value){
+        if (isSupported()) {
+          storage.setItem(name, value);
+        } else {
+          inMemoryStorage[name] = String(value); // not everyone uses TypeScript
+        }
+      }
+        return {
+            getItem : getItem,
+            setItem : setItem,
+            removeItem : removeItem,
+            clear : clear,
+            key : key,
+            length : length
+        };
     }
 
-    function storeFormtoLocalStorage(boundary, data) {
-        if(! isSupported(window.sessionStorage)){
-            return false;
-        }
+    function storeFormtoLocalStorage(options) {
+
         //var form =  $( selectorFormContainer ).find("form");
 
         //var strContent = $.getMultipartData("#" + form.attr("id"));
+        var data = options.data || null;
+        var boundary = options.boundary || null;
+        var formData = options.formData || null;
 
         if(typeof LZString !== "undefined"){
-            //var compressed = LZString.compressToEncodedURIComponent(data);
             var compressed = LZString.compressToEncodedURIComponent(data);
+            var formD = LZString.compress(JSON.stringify(formData));
 
             if (typeof Storage !== 'undefined') { // We have local storage support
-                sessionStorage.form = compressed; // to save to local storage
-                sessionStorage.boundary = boundary;
-
+                sessionStore.setItem("form", compressed);// to save to local storage
+                sessionStore.setItem("boundary",boundary);
+                sessionStore.setItem(defaultForm, formD);
                 // TODO: url shortner
                 //window.location.hash = compressed;
             }
         }
     }
 
-    function searchFormAjax(boundary, data, url){
+    function searchFormAjax(boundary, data, url, formData){
         $.ajax({
             type: "POST",
             contentType: 'multipart/form-data; boundary='+ boundary,
@@ -1265,7 +1319,31 @@
             //processData:false,
             beforeSend: beforeSendForm,
             success: function (dataRes, status, req) {
-                storeFormtoLocalStorage(boundary, data);
+                /*function isnotchecked($field) {
+                    var arr = [];
+                    $.each( $field.find(".option input[type='checkbox']:not(:checked)") , function (ix, ch) {
+                        arr.push( $(ch).parent() );
+                    });
+                    if(arr.length > 0){
+                        return true;
+                    }
+                    return false;
+                }
+                var $fields = $( selectorFormContainer + ", " + selectorLeftForm ).find("[data-fieldname]");
+                var cheked = false;
+
+                $.each($fields,function (ix, $field) {
+                    if(!isnotchecked($field)){
+                        cheked = true;
+                    }
+                });
+
+                if(cheked){
+                    storeFormtoLocalStorage({ boundary: boundary,data: data, formData: formData});
+                }*/
+
+                storeFormtoLocalStorage({ boundary: boundary,data: data, formData: formData});
+
                 formSuccess(dataRes,status,req);
             },
             complete:formAjaxComplete,
@@ -1273,12 +1351,10 @@
         });
     }
 
-    function restoreFromSessionStorage(){
-        if(! isSupported(window.sessionStorage)){
-            return false;
-        }
+    var defaultForm = window.location.pathname.substr(window.location.pathname.indexOf("@@"), window.location.pathname.length-1) || "defaultForm";
 
-        if(typeof  sessionStorage.form === "undefined"){
+    function restoreFromSessionStorage(){
+        if( sessionStore.getItem("form") === null){
             return false;
         }
         if ("undefined" === typeof LZString) {
@@ -1287,20 +1363,64 @@
         }
 
         try {
-            //var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
-            var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
+            //var dec = LZString.decompressFromEncodedURIComponent(sessionStore.form);
+            var dec = LZString.decompressFromEncodedURIComponent(sessionStore.getItem("form"));
 
             var form = $(selectorFormContainer).find("form");
 
             var strContent = $.getMultipartData("#" + form.attr("id"));
-            if (dec !== strContent[1]) {
+
+            var compareVals = function (fromStorage, fromForm){
+                return true;
+
+                var notSame = false;
+
+                try {
+                    var prelFromStorage = JSON.parse(fromStorage);
+
+
+                    $.each(Object.keys(prelFromStorage), function (ix, item) {
+                       var arr = prelFromStorage[item];
+
+                       //TODO: issue on some pages especially on pagination
+                       var res = typeof fromForm[item]  !== "undefined" ? fromForm[item].filter( function( el ) {
+                          return arr.indexOf( el ) === -1;
+                        } )  : [];
+                        if(res.length > 0) notSame = true;
+                    });
+
+                } catch (e) {
+                    return false;
+                }
+
+                if(!notSame) return false;
+
+                return true;
+
+            };
+
+            var defForm = sessionStore.getItem(defaultForm);
+
+            var getFormD = $.getMultipartData( "#" + form.attr("id") , sessionStore.getItem("boundary"));
+
+            var compF = function(fromS, fromF){
+                /*console.log(fromS);
+                console.log(fromF);*/
+                //TODO : compare default form data with sessionstorage
+                //return fromS === fromF;
+                return true;
+            };
+
+            //if ( compareVals( LZString.decompress(defForm),strContent[2]) ) {
+            if ( compF( dec , getFormD[1]) ) {
+
                 var url = form.attr("action");
-                var boundary = sessionStorage.boundary;
+                var boundary = sessionStore.getItem("boundary");
 
                 searchFormAjax(boundary, dec, url);
 
                 // TODO: url shortner
-                //window.location.hash = sessionStorage.form;
+                //window.location.hash = sessionStore.getItem("form");
 
             } else {
                 console.log("same data");
@@ -1309,6 +1429,7 @@
             console.log(e);
         }
     }
+
 
     jQuery(document).ready(function($){
         initPageElems();
@@ -1329,7 +1450,6 @@
         window.WISE = {};
         window.WISE.formData = $( selectorFormContainer ).clone(true);
         window.WISE.blocks = [];
-
 
         // ajax form submission
         $( selectorFormContainer )
@@ -1357,7 +1477,7 @@
 
                 var strContent = $.getMultipartData("#" + form.attr("id"));
 
-                searchFormAjax(strContent[0], strContent[1], url);
+                searchFormAjax(strContent[0], strContent[1], url, strContent[2]);
             });
 
         restoreFromSessionStorage();
