@@ -343,6 +343,11 @@ additional_fields = {
     # 'Score': 'Score'
 }
 
+summary_fields = {
+    'assessment_summary': u'Description_Summary',
+    'recommendations': u'RecommendationsArt9'
+}
+
 
 class AssessmentDataForm2018(Container, BaseUtil):
     """ The assessment form for 2018
@@ -481,11 +486,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
                     db.save_record(sql2018.COMAssessment, **d)
 
     def save_summary(self, parent_data, child_data):
-        columns_map = {
-            'assessment_summary': u'Description_Summary',
-            'recommendations': u'RecommendationsArt9'
-        }
-
         # import pdb; pdb.set_trace()
         features_reported = parent_data['feature_reported']
 
@@ -499,10 +499,10 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 if not v:
                     continue
 
-                field_name = columns_map.get(k)
+                field_name = summary_fields.get(k)
                 d = {}
 
-                d[field_name] = v
+                d[field_name] = unicode(v)
                 d['COM_GeneralId'] = self.general_id
                 d['MSFDArticle'] = parent_data['article']
                 d['Feature'] = feature
@@ -542,10 +542,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
         base_name = tree.name
         # TODO: get list of descriptors?
         data = self.get_flattened_data(self)
-        child_data = {}
-
-        for children in self.main_assessment_data_forms:
-            child_data.update(children.data)
 
         descriptor = data['descriptor']
         descriptor_criterions = get_ges_criterions(descriptor)
@@ -666,23 +662,35 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
     def update(self):
         print ("====Doing assessment data form update")
+        # TODO: identify the cases when the update happens
+
+        if not self.subforms:  # update may be called multiple times? When?
+            self.build_forms()
+
+        sumform = SummaryAssessmentDataForm2018(self, self.request)
+
+        data = self.get_flattened_data(self)
+        sumform.set_default_values(data)
+        # sumform.fields['recommendations'].field.default = u'DEFAULTED'
+
         self.main_assessment_data_forms = [
-            SummaryAssessmentDataForm2018(self, self.request),
+            sumform
         ]
         self.children = [
             # BasicAssessmentDataForm2018(self, self.request),
             self.render_subforms,
         ] + self.main_assessment_data_forms
 
-        # TODO: identify the cases when the update happens
-
-        if not self.subforms:   # update may be called multiple times? When?
-            self.build_forms()
-
 
 class ISummaryAssessmentData2018(Interface):
-    assessment_summary = Text(title=u'Assessment summary')
-    recommendations = Text(title=u'Recommendations')
+    assessment_summary = Text(
+        title=u'Assessment summary',
+        required=False
+    )
+    recommendations = Text(
+        title=u'Recommendations',
+        required=False
+    )
 
 
 class SummaryAssessmentDataForm2018(EmbededForm):
@@ -693,3 +701,32 @@ class SummaryAssessmentDataForm2018(EmbededForm):
         super(SummaryAssessmentDataForm2018, self).__init__(context, request)
         fields = [ISummaryAssessmentData2018]
         self.fields = Fields(*fields)
+
+    def set_default_values(self, data):
+        general_id = getattr(self.context, 'general_id')
+        feature = data.get('feature_reported', None)
+        if feature:
+            feature = feature[0]
+
+        if not general_id:
+            return
+
+        assess_data = self.context.get_assessment_data(
+            general_id,
+            feature
+        )
+        value = ''
+
+        for name, field in self.fields.items():
+            db_field_name = summary_fields[name]
+            # import pdb; pdb.set_trace()
+            for row in assess_data:
+                value = getattr(row, db_field_name)
+                if row.MSFDArticle == data['article'] and \
+                   row.Feature in data['feature_reported'] and \
+                   row.MarineUnit in data['marine_unit_ids'] and \
+                   not row.AssessmentCriteria and \
+                   value:
+                    break
+
+            field.field.default = unicode(value)
