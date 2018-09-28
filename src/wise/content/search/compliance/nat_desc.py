@@ -381,7 +381,12 @@ class AssessmentDataForm2018(Container, BaseUtil):
         # save COM_Assessment data
         self.save_assessment(data, parent_data)
 
+        # save Summary data
+        self.save_summary(parent_data, child_data)
+
         print data
+        print parent_data
+        print child_data
 
     def save_general(self, parent_data):
         d_general = {}
@@ -411,29 +416,17 @@ class AssessmentDataForm2018(Container, BaseUtil):
         return general_id
 
     def save_assessment(self, data, parent_data):
-        # get COM_assessments data
         all_features_reported = parent_data['feature_reported']
-
-        # get data from COM_assessments to be able to decide if the
-        # form data will be inserted of updated
-        @use_db_session('session_2018')
-        def _get_assessment_data(feature_reported):
-            res = self.get_assessment_data(
-                self.general_id,
-                feature_reported
-            )
-
-            return res
 
         for feature_reported in all_features_reported:
 
-            assessment_data = _get_assessment_data(feature_reported)
-
-            # save in COM_Assessment
+            assessment_data = self.get_assessment_data(
+                self.general_id,
+                feature_reported
+            )
             for k, v in data.items():
                 if not v:
                     continue
-                print k, v
 
                 d = {}
 
@@ -485,9 +478,51 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
                     if id_assess:
                         d['Id'] = id_assess
-                    # import pdb; pdb.set_trace()
                     db.save_record(sql2018.COMAssessment, **d)
 
+    def save_summary(self, parent_data, child_data):
+        columns_map = {
+            'assessment_summary': u'Description_Summary',
+            'recommendations': u'RecommendationsArt9'
+        }
+
+        # import pdb; pdb.set_trace()
+        features_reported = parent_data['feature_reported']
+
+        for feature in features_reported:
+
+            assessment_data = self.get_assessment_data(
+                self.general_id,
+                feature
+            )
+            for k, v in child_data.items():
+                if not v:
+                    continue
+
+                field_name = columns_map.get(k)
+                d = {}
+
+                d[field_name] = v
+                d['COM_GeneralId'] = self.general_id
+                d['MSFDArticle'] = parent_data['article']
+                d['Feature'] = feature
+
+                for mru in parent_data['marine_unit_ids']:
+                    d['MarineUnit'] = mru
+
+                    id_assess = []
+
+                    for row in assessment_data:
+                        if getattr(row, field_name) and \
+                           not row.AssessmentCriteria:
+
+                            id_assess.append(row.Id)
+
+                    if id_assess:
+                        d['Id'] = id_assess
+                    db.save_record(sql2018.COMAssessment, **d)
+
+    @use_db_session('session_2018')
     def get_assessment_data(self, general_id, feature=None):
         conditions = []
         conditions.append(sql2018.COMAssessment.COM_GeneralId == general_id)
@@ -520,8 +555,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
         # check if article was already assessed
         @use_db_session('session_2018')
         def func():
-            # threadlocals.session_name = 'session_2018'
-
             mc = sql2018.COMGeneral
             conditions = []
             conditions.append(mc.CountryCode == data['member_state'])
@@ -570,7 +603,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
                     row_name,  # AssessedInformation
                     crit.id  # GESComponent_Target
                 )
-                # import pdb; pdb.set_trace()
 
                 field = Choice(
                     title=field_title,
@@ -650,7 +682,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
 class ISummaryAssessmentData2018(Interface):
     assessment_summary = Text(title=u'Assessment summary')
-    recommendations = Text(title=u'Recomandations')
+    recommendations = Text(title=u'Recommendations')
 
 
 class SummaryAssessmentDataForm2018(EmbededForm):
