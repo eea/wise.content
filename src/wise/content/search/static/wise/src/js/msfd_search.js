@@ -25,6 +25,19 @@
         return randomstring;
     };
 
+    /*$.getFormDataObject = function(frmName){
+        var formData = $(frmName).serializeArray();
+        var res = [];
+        var vals = {};
+        $.each( formData ,function(indx, val){
+            res.push(val.name);
+            if(!vals[val.name]) vals[val.name] = [];
+            vals[val.name].push(val.value);
+        });
+
+        //var uniqueItems = Array.from(new Set(res));
+    }*/
+
     $.getMultipartData = function(frmName){
         //Start multipart formatting
         var initBoundary= $.randomString();
@@ -53,12 +66,10 @@
         });
 
         //End the body by delimiting it
-
         strMultipartBody += strBoundary + "--" + strCRLF;
 
         //Return boundary without -- and the multipart content
         return [initBoundary,strMultipartBody];
-
     };
 
     var loading = false;
@@ -1230,11 +1241,15 @@
         //var strContent = $.getMultipartData("#" + form.attr("id"));
 
         if(typeof LZString !== "undefined"){
+            //var compressed = LZString.compressToEncodedURIComponent(data);
             var compressed = LZString.compressToEncodedURIComponent(data);
 
             if (typeof Storage !== 'undefined') { // We have local storage support
                 sessionStorage.form = compressed; // to save to local storage
                 sessionStorage.boundary = boundary;
+
+                // TODO: url shortner
+                //window.location.hash = compressed;
             }
         }
     }
@@ -1258,7 +1273,7 @@
         });
     }
 
-    function refreshFromLocalStorage(){
+    function restoreFromSessionStorage(){
         if(! isSupported(window.sessionStorage)){
             return false;
         }
@@ -1272,6 +1287,7 @@
         }
 
         try {
+            //var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
             var dec = LZString.decompressFromEncodedURIComponent(sessionStorage.form);
 
             var form = $(selectorFormContainer).find("form");
@@ -1282,6 +1298,9 @@
                 var boundary = sessionStorage.boundary;
 
                 searchFormAjax(boundary, dec, url);
+
+                // TODO: url shortner
+                //window.location.hash = sessionStorage.form;
 
             } else {
                 console.log("same data");
@@ -1341,7 +1360,7 @@
                 searchFormAjax(strContent[0], strContent[1], url);
             });
 
-        refreshFromLocalStorage();
+        restoreFromSessionStorage();
     });
 
 }(window, document, jQuery));
