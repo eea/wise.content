@@ -196,7 +196,7 @@ class IBasicAssessmentData2018(Interface):
     # TODO: this needs a select box?
     feature_reported = List(
         title=u'Feature reported',
-        value_type=Choice(vocabulary=features_vocabulary)
+        value_type=Choice(vocabulary=features_vocabulary),
     )
 
 
