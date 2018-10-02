@@ -1298,7 +1298,7 @@
             var formD = LZString.compress(JSON.stringify(formData));
 
             if (typeof Storage !== 'undefined') { // We have local storage support
-                sessionStore.setItem("form", compressed);// to save to local storage
+                sessionStore.setItem("form-" +  defaultForm, compressed);// to save to local storage
                 sessionStore.setItem("boundary",boundary);
                 sessionStore.setItem(defaultForm, formD);
                 // TODO: url shortner
@@ -1353,7 +1353,7 @@
     var defaultForm = window.location.pathname.substr(window.location.pathname.indexOf("@@"), window.location.pathname.length-1) || "defaultForm";
 
     function restoreFromSessionStorage(){
-        if( sessionStore.getItem("form") === null){
+        if( sessionStore.getItem("form-" + defaultForm ) === null){
             return false;
         }
         if ("undefined" === typeof LZString) {
@@ -1363,7 +1363,7 @@
 
         try {
             //var dec = LZString.decompressFromEncodedURIComponent(sessionStore.form);
-            var dec = LZString.decompressFromEncodedURIComponent(sessionStore.getItem("form"));
+            var dec = LZString.decompressFromEncodedURIComponent(sessionStore.getItem("form-" + defaultForm));
 
             var form = $(selectorFormContainer).find("form");
 
@@ -1411,7 +1411,7 @@
                 searchFormAjax(boundary, dec, url);
 
                 // TODO: url shortner
-                //window.location.hash = sessionStore.getItem("form");
+                //window.location.hash = sessionStore.getItem("form-" + defaultForm);
 
             } else {
                 console.log("same data");
