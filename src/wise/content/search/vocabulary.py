@@ -202,10 +202,8 @@ def get_region_subregions_vb_factory(context):
 
 
 @provider(IVocabularyFactory)
-@db.switch_session
+@db.use_db_session('session')
 def get_member_states_vb_factory(context):
-    db.threadlocals.session_name = 'session'
-
     conditions = []
 
     t = sql.t_MSFD4_GegraphicalAreasID

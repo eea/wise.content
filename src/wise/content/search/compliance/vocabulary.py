@@ -44,6 +44,7 @@ def parse_forms_file():
             if not row:
                 continue
             article, criteria, information, evidence = row
+            evidence = unicode(evidence, 'utf-8')
 
             l4 = L(evidence)    # always last level, we can safely create it
 
