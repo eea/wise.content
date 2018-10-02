@@ -1429,6 +1429,18 @@
         }
     }
 
+    function resetStorageForPage(ev){
+        var isLink = $(this).attr("href").indexOf("@@");
+        var href = $(this).attr("href");
+        if( isLink > 0 ){
+            ev.preventDefault();
+            var ls = $(this).attr("href").substr( isLink, href.length-1);
+            sessionStore.removeItem(ls);
+            sessionStore.removeItem("form");
+            window.location.href = href;
+        }
+    }
+
 
     jQuery(document).ready(function($){
         initPageElems();
@@ -1480,6 +1492,9 @@
             });
 
         restoreFromSessionStorage();
+
+        $(".topnav a").on("click", resetStorageForPage);
+
     });
 
 }(window, document, jQuery));
