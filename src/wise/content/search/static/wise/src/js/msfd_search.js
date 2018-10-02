@@ -1370,8 +1370,6 @@
             var strContent = $.getMultipartData("#" + form.attr("id"));
 
             var compareVals = function (fromStorage, fromForm){
-                return true;
-
                 var notSame = false;
 
                 try {
@@ -1385,7 +1383,10 @@
                        var res = typeof fromForm[item]  !== "undefined" ? fromForm[item].filter( function( el ) {
                           return arr.indexOf( el ) === -1;
                         } )  : [];
-                        if(res.length > 0) notSame = true;
+                        if(res.length > 0) {
+                         notSame = true;
+                         return false;
+                        }
                     });
 
                 } catch (e) {
@@ -1402,16 +1403,7 @@
 
             var getFormD = $.getMultipartData( "#" + form.attr("id") , sessionStore.getItem("boundary"));
 
-            var compF = function(fromS, fromF){
-                /*console.log(fromS);
-                console.log(fromF);*/
-                //TODO : compare default form data with sessionstorage
-                //return fromS === fromF;
-                return true;
-            };
-
-            //if ( compareVals( LZString.decompress(defForm),strContent[2]) ) {
-            if ( compF( dec , getFormD[1]) ) {
+            if ( compareVals( LZString.decompress(defForm),strContent[2]) ) {
 
                 var url = form.attr("action");
                 var boundary = sessionStore.getItem("boundary");
