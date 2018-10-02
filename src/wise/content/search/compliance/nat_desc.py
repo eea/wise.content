@@ -380,8 +380,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
     def _save(self, data, parent_data, child_data):
 
         # save COM_General data
-        if not self.general_id:
-            self.general_id = self.save_general(parent_data)
+        self.general_id = self.save_general(parent_data)
 
         # save COM_Assessment data
         self.save_assessment(data, parent_data)
@@ -486,7 +485,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
                     db.save_record(sql2018.COMAssessment, **d)
 
     def save_summary(self, parent_data, child_data):
-        # import pdb; pdb.set_trace()
         features_reported = parent_data['feature_reported']
 
         for feature in features_reported:
@@ -582,8 +580,6 @@ class AssessmentDataForm2018(Container, BaseUtil):
             form.title = '{}: {}'.format(base_name, row_name)
 
             for crit in descriptor_criterions:
-                # print crit
-
                 field_title = u'{} {}: {}'.format(base_name, row_name,
                                                   crit.title)
                 field_name = '{}_{}_{}'.format(base_name, row_name, crit.id)

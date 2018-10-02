@@ -12,7 +12,7 @@ from wise.content.search import sql, sql2018
 from wise.content.search.utils import db_result_key, pivot_query
 
 env = os.environ.get
-DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')
+DSN = env('MSFDURI', 'mssql+pymssql://SA:bla3311!@msdb')  # ?charset=utf8mb4
 DBS = {
     'session': env('MSFD_db_default', 'MarineDB'),
     'session_2018': env('MSFD_db_2018', 'MSFD2018_sandbox')
@@ -85,7 +85,7 @@ def use_db_session(session_name):
 
 
 def _make_session(dsn):
-    engine = create_engine(dsn, pool_recycle=1800)
+    engine = create_engine(dsn, pool_recycle=1800)  # , encoding="utf8"
     Session = scoped_session(sessionmaker(bind=engine))
     register(Session, keep_session=True)
 
@@ -330,11 +330,10 @@ def get_available_marine_unit_ids(marine_unit_ids, klass):
 
 
 @cache(db_result_key)
-@switch_session
+@use_db_session('session')
 def get_marine_unit_id_names(marine_unit_ids):
     """ Returns tuples of (id, label) based on the marine_unit_ids
     """
-    threadlocals.session_name = 'session'
 
     sess = session()
     t = sql.t_MSFD4_GegraphicalAreasID
@@ -415,10 +414,8 @@ def compliance_art8_join(columns, mc_join1, mc_join2, *conditions):
     return [count, q]
 
 
-@switch_session
+@use_db_session('session_2018')
 def save_record(mapper_class, **data):
-    threadlocals.session_name = 'session_2018'
-
     sess = session()
 
     id_primary_key = data.pop('Id', [])
