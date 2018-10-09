@@ -1,0 +1,192 @@
+<div class="overflow-table">
+  <div class=""
+    tal:define="view_name string:V_ART8_GES_2018;">
+
+    <h5>2018 Member State Report</h5>
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>MarineUnitID</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Feature</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Element</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ElementCode</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ElementCodeSource</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Element2</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Element2Code</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Element2CodeSource</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ElementSource</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Criteria</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Parameter</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ParameterOther</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ThresholdValueUpper</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ThresholdValueLower</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ThresholdQualitative</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ThresholdValueSource</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ThresholdValue SourceOther</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ValueAchievedUpper</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ValueAchievedLower</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ValueUnit</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ValueUnitOther</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Proportion ThresholdValue</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ProportionValue Achieved</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Proportion ThresholdValue Unit</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Trend</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ParameterAchieved</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>DescriptionParameter</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>RelatedIndicator</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>CriteriaStatus</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>DescriptionCriteria</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>ElementStatus</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>DescriptionElement</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>IntegrationRuleTypeParameter</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>IntegrationRuleDescriptionParameter</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>IntegrationRuleTypeCriteria</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>IntegrationRuleDescriptionCriteria</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>GESextentThreshold</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>GESextentAchieved</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>GESextentUnit</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>GESachieved</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>DescriptionOverallStatus</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>AssessmentPeriod</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>RelatedPressures</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>Related activities</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+        <tr>
+            <th>RelatedTargets</th>
+            <td colspan="42">Row not implemented</td>
+        </tr>
+
+
+
+    </table>
+  </div>
+</div>

@@ -34,9 +34,9 @@ class Report2012(BrowserView, Article8, Article10, BaseUtil):
     """
 
     # art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
-    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
-    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
-    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    Art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
+    Art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
+    Art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
 
     # def __init__(self, context, request):
     #     super(Report2012, self).__init__(context, request)
@@ -265,7 +265,33 @@ class ReportData2018(BrowserView):
     """ TODO: get code in this
     """
 
-    __call__ = ViewPageTemplateFile('../pt/report-header-display.pt')
+    Art8 = ViewPageTemplateFile('../pt/nat-desc-report-data-art8-2018.pt')
+    Art9 = ''
+    Art10 = ''
+
+    def get_data_from_view(self, view_name):
+        view_table = getattr(sql, view_name)
+
+        conditions = []
+        
+        count, res = db.get_all_records(
+            view_table,
+            *conditions
+        )
+
+        return []
+
+    def __call__(self):
+        form_data = self.context.context.get_flattened_data(self)
+        article = form_data.get('article', None)
+
+        member_state = form_data.get('member_state', None)
+        descriptor = form_data.get('descriptor', None)
+        marine_unit_ids = form_data.get('marine_unit_ids', None)
+
+        template = getattr(self, article, None)
+
+        return template() if template else ""
 
 
 class ReportHeaderForm2018(BrowserView):
