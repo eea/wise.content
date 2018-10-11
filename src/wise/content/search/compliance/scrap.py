@@ -223,6 +223,32 @@ def compliance_report_types(context):
   <!--   permission="zope2.View" -->
   <!--   /> -->
 
+# def get_feature_terms_old():
+#
+#     # NOTE: this code is no longer used, there are features that are not in the
+#     # tsv file. We will use the L_features table
+#
+#     terms = []
+#     seen = []
+#
+#     for group_name, features in FEATURES.items():
+#         if 'activity' in group_name.lower():
+#             continue
+#
+#         for (key, title) in features:
+#             if key in seen:
+#                 continue
+#             seen.append(key)
+#             term = OptgroupTerm(value=key, token=key, title=title,
+#                                 optgroup=group_name)
+#             terms.append(term)
+#
+#     return terms
+import csv
+from collections import defaultdict
+
+from pkg_resources import resource_filename
+
 from plone.app.textfield.widget import RichTextWidget
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, interfaces, sql2018
@@ -606,3 +632,24 @@ class ComplianceAssessment(EmbededForm):
         # descriptor = self.get_form_data_by_key(self, 'descriptor')
 
         # return getMultiAdapter((self, self.request), name='deter')
+
+# from .vocabulary import LABELS
+
+
+# def parse_features_file():
+#     csv_f = resource_filename('wise.content',
+#                               'search/data/features.tsv')
+#
+#     res = defaultdict(list)
+#     with open(csv_f, 'rb') as csvfile:
+#         csv_file = csv.reader(csvfile, delimiter='\t')
+#
+#         for row in csv_file:
+#             if not (len(row) == 8 and row[-1].lower() == 'y'):
+#                 continue
+#             res[row[0]].append((row[1], row[2]))
+#
+#     return res
+#
+#
+# FEATURES = parse_features_file()

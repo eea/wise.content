@@ -265,33 +265,67 @@ class ReportData2018(BrowserView):
     """ TODO: get code in this
     """
 
-    Art8 = ViewPageTemplateFile('../pt/nat-desc-report-data-art8-2018.pt')
+    Art8 = ViewPageTemplateFile('../pt/nat-desc-report-data-multiple-muid.pt')
     Art9 = ''
     Art10 = ''
+    view_name = 't_V_ART8_GES_2018'
 
-    def get_data_from_view(self, view_name):
-        view_table = getattr(sql, view_name)
+    def get_data_from_view(self):
+        data = self.context.context.get_flattened_data(self)
 
-        conditions = []
-        
+        def d(k):
+            return data.get(k, None)
+
+        article = d('article')
+
+        member_state = d('member_state')
+        descriptor = d('descriptor')
+        marine_unit_ids = d('marine_unit_ids')
+        feature = d('feature_reported')
+
+        t = getattr(sql2018, self.view_name)
+
         count, res = db.get_all_records(
-            view_table,
-            *conditions
+            t,
+            t.c.CountryCode == member_state,
+            t.c.GESComponent == descriptor,
+            t.c.MarineReportingUnit.in_(marine_unit_ids),
+            t.c.Feature.in_(feature),
         )
 
-        return []
+        return (article, res)
 
+    def change_orientation(self, data):
+        """ From a set of results, create labeled list of rows
+        """
+        res = []
+        row0 = data[0]
+
+        for name in row0._fields:
+            values = [getattr(row, name) for row in data]
+            res.append([name, values])
+
+        return res
+
+    @use_db_session('session_2018')
     def __call__(self):
-        form_data = self.context.context.get_flattened_data(self)
-        article = form_data.get('article', None)
 
-        member_state = form_data.get('member_state', None)
-        descriptor = form_data.get('descriptor', None)
-        marine_unit_ids = form_data.get('marine_unit_ids', None)
+        article, data = self.get_data_from_view()
 
         template = getattr(self, article, None)
 
-        return template() if template else ""
+        g = defaultdict(list)
+
+        for row in data:
+            g[row.MarineReportingUnit].append(row)
+
+        res = [(k, self.change_orientation(v)) for k, v in g.items()]
+        # data = self.change_orientation(data)
+
+        if template:
+            return template(data=res, title='2018 Member State Report')
+
+        return ''
 
 
 class ReportHeaderForm2018(BrowserView):
@@ -327,6 +361,7 @@ def get_default_additional_field_value(
 
     for x in data_assess:
         field_data = getattr(x, field_name)
+
         if x.MSFDArticle == article and \
            x.Feature == feature and \
            x.AssessmentCriteria == assess_crit and \
@@ -454,6 +489,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 self.general_id,
                 feature_reported
             )
+
             for k, v in data.items():
                 if not v:
                     continue
@@ -487,6 +523,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
 
                     # get the Id from assessment_data, if found it will be
                     # an update, otherwise an insert into db
+
                     for x in assessment_data:
                         if x.MarineUnit != mru:
                             continue
@@ -500,10 +537,12 @@ class AssessmentDataForm2018(Container, BaseUtil):
                         if field_name in additional_fields.values():
                             if getattr(x, field_name):
                                 id_assess.append(x.Id)
+
                                 break
 
                         if (getattr(x, field_name) == d.get(field_name)):
                             id_assess.append(x.Id)
+
                             break
 
                     if id_assess:
@@ -519,6 +558,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
                 self.general_id,
                 feature
             )
+
             for k, v in child_data.items():
                 if not v:
                     continue
@@ -550,6 +590,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
     def get_assessment_data(self, general_id, feature=None):
         conditions = []
         conditions.append(sql2018.COMAssessment.COM_GeneralId == general_id)
+
         if feature:
             conditions.append(sql2018.COMAssessment.Feature == feature)
 
@@ -727,6 +768,7 @@ class SummaryAssessmentDataForm2018(EmbededForm):
     def set_default_values(self, data):
         general_id = getattr(self.context, 'general_id')
         feature = data.get('feature_reported', None)
+
         if feature:
             feature = feature[0]
 
@@ -742,8 +784,10 @@ class SummaryAssessmentDataForm2018(EmbededForm):
         for name, field in self.fields.items():
             db_field_name = summary_fields[name]
             # import pdb; pdb.set_trace()
+
             for row in assess_data:
                 value = getattr(row, db_field_name)
+
                 if row.MSFDArticle == data['article'] and \
                    row.Feature in data['feature_reported'] and \
                    row.MarineUnit in data['marine_unit_ids'] and \

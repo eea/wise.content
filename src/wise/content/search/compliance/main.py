@@ -7,7 +7,7 @@ from plone.z3cform.layout import wrap_form
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import \
     ViewPageTemplateFile as Template
-from wise.content.search import db
+from wise.content.search import db, sql2018
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
@@ -169,15 +169,48 @@ class ArticleForm(EmbededForm):
     def get_subform(self):
         return MarineUnitIDsForm(self, self.request)
 
+    @db.use_db_session('session_2018')
+    def get_muids_2018(self, article, country):
+        m = {
+            'Art8': sql2018.ART8GESMarineUnit
+        }
+
+        ris = db.get_unique_from_mapper(
+            sql2018.ReportedInformation,
+            'Id',
+            sql2018.ReportedInformation.CountryCode == country
+        )
+        ris = [int(c) for c in ris]
+        t = m.get(article)
+
+        if not t:
+            print "TODO: provide support for article ", article
+
+            return []
+
+        muids = db.get_unique_from_mapper(
+            t,
+            'MarineReportingUnit',
+            t.IdReportedInformation.in_(ris),
+        )
+
+        print muids
+
+        return muids
+
     def get_available_marine_unit_ids(self):
         # marine_unit_ids = self.data.get('marine_unit_ids')
 
         # TODO: should also do the request form reading
         data = self.get_flattened_data(self)
+        article = data['article']
         country = data['member_state']
 
         if country:
-            return db.get_marine_unit_ids(member_states=[country])
+            _count, d_2012 = db.get_marine_unit_ids(member_states=[country])
+            d_2018 = self.get_muids_2018(article, country)
+
+            return (_count + len(d_2018), d_2012 + d_2018)
         else:
             return []
 
@@ -215,6 +248,7 @@ class NationalDescriptorAssessmentForm(Container):
     """ Form to create and assess a national descriptor overview
     """
     assessment_topic = u'National summary'
+
     form_name = "national-descriptor-assessment-form"
     render = Template('../pt/container.pt')
     css_class = "left-side-form"

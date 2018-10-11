@@ -1,5 +1,6 @@
 import os
 import threading
+from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -173,8 +174,6 @@ def get_marine_unit_ids(**data):
     if 'marine_unit_ids' in data:
         return len(data['marine_unit_ids']), data['marine_unit_ids']
 
-    # import pdb; pdb.set_trace()
-
     # if 'region_subregions' in data:
     #     conditions.append(table.c.RegionSubRegions.in_(
     #         data['region_subregions']))
@@ -343,8 +342,6 @@ def get_marine_unit_id_names(marine_unit_ids):
         .order_by(t.c.MarineUnits_ReportingAreas)\
         .distinct()
 
-    # import pdb; pdb.set_trace()
-
     total = q.count()
     q = [x for x in q]
 
@@ -390,8 +387,6 @@ def get_all_records_outerjoin(mapper_class, klass_join, *conditions):
     count = res.count()
     res = [x for x in res]
 
-    # import pdb; pdb.set_trace()
-
     return [count, res]
 
 
@@ -416,15 +411,18 @@ def compliance_art8_join(columns, mc_join1, mc_join2, *conditions):
 
 @use_db_session('session_2018')
 def save_record(mapper_class, **data):
+    print "we don't save, please save"
+
+    return
     sess = session()
 
     id_primary_key = data.pop('Id', [])
     mc = mapper_class(**data)
 
-    # import pdb; pdb.set_trace()
     len_ids = len(id_primary_key)
 
     # insert into db if no Id provided
+
     if len_ids < 1:
         sess.add(mc)
     # update the row(s) based on the Id(s)
@@ -433,6 +431,7 @@ def save_record(mapper_class, **data):
 
         # due to a bug??, if only one Id is provided
         # because of the "in_" operator we get an error
+
         if len_ids > 1:
             condition.append(mapper_class.Id.in_(id_primary_key))
         else:
@@ -440,12 +439,16 @@ def save_record(mapper_class, **data):
 
         sess.query(mapper_class).filter(*condition).update(data)
 
-    try:
-        transaction.commit()
-    except Exception as e:
-        import pdb; pdb.set_trace()
-        sess.rollback()
-        # transaction.commit()
+    return
+    # try:
+    #     transaction.commit()
+    # except Exception as e:
+    #     print "------------ we rollback, please check before deploy!!!!!!!!!"
+    #     print e
+    #     sess.rollback()
+    #
+    #     return
+    #     # transaction.commit()
 
     if not id_primary_key:
         id_primary_key = mc.Id
