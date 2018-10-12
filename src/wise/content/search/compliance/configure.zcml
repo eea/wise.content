@@ -5,19 +5,19 @@
   xmlns:z3c="http://namespaces.zope.org/z3c"
   i18n_domain="wise.content">
 
-  <browser:page
-    for="*"
-    name="comp-start"
-    class=".main.StartComplianceView"
-    template="../pt/start.pt"
-    permission="zope2.View"
-    />
+  <!--<browser:page-->
+    <!--for="*"-->
+    <!--name="comp-start"-->
+    <!--class=".main.StartComplianceView"-->
+    <!--template="../pt/start.pt"-->
+    <!--permission="zope2.View"-->
+    <!--/>-->
 
-  <browser:page
-    for="*"
-    name="comp-national-descriptor"
-    class=".main.NationalDescriptorFormView"
-    permission="zope2.View"
-    />
+  <!--<browser:page-->
+    <!--for="*"-->
+    <!--name="comp-national-descriptor"-->
+    <!--class=".main.NationalDescriptorFormView"-->
+    <!--permission="zope2.View"-->
+    <!--/>-->
 
 </configure>
