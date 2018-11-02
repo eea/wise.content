@@ -33,6 +33,26 @@
       permission="cmf.ManagePortal"
       />
 
+  <browser:page
+      class=".misc.TranslationCallback"
+      for="*"
+      name="translation-callback"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      for="*"
+      name="translation-test"
+      permission="zope2.View"
+      template="pt/translation-test.pt"
+      />
+
+  <browser:page
+      for="*"
+      name="request-translation"
+      permission="zope2.View"
+      class=".misc.SendTranslationRequest"
+      />
 
   <browser:page
       name="view"
