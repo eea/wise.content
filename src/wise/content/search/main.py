@@ -6,7 +6,7 @@ from z3c.form.field import Fields
 
 from .a11 import StartArticle11Form
 from .a1314 import StartArticle1314Form
-from .base import (MAIN_FORMS, EmbededForm, ItemDisplayForm, MainForm,
+from .base import (MAIN_FORMS, EmbeddedForm, ItemDisplayForm, MainForm,
                    MainFormWrapper)
 from .db import get_all_records, get_item_by_conditions
 from .sql_extra import MSCompetentAuthority
@@ -83,7 +83,7 @@ class StartArticle8910Form(MainForm):
             return RegionForm(self, self.request)
 
 
-class RegionForm(EmbededForm):
+class RegionForm(EmbeddedForm):
     """ Select the memberstate, region, area form
     """
 
@@ -94,7 +94,7 @@ class RegionForm(EmbededForm):
         return MemberStatesForm(self, self.request)
 
 
-class MemberStatesForm(EmbededForm):
+class MemberStatesForm(EmbeddedForm):
     fields = Fields(interfaces.IMemberStates)
     fields['member_states'].widgetFactory = CheckBoxFieldWidget
 
@@ -102,7 +102,7 @@ class MemberStatesForm(EmbededForm):
         return AreaTypesForm(self, self.request)
 
 
-class AreaTypesForm(EmbededForm):
+class AreaTypesForm(EmbeddedForm):
 
     fields = Fields(interfaces.IAreaTypes)
     fields['area_types'].widgetFactory = CheckBoxFieldWidget
@@ -130,7 +130,7 @@ class AreaTypesForm(EmbededForm):
 StartArticle8910View = wrap_form(StartArticle8910Form, MainFormWrapper)
 
 
-class MarineUnitIDsForm(EmbededForm):
+class MarineUnitIDsForm(EmbeddedForm):
     """ Select the MarineUnitID based on MemberState, Region and Area
     """
 

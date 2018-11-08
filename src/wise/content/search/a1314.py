@@ -7,7 +7,7 @@ from wise.content.search import db, interfaces, sql
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.field import Fields
 
-from .base import EmbededForm, ItemDisplayForm, MainForm
+from .base import EmbeddedForm, ItemDisplayForm, MainForm
 from .db import get_all_records
 from .utils import all_values_from_field, data_to_xls, default_value_from_field
 
@@ -31,7 +31,7 @@ class StartArticle1314Form(MainForm):
         return default_value_from_field(self, self.fields['report_type'])
 
 
-class MemberStatesForm(EmbededForm):
+class MemberStatesForm(EmbeddedForm):
     """ Select the member states based on region
     """
     # fields = Fields(interfaces.IMemberStates)
@@ -59,7 +59,7 @@ class MemberStatesForm(EmbededForm):
         return [count, [x[0] for x in res]]
 
 
-class MarineUnitIDsForm(EmbededForm):
+class MarineUnitIDsForm(EmbeddedForm):
     """ Select the MarineUnitID based on MemberState, Region and Area
     """
 
@@ -90,7 +90,7 @@ class MarineUnitIDsForm(EmbededForm):
         return UniqueCodesForm(self, self.request)
 
 
-class UniqueCodesForm(EmbededForm):
+class UniqueCodesForm(EmbeddedForm):
     """ Select the unique codes
     """
 

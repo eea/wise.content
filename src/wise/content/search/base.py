@@ -326,13 +326,13 @@ class MainFormWrapper(FormWrapper):
         return super(MainFormWrapper, self).render()
 
 
-class EmbededForm(BaseEnhancedForm, Form, BaseUtil):
+class EmbeddedForm(BaseEnhancedForm, Form, BaseUtil):
     """ Our most basic super-smart-superclass for forms
 
     It can embed other children forms
     """
 
-    implements(interfaces.IEmbededForm)
+    implements(interfaces.IEmbeddedForm)
     ignoreContext = True
 
     template = ViewPageTemplateFile('pt/subform.pt')
@@ -345,7 +345,7 @@ class EmbededForm(BaseEnhancedForm, Form, BaseUtil):
         self.data = {}
 
     def update(self):
-        super(EmbededForm, self).update()
+        super(EmbeddedForm, self).update()
 
         self.data, errors = self.extractData()
 
@@ -373,7 +373,7 @@ class EmbededForm(BaseEnhancedForm, Form, BaseUtil):
             return extras()
 
 
-class MarineUnitIDSelectForm(EmbededForm):
+class MarineUnitIDSelectForm(EmbeddedForm):
     """ Base form for displaying information for a single MarineUnitID
     """
 
@@ -420,7 +420,7 @@ class MarineUnitIDSelectForm(EmbededForm):
         return (count, [x[0] for x in res])
 
 
-class ItemDisplayForm(EmbededForm):
+class ItemDisplayForm(EmbeddedForm):
     """ Generic form for displaying records
     """
 

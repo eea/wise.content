@@ -13,7 +13,7 @@ from wise.content.search import db, sql, sql2018
 from z3c.form.field import Fields
 from z3c.formwidget.optgroup.widget import OptgroupFieldWidget
 
-from ..base import BaseUtil, EmbededForm
+from ..base import BaseUtil, EmbeddedForm
 from ..db import switch_session, threadlocals
 from ..features import features_vocabulary
 from ..gescomponents import get_ges_criterions
@@ -36,9 +36,9 @@ class Report2012(BrowserView, Article8, Article10, BaseUtil):
     """
 
     # art3 = ViewPageTemplateFile('../pt/compliance-a10.pt')
-    art8 = ViewPageTemplateFile('../pt/compliance-a8.pt')
-    art9 = ViewPageTemplateFile('../pt/compliance-a9.pt')
-    art10 = ViewPageTemplateFile('../pt/compliance-a10.pt')
+    art8 = ViewPageTemplateFile('../pt/report-data-a8.pt')
+    art9 = ViewPageTemplateFile('../pt/report-data-a9.pt')
+    art10 = ViewPageTemplateFile('../pt/report-data-a10.pt')
 
     # def __init__(self, context, request):
     #     super(Report2012, self).__init__(context, request)
@@ -362,7 +362,7 @@ class AssessmentDataForm2018(Container, BaseUtil):
         for row in tree.children:
             row_name = row.name
 
-            form = EmbededForm(self, self.request)
+            form = EmbeddedForm(self, self.request)
 
             form.form_name = 'form' + row_name
             fields = []
@@ -452,7 +452,7 @@ class IBasicAssessmentData2018(Interface):
                               vocabulary=features_vocabulary)
 
 
-class BasicAssessmentDataForm2018(EmbededForm):
+class BasicAssessmentDataForm2018(EmbeddedForm):
     """
     """
 
@@ -465,7 +465,7 @@ class ISummaryAssessmentData2018(Interface):
     recommendations = Text(title=u'Recomandations')
 
 
-class SummaryAssessmentDataForm2018(EmbededForm):
+class SummaryAssessmentDataForm2018(EmbeddedForm):
     """
     """
 

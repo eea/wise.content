@@ -2,7 +2,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from wise.content.search import db, sql
 from z3c.form.field import Fields
 
-from .base import (EmbededForm, ItemDisplay, MarineUnitIDSelectForm,
+from .base import (EmbeddedForm, ItemDisplay, MarineUnitIDSelectForm,
                    MultiItemDisplayForm)
 from .interfaces import IA81Form
 from .utils import (data_to_xls, register_form, register_form_section,
@@ -10,7 +10,7 @@ from .utils import (data_to_xls, register_form, register_form_section,
 
 
 @register_form
-class A81aForm(EmbededForm):
+class A81aForm(EmbeddedForm):
     """ Main form for A81a.
 
     Allows selecting between Ecosystem, Functional, etc

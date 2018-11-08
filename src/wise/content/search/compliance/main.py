@@ -14,7 +14,7 @@ from z3c.form.field import Fields
 from z3c.form.form import Form
 
 from ..base import MainFormWrapper as BaseFormWrapper
-from ..base import BaseEnhancedForm, EmbededForm
+from ..base import BaseEnhancedForm, EmbeddedForm
 from ..interfaces import IMainForm, IMarineUnitIDsSelect
 from .base import Container
 from .nat_desc import (AssessmentDataForm2018, AssessmentHeaderForm2018,
@@ -146,7 +146,7 @@ class IGESDescriptor(Interface):
     )
 
 
-class GESDescriptorForm(EmbededForm):
+class GESDescriptorForm(EmbeddedForm):
     fields = Fields(IGESDescriptor)
 
     def get_subform(self):
@@ -161,7 +161,7 @@ class IArticle(Interface):
     )
 
 
-class ArticleForm(EmbededForm):
+class ArticleForm(EmbeddedForm):
     fields = Fields(IArticle)
 
     def get_subform(self):
@@ -180,7 +180,7 @@ class ArticleForm(EmbededForm):
             return []
 
 
-class MarineUnitIDsForm(EmbededForm):
+class MarineUnitIDsForm(EmbeddedForm):
     fields = Fields(IMarineUnitIDsSelect)
     fields['marine_unit_ids'].widgetFactory = CheckBoxFieldWidget
 

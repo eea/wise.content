@@ -8,7 +8,7 @@
 #     )
 
 
-# class AssessmentTopicForm(EmbededForm):
+# class AssessmentTopicForm(EmbeddedForm):
 #     """ Select the memberstate, region, area form
 #     """
 #
@@ -28,7 +28,7 @@
 #     )
 #
 #
-# class ArticleForm(EmbededForm):
+# class ArticleForm(EmbeddedForm):
 #     """
 #     """
 #
@@ -48,7 +48,7 @@
 #     )
 #
 #
-# class ReportingDeadlineForm(EmbededForm):
+# class ReportingDeadlineForm(EmbeddedForm):
 #     """
 #     """
 #
@@ -59,7 +59,7 @@
 
 
 
-# class AssessmentDisplayForm(EmbededForm):
+# class AssessmentDisplayForm(EmbeddedForm):
 #     """
 #     """
 #     template = ViewPageTemplateFile('pt/assessment_display.pt')
@@ -231,7 +231,7 @@ from z3c.form.browser.textarea import TextAreaWidget
 from z3c.form.button import buttonAndHandler
 from z3c.form.field import Fields
 
-from .base import EmbededForm, ItemDisplayForm
+from .base import EmbeddedForm, ItemDisplayForm
 
 
 def register_compliance_module(klass):
@@ -253,7 +253,7 @@ def register_compliance_module(klass):
     return ComplianceModuleMain
 
 
-class ComplianceModule(EmbededForm):
+class ComplianceModule(EmbeddedForm):
     css_class = 'only-left-side-form'
     # template = ViewPageTemplateFile('pt/compliance.pt')
     fields = Fields(interfaces.IComplianceModule)
@@ -297,7 +297,7 @@ class ComplianceDisplay(ItemDisplayForm):
         del self.widgets['page']
 
 
-class ComplianceAssessment(EmbededForm):
+class ComplianceAssessment(EmbeddedForm):
     # css_class = 'only-left-side-form'
     fields = Fields(interfaces.IComplianceAssessment)
     # fields['com_assessment'].widgetFactory = TextWidget
@@ -449,7 +449,7 @@ class ComplianceAssessment(EmbededForm):
 #     pass
 #
 #
-# class ReportForm2018(EmbededForm):
+# class ReportForm2018(EmbeddedForm):
 #     fields = Fields(IReportForm)
   <!-- <browser:page -->
   <!--   for="*" -->

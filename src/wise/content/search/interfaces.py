@@ -9,7 +9,7 @@ class IMainForm(Interface):
     """
 
 
-class IEmbededForm(Interface):
+class IEmbeddedForm(Interface):
     """ A form that is "embeded" in another form
     """
 
@@ -18,7 +18,7 @@ class IEmbededForm(Interface):
         """
 
 
-class IItemDisplayForm(IEmbededForm):
+class IItemDisplayForm(IEmbeddedForm):
     data_template = Attribute(u"Template to be used to show item data")
     extra_data_template = Attribute(u"Template for any extra item data")
 
