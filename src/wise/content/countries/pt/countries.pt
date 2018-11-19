@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="plone">
+<body>
+
+<metal:content-core fill-slot="content-core">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+          integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css" />
+    <link href="http://localhost:5080/Plone/++resource++vue_app.css" rel="stylesheet">
+    <script>
+        window.ajax_target = "countries-search-countries-list";
+    </script>
+
+    <div id="countries-search"></div>
+
+
+  <script type="text/javascript" src="/Plone/++resource++vue_manifest.js"></script><script type="text/javascript" src="/Plone/++resource++vue_vendor.js"></script><script type="text/javascript" src="/Plone/++resource++vue_app.js"></script>
+
+</metal:content-core>
+
+</body>
+</html>

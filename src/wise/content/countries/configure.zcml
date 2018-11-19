@@ -1,0 +1,30 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
+  xmlns:z3c="http://namespaces.zope.org/z3c"
+  i18n_domain="wise.content">
+
+  <browser:page
+    for="*"
+    name="countries-search"
+    permission="zope2.View"
+    class = ".countries.Countries"
+    template="pt/countries.pt"
+    />
+
+  <browser:page
+    for="*"
+    name="countries-search-countries-list"
+    permission="zope2.View"
+    class=".countries.Countries"
+    attribute="countries"
+    />
+
+  <browser:resource
+    name="vue_app.js"
+    file="./static/js/vue_app.js"
+    />
+
+
+</configure>
