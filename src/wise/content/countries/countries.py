@@ -1,6 +1,4 @@
 from Products.Five.browser import BrowserView
-from .interfaces import IVueEnabled
-from zope.interface import implements
 import json
 import datetime
 
@@ -11,10 +9,6 @@ from wise.msfd.utils import db_objects_to_dict
 from wise.msfd.base import BaseUtil
 
 class Countries(BrowserView):
-
-    implements(IVueEnabled)
-    def __call__(self):
-        return self.index()
 
     def countries(self):
         self.request.response.setHeader("Access-Control-Allow-Origin", "*")
