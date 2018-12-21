@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <registry>
-  <record name="plone.allowed_sizes" interface="Products.CMFPlone.interfaces.controlpanel.IImagingSchema" field="allowed_sizes">
+<!-- interface="Products.CMFPlone.interfaces.controlpanel.IImagingSchema" field="allowed_sizes" -->
+  <record name="plone.allowed_sizes" >
+    <field type="plone.registry.field.List">
+      <title>Image Scales Allowed sizes</title>
+      <value_type type="plone.registry.field.TextLine"></value_type>
+    </field>
     <value>
       <element>high 1400:1400</element>
       <element>large 768:768</element>
