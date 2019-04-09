@@ -1,0 +1,10 @@
+node:
+    image: node:10.11.0
+    volumes:
+        - ./vue_app:/vue_src
+        - ./vue_app/build.sh:/build.sh
+        - ./static/js:/vue_src/dist
+    entrypoint: /vue_src/entrypoint.sh
+    #entrypoint: sh -c "tail -f /dev/null"
+    ports :
+        - '8080:8080'

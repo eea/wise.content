@@ -12,7 +12,8 @@
   <include package="plone.app.contentmenu" />
 
   <include package=".browser" />
-  <!-- <include package=".search" /> -->
+  <include package=".search" />
+  <include package=".countries" />
 
   <include file="upgrades.zcml" />
   <include file="cache.zcml" />
