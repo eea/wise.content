@@ -1,6 +1,6 @@
 <template>
     <div class="results">
-
+        
         <div><span> Results:</span> <span class="results-number">{{filtered_results.length}}</span> </div>
         <div><span> Showing:</span> <span class="from-to">{{ pos + 1}} - {{ Math.min(pos + batch_size, filtered_results.length)}}</span></div>
         <paginator v-if="filtered_results.length > batch_size" :batch_size="batch_size" :pos="pos" :count="filtered_results.length" @pageChanged="pageChanged"></paginator>
@@ -45,7 +45,7 @@ export default {
             this.results.forEach(function(result){
                 if (tmp_countries.includes(result.country)){
                     tmp_results.push(result);
-                }
+                } 
             });
             return tmp_results;
         }
@@ -61,7 +61,7 @@ export default {
 
 </script>
 <style>
-    .results {
+    .results {        
         /*width:800px*/
     }
     .results-number,

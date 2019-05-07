@@ -9,6 +9,10 @@
             <ul id="countries-list">
                     <Country v-for="country in countries" :country="country" :key="country.name" @countryChecked="countryChecked">
                     </Country>
+            </ul>            
+            <ul id="MRU-data">
+                <MRU v-for="MRU in MRUs" :MRU="MRU" :key="MRU.key" @MRUChecked="MRUChecked">
+                </MRU>
             </ul>
         <div style="clear:both"></div>
         </div>
@@ -23,30 +27,38 @@
 
 import Country from './components/Country.vue';
 import Results from './components/Results.vue';
+import MRU from './components/MRU.vue';
 import axios from 'axios';
 
 export default {
     name: "CountriesSearch",
-    components: { Country, Results },
+    components: {Country, Results, MRU},
     data() {
         return {
-            countries : [], 
+            countries : [],
+            MRUs: [], 
             batch_size: 10,
             pos: 0,
             results : []}
     },
     mounted() {
-//        axios.get('http://localhost:5080/Plone/marine/countries-search-countries-list')
+        axios.get('http://localhost:5080/Plone/marine/countries-search-countries-list')
         axios.get(window.ajax_target)
             .then(function(response) {
-                this.countries = response.data.countries;
-                this.results = response.data.competentauthorities;
+                console.log(response);
+                this.countries = response.data.y2012.countries;
+                this.results = response.data.y2012.competentauthorities;
+                this.MRUs = response.data.y2018.MarineReportingUnits;
                 this.getUrlQuery()
             }
             .bind(this)
         );
     },
     methods: {
+        MRUChecked() {
+            this.pos = 0;
+            this.setUrlQuery();
+        },
         countryChecked() {
             this.pos = 0;
             this.setUrlQuery();
@@ -64,6 +76,12 @@ export default {
                     tmp_selected_countries.push(country.code);
                 }
             });
+            var tmp_selected_MRUs = []
+            this.MRUs.forEach(function(MRU){
+                if (MRU.checked){
+                    tmp_selected_MRUs.push(MRU.code);
+                }
+            });            
             var query = {};
             if (tmp_page > 1){
                 query.page = tmp_page;
@@ -71,8 +89,11 @@ export default {
             if (tmp_selected_countries.length < this.countries.length) {
                 query.country = tmp_selected_countries;
             }
+            if (tmp_selected_MRUs.length < this.MRUs.length) {
+                query.MRU = tmp_selected_MRUs;
+            }
             this.$router.replace({ path: '', query: query})
-        },
+        },        
         getUrlQuery(){
             this.pos = ((this.$route.query.page || 1)- 1) * this.batch_size;
             var countries = this.$route.query.country;
@@ -86,6 +107,17 @@ export default {
                     }
                 });
             }
+            var MRUs = this.$route.query.MRU;
+            if (MRUs !== undefined){
+                this.MRUs.forEach(function(MRU){
+                    if (MRUs.includes(MRU.code)){
+                        MRU.checked = true;
+                    }
+                    else {
+                        MRU.checked = false;
+                    }
+                });
+            }
         }
     }
 }
@@ -95,28 +127,29 @@ export default {
 
 <style>
 
-    #countries-list{
+    #countries-list, #MRU-data {
         margin-top:5px;
     }
     .facet_group {
         width:100%;
-        float:left;
+        height: 370px !important;
+        float:left; 
         background-color:#F6FAFD;
     }
 @media screen and (min-width: 1024px){
-    #countries-list{
+    #countries-list, #MRU-data {
         columns:3;
     }
     .facet_group {
-        height:150px;
+        height:165px;
     }
 }
 @media screen and (max-width: 1024px){
-    #countries-list{
+    #countries-list, #MRU-data {
         columns:2;
     }
     .facet_group {
-        height:220px;
+        height:330px;
     }
 }
     .countries-list-column {

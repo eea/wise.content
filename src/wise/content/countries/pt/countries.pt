@@ -15,7 +15,6 @@
             <div id="countries-search"></div>
             <script type="text/javascript" src="/Plone/++resource++vue_app.js"></script>
         </div>
-
     </metal:content-core>
 </body>
 </html>
