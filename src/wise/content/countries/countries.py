@@ -1,5 +1,4 @@
 import json
-from collections import defaultdict
 from datetime import datetime
 
 from sqlalchemy.orm import defer
@@ -7,7 +6,6 @@ from sqlalchemy.orm import defer
 from Products.Five.browser import BrowserView
 from wise.msfd import db, sql2018
 from wise.msfd.base import BaseUtil
-from wise.msfd.sql import t_MSFDCommon
 from wise.msfd.sql_extra import MSCompetentAuthority
 from wise.msfd.utils import db_objects_to_dict
 
@@ -17,6 +15,7 @@ def default(obj):
         return {'_isoformat': obj.isoformat()}
 
     return super().default(obj)
+
 
 class CountrySearch(BrowserView):
     """ A search listing for countries and associated information.
