@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>vue-app</title>
-  </head>
-  <body>
-    <div id="countries-search"></div>
 
-    <script>
-        window.ajax_target = "http://localhost:5080/Plone/marine/countries-search-countries-list";
-    </script>
+<head>
+  <meta charset="utf-8">
+  <title>vue-app</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
 
-    <div id="app"></div>
-    <script src="/dist/vue_app.js"></script>
-  </body>
+<body>
+  <div id="countries-search"></div>
+
+  <script>
+    window.ajax_target = "http://localhost:5080/Plone/marine/countries-search-countries-list";
+
+  </script>
+
+  <div id="app"></div>
+  <script src="/dist/vue_app.js"></script>
+</body>
+
 </html>

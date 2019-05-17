@@ -9,7 +9,7 @@
     for="*"
     name="countries-search"
     permission="zope2.View"
-    class = ".countries.Countries"
+    class=".countries.CountrySearch"
     template="pt/countries.pt"
     />
 
@@ -17,14 +17,13 @@
     for="*"
     name="countries-search-countries-list"
     permission="zope2.View"
-    class=".countries.Countries"
-    attribute="countries"
+    class=".countries.CountrySearch"
+    attribute="results"
     />
 
   <browser:resource
     name="vue_app.js"
     file="./static/js/vue_app.js"
     />
-
 
 </configure>

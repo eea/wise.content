@@ -1,0 +1,196 @@
+
+
+
+
+      <div style="clear:both"></div>
+    </div>
+    <div style="clear:both"></div>
+
+  </div>
+
+    {{ availableCountries }}
+
+
+    <!-- <ul id="countries&#45;list"> -->
+    <!--   <Country -->
+    <!--     v&#45;for="country in countries" -->
+    <!--     :country="country" -->
+    <!--     :key="country.name" -->
+    <!--     @countryChecked="countryChecked"> -->
+    <!--   </Country> -->
+    <!-- </ul> -->
+    <!-- <ul id="MRU&#45;data"> -->
+    <!--   <MRU v&#45;for="MRU in MRUs" :MRU="MRU" :key="MRU.key" @MRUChecked="MRUChecked"> -->
+    <!--   </MRU> -->
+    <!-- </ul> -->
+    <!-- <div id="search&#45;results"> -->
+    <!--   <Results :countries="countries" :results="results" :batch_size="batch_size" :pos="pos" @pageChanged="pageChanged"></Results> -->
+    <!-- </div> -->
+import CountryFilter from './components/CountryFilter.vue';
+import Country from './components/Country.vue';
+import Results from './components/Results.vue';
+import MRU from './components/MRU.vue';
+import axios from 'axios';
+
+export default {
+  name: "CountriesSearch",
+  components: {Country, Results, MRU, CountryFilter},
+  data() {
+    return {
+      countries : [],
+      selectedCountries: [],
+      MRUs: [],
+      batch_size: 10,
+      pos: 0,
+      results : []
+    }
+  },
+  mounted() {
+    // axios.get('http://localhost:5080/Plone/marine/countries-search-countries-list')
+    axios.get(window.ajax_target)
+      .then(function(response) {
+
+        let seen = [];
+        let countries = [];
+
+        for (let rec of response.data.results) {
+          if (seen.indexOf(rec.CountryCode) == -1) {
+            countries.push({
+              name: rec.Country,
+              code: rec.CountryCode
+            })
+            seen.push(rec.CountryCode)
+          }
+          // console.log("Country", rec.Country);
+        }
+
+        console.log("Countries list bla", countries);
+        this.countries = countries;
+        // this.countries = response.data.y2012.countries;
+        // this.results = response.data.y2012.competentauthorities;
+        // this.MRUs = response.data.y2018.MarineReportingUnits;
+        // this.getUrlQuery()
+      }.bind(this)
+      );
+  },
+  methods: {
+    MRUChecked() {
+      this.pos = 0;
+      this.setUrlQuery();
+    },
+    countryChecked() {
+      this.pos = 0;
+      this.setUrlQuery();
+    },
+    pageChanged(page) {
+      this.$emit("pageChanged", this.page);
+      this.pos = (page - 1) * this.batch_size;
+      this.setUrlQuery();
+    },
+    setUrlQuery(){
+      var tmp_page = this.pos/this.batch_size + 1
+      var tmp_selected_countries = []
+      this.countries.forEach(function(country){
+        if (country.checked){
+          tmp_selected_countries.push(country.code);
+        }
+      });
+      var tmp_selected_MRUs = []
+      this.MRUs.forEach(function(MRU){
+        if (MRU.checked){
+          tmp_selected_MRUs.push(MRU.code);
+        }
+      });
+      var query = {};
+      if (tmp_page > 1){
+        query.page = tmp_page;
+      }
+      if (tmp_selected_countries.length < this.countries.length) {
+        query.country = tmp_selected_countries;
+      }
+      if (tmp_selected_MRUs.length < this.MRUs.length) {
+        query.MRU = tmp_selected_MRUs;
+      }
+      this.$router.replace({ path: '', query: query})
+    },
+    getUrlQuery(){
+      this.pos = ((this.$route.query.page || 1)- 1) * this.batch_size;
+      var countries = this.$route.query.country;
+      if (countries !== undefined){
+        this.countries.forEach(function(country){
+          if (countries.includes(country.code)){
+            country.checked = true;
+          }
+          else {
+            country.checked = false;
+          }
+        });
+      }
+      var MRUs = this.$route.query.MRU;
+      if (MRUs !== undefined){
+        this.MRUs.forEach(function(MRU){
+          if (MRUs.includes(MRU.code)){
+            MRU.checked = true;
+          }
+          else {
+            MRU.checked = false;
+          }
+        });
+      }
+    }
+  }
+}
+
+</script>
+
+
+
+        # commons = db.get_all_records(t_MSFDCommon)
+        # import pdb
+        # pdb.set_trace()
+
+        # json_data = []
+        # countries = []
+        # util = BaseUtil()
+        #
+        # for doc in data:
+        #     nice_ca = {}
+        #     nice_doc = []
+        #
+        #     for elem in doc.items():
+        #         nice_elem = {}
+        #         nice_elem['key'] = elem[0]
+        #         nice_elem['name'] = util.name_as_title(elem[0])
+        #
+        #         if isinstance(elem[1], datetime.datetime):
+        #             nice_elem['value'] = str(elem[1])
+        #         else:
+        #             nice_elem['value'] = elem[1]
+        #
+        #         if elem[0] == 'C_CD':
+        #             nice_ca['country'] = [item[3]
+        #                                   for item in commons[1] if item[2] == elem[1]][0]
+        #             found = False
+        #
+        #             for country in countries:
+        #                 if country['name'] == nice_ca['country']:
+        #                     found = True
+        #                     country['count'] += 1
+        #
+        #             if not found:
+        #                 country = {
+        #                     'name': nice_ca['country'],
+        #                     'checked': False,
+        #                     'count': 1,
+        #                     'code': elem[1]
+        #                 }
+        #                 countries.append(country)
+        #         nice_doc.append(nice_elem)
+        #     nice_ca['fields'] = nice_doc
+        #     json_data.append(nice_ca)
+        #
+        # result = {}
+        # result['countries'] = sorted(countries, key=lambda x: x['name'])
+        # result['competentauthorities'] = json_data
+
+        # return result

@@ -1,37 +1,67 @@
 <template>
-    <div class="result-item">
-        <table class="result-table">
-            <tr v-for="field in result.fields" v-if="fields_whitelist.includes(field.key)">
-                <td class="key">{{ field.name }}</td>
-                <td class="value">{{ field.value }}</td>
-            </tr>
-        </table>
-        <button class="details-button" @click="showModal = true">Details</button>
-        <ModalDetails v-if="showModal" @close="showModal = false" :result="result">
-        </ModalDetails>
-    </div>
+  <div class="result-item" v-bind:class="typeClass()">
+    <div> {{ item.Type }}</div>
+    <h5 style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</h5>
+    <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
+    <ModalDetails v-if="showModal" @close="showModal = false" :item="item">
+    </ModalDetails>
+  </div>
 </template>
+
 <script>
-
 import ModalDetails from './ModalDetails.vue';
-
 export default {
-
-    components: { ModalDetails },
-
-    props: [ 'result' ],
-    data() {
-        return {
-            fields_whitelist:['C_CD', 'MSCACode', 'CompetentAuthorityName', 'City'],
-            showModal: false
-        }
+  components: { ModalDetails },
+  props: [ 'item' ],
+  data() {
+    return {      
+      showModal: false
     }
+  },
+  methods: {
+    typeClass() {
+      return this.item.Type.toLowerCase().split(' ').join('-');
+    }
+  }
 }
 
 </script>
 <style>
-    .result-item{border:1px solid gray;width:240px; float:left; height:300px; margin:3px; padding:3px; position:relative;}
-    .details-button{position: absolute;right: 0;bottom: 0; margin-right:3px; margin-bottom:3px}
-    .result-table {}
-    .result-table > tr > td.key {font-weight: bold;}
+  .area {
+    background-color: #ffdbe1a8;
+  }
+  .region {
+    background-color: #a6d5ff54;
+  }
+  
+  .competent-authority {
+    background-color: #d6ffe13b;
+  }
+  
+  .marine-reporting-unit {
+    background-color: #fcffd47d;
+  }
+  
+  .result-item {
+    margin: 0.5rem;
+    border:0.1rem solid gray;
+    width: 20rem;
+    float:left;
+    height: 15rem;
+    padding:1em; position:relative;
+    }
+  
+  .details-button {
+    font-size: 1rem;
+    position: absolute;
+    max-height: 2.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    margin-right: 1rem; 
+    margin-bottom: 1rem;
+    }
+
+  .result-table > tr > td.key {
+    font-weight: bold;
+    }
 </style>
