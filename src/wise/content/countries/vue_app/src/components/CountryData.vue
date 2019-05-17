@@ -1,26 +1,29 @@
 <template>
   <div>
+    {{ selectedTypes }}
+    {{ selectedCountryCodes }}
     <div class="filter-wrapper">
       <country-filter
         :available-countries="countries"
-        :preselected-countries="preselectedCountries"
+        :preselected-countries="preselectedCountries()"
         @selectionChange="updateCountryFilter">
       </country-filter>
 
       <type-filter
         :available-types="dataTypes"
-        :preselected-types="preselectedTypes"
+        :preselected-types="preselectedTypes()"
         @selectionChange="updateTypesFilter">
       </type-filter>
     </div>
 
     <country-listing
       :display-data="displayData"
-      :preselected-countries="preselectedCountries"
+      :preselected-countries="preselectedCountries()"
       :preselected-types="preselectedTypes">
     </country-listing>
   </div>
 </template>
+
 <script>
 import CountryFilter from './CountryFilter.vue';
 import TypeFilter from './TypeFilter.vue';
@@ -36,16 +39,16 @@ export default {
   methods: {
     updateUrl(){
       this.$router.replace({
-        path:	 "", 
+        path: "",
         query: {
-          c:this.countryFilter, 
-          t:this.typesFilter
+          c:this.selectedCountryCodes,
+          t:this.selectedTypes
         }})
     },
 
     updateCountryFilter (codes) {
       // dirty trick, should refactor
-      this.countryFilter = codes
+      this.selectedCountryCodes = codes
       this.$children.forEach(c => {
         if (c.$options._componentTag == 'country-listing') {
           c.resetPage()
@@ -56,22 +59,59 @@ export default {
 
     updateTypesFilter (types) {
       // dirty trick, should refactor
-      this.typesFilter = types
+      this.selectedTypes = types
       this.$children.forEach(c => {
-        if (c.$options._componentTag == 'country-listing') {          
+        if (c.$options._componentTag == 'country-listing') {
           c.resetPage()
         }
       })
       this.updateUrl();
-    }
+    },
+
+    preselectedCountries() {
+      let preCs = [];
+      let countriesFromUrl = this.$route.query.c;
+      if (typeof countriesFromUrl === 'undefined') {
+        countriesFromUrl = [];
+      }
+      else if (Array.isArray(countriesFromUrl)){
+        countriesFromUrl.forEach(function(preC){
+          preCs.push(preC);
+        })
+      }
+      else {
+        preCs.push(countriesFromUrl);
+      }
+      return preCs;
+    },
+
+    preselectedTypes() {
+      let preTs = [];
+      let typesFromUrl = this.$route.query.t;
+
+      if (typeof typesFromUrl === 'undefined') {
+        typesFromUrl = [];
+      }
+      else if (Array.isArray(typesFromUrl)){
+        typesFromUrl.forEach(function(preT){
+          preTs.push(preT);
+        })
+      }
+      else {
+        preTs.push(typesFromUrl);
+      }
+      return preTs;
+    },
+
   },
 
   data () {
     return {
       'allData': [],
-      'countryFilter': [],
-      'typesFilter': [],
+      'selectedCountryCodes': this.preselectedCountries(),
+      'selectedTypes': this.preselectedTypes(),
       'startPage': 0,
+      'visited': false
     }
   },
 
@@ -87,14 +127,27 @@ export default {
       this.allData.forEach((r) => {
         if (types.indexOf(r.Type) == -1)
           types.push(r.Type)
-      
+
       })
       return types;
     },
+
     displayData () {
       let data = this.allData
-      let countries = this.countryFilter
-      let types = this.typesFilter
+
+      let countries
+      let types
+
+      if (!this.visited) {
+        countries = this.preselectedCountries()
+        types = this.preselectedTypes()
+        console.log("Using v1", countries, types)
+        this.visited = true
+      } else {
+        countries = this.selectedCountryCodes
+        types = this.selectedTypes
+        console.log("Using v2", countries, types)
+      }
 
       if (countries.length) {
         data = data.filter(r => countries.indexOf(r.CountryCode) > -1)
@@ -103,41 +156,6 @@ export default {
         data = data.filter(r => types.indexOf(r.Type) > -1)
       }
       return data
-    },
-    
-    preselectedCountries() {
-      let preCs = [];
-      let countriesFromUrl = this.$route.query.c;
-      if (typeof countriesFromUrl === 'undefined') {
-        countriesFromUrl = [];
-      } 
-      else if (Array.isArray(countriesFromUrl)){
-        countriesFromUrl.forEach(function(preC){
-          preCs.push(preC);
-        })
-      }
-      else {
-        preCs.push(countriesFromUrl);
-      }
-      return preCs;
-    },
-
-    preselectedTypes() {
-      let preTs = [];
-      let typesFromUrl = this.$route.query.t;
-      
-      if (typeof typesFromUrl === 'undefined') {
-        typesFromUrl = [];
-      }
-      else if (Array.isArray(typesFromUrl)){
-        typesFromUrl.forEach(function(preT){
-          preTs.push(preT);
-        })
-      }
-      else {
-        preTs.push(typesFromUrl);
-      }
-      return preTs;
     },
 
     countries () {

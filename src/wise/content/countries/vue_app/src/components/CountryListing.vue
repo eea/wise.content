@@ -1,7 +1,9 @@
 <template>
   <div class="results">
     <div style="clear:both"></div>
-    <div style="margin-top: 1rem;margin-left: 2.2rem"><span>Results:</span> <span class="results-number">{{displayData.length}}</span> </div>
+    <div style="margin-top: 1rem;margin-left: 2.2rem">
+      <span>Results:</span> <span class="results-number">{{displayData.length}}</span>
+    </div>
     <div style="margin-left: 2.3rem">
       <span> Showing:</span>
       <span class="from-to">
