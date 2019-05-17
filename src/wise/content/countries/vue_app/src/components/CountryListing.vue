@@ -56,8 +56,6 @@ export default {
   },
   props: [
     'displayData',
-    'preselectedCountries',
-    'preselectedTypes'
   ],
   computed: {
     pagedData() {

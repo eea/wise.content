@@ -16,10 +16,7 @@
       </type-filter>
     </div>
 
-    <country-listing
-      :display-data="displayData"
-      :preselected-countries="preselectedCountries()"
-      :preselected-types="preselectedTypes">
+    <country-listing :display-data="displayData">
     </country-listing>
   </div>
 </template>
@@ -34,6 +31,16 @@ export default {
     CountryFilter,
     CountryListing,
     TypeFilter,
+  },
+
+  data () {
+    return {
+      'allData': [],
+      'selectedCountryCodes': this.preselectedCountries(),
+      'selectedTypes': this.preselectedTypes(),
+      'startPage': 0,
+      'visited': false
+    }
   },
 
   methods: {
@@ -105,16 +112,6 @@ export default {
 
   },
 
-  data () {
-    return {
-      'allData': [],
-      'selectedCountryCodes': this.preselectedCountries(),
-      'selectedTypes': this.preselectedTypes(),
-      'startPage': 0,
-      'visited': false
-    }
-  },
-
   mounted() {
     this.$parent.$on('data-download', (data) => {
       this.allData = data.results
@@ -135,19 +132,8 @@ export default {
     displayData () {
       let data = this.allData
 
-      let countries
-      let types
-
-      if (!this.visited) {
-        countries = this.preselectedCountries()
-        types = this.preselectedTypes()
-        console.log("Using v1", countries, types)
-        this.visited = true
-      } else {
-        countries = this.selectedCountryCodes
-        types = this.selectedTypes
-        console.log("Using v2", countries, types)
-      }
+      let countries = this.selectedCountryCodes
+      let types = this.selectedTypes
 
       if (countries.length) {
         data = data.filter(r => countries.indexOf(r.CountryCode) > -1)
