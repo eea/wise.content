@@ -5,7 +5,7 @@
       <div class="modal-wrapper">
         <div class="modal-container">
           <div class="modal-header">
-            <span class="modal-title" >
+            <span class="modal-title">
               {{ item.Title }}
             </span>
             <button class="modal-default-button" @click="$emit('close')">
