@@ -1,7 +1,5 @@
 <template>
   <div>
-    {{ selectedTypes }}
-    {{ selectedCountryCodes }}
     <div class="filter-wrapper">
       <country-filter
         :available-countries="countries"

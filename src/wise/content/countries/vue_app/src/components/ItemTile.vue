@@ -1,7 +1,7 @@
 <template>
   <div class="result-item" v-bind:class="typeClass()">
     <div> {{ item.Type }}</div>
-    <h5 style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</h5>
+    <div style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</div>
     <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
     <ModalDetails v-if="showModal" @close="showModal = false" :item="item">
     </ModalDetails>
@@ -43,13 +43,19 @@ export default {
   }
   
   .result-item {
-    margin: 0.5rem;
+    margin: 3.5rem;
     border:0.1rem solid gray;
-    width: 20rem;
+    width: 27rem;
     float:left;
-    height: 15rem;
-    padding:1em; position:relative;
+    height: 17rem;
+    padding:1em; 
+    position:relative;
     }
+  
+  h5.result-item {
+    font-weight: bold;
+     margin: 2rem 0rem 2rem 1rem;
+  }
   
   .details-button {
     font-size: 1rem;

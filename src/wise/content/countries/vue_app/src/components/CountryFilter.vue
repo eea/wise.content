@@ -18,7 +18,6 @@
           <div class="country-count"> {{country.count}} </div>
         </li>
       </ul>
-      <div>{{preselectedCountries}}</div>
     </div>
   </div>
 </template>

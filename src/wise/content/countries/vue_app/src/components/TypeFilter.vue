@@ -17,7 +17,6 @@
           <div class="type-name"> {{section}} </div>
         </li>
       </ul>
-    <div>{{preselectedTypes}}</div>
     </div>
   </div>
 </template>
