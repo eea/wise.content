@@ -23,7 +23,7 @@ export default {
 
 <style>
   .vue_app {
-    margin: 0.5rem -2.5rem -2.5rem 0.5rem;
+    margin-top: 1.5rem;
     font-family: 'Open Sans',Verdana,Helvetica,Arial,sans-serif;
   }
   #countries-list, #type-list {
@@ -31,7 +31,8 @@ export default {
     padding-left: 0.5em;
   }
   .country-filter {
-    width:60%;
+    width:66.5%;
+    margin-left: 4.9rem;
   }
   .type-filter {
     width: 20%;
@@ -39,7 +40,6 @@ export default {
   .country-filter, .type-filter {
     float:left;
     height: 16rem;
-    margin-left: 2.2rem;
   }
 
   @media screen and (min-width: 1024px){        
@@ -65,13 +65,14 @@ export default {
       columns: 1;
     }
     .country-filter {
-      width:90%;
+      width:110%;
       margin-right: 25rem;
       height: 220px;
     }
     .type-filter {
       width:90%;
       height: 85px;
+      margin: 0 2.2rem 0 4.9rem;
      }
   }
 
@@ -84,8 +85,8 @@ export default {
   }
 
   .facet-title {
-    width: 14.6rem;
-    margin-right: 1.5rem;
+    width: 10rem;
+    margin-right: 1rem;
     height:100%;
     float:left;
     background-color: #0071b3;
@@ -99,7 +100,7 @@ export default {
     display: flex;
     position: relative;
     min-width: 2.1875rem;
-    smargin-right: 1.25rem;
+    margin-right: 1.25rem;
   }
 
   .facet-title:after {
@@ -143,13 +144,11 @@ input.type-checkbox,
   float:right; color:gray
 }
 
+.items-per-page {
+  width: 100%;
+}
+
 .filter-wrapper {
   width: 100%
 }
-
-.items-per-page {
-  margin-left: 1.5rem;
-  width: 95%;
-}
-
 </style>

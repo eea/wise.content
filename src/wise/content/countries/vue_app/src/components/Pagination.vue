@@ -1,10 +1,8 @@
 <template>
-  <div class="paginator-container">
-    <div class="paginator">
+  <div class="pagination-container">
+    <div class="pagination">
       <div style="clear:both"></div>
-
-      <div
-        v-if="page > 0"
+      <div v-if="page > 0"
         class="prev-page-link"
         @click="goToPrevPage">Previous</div>
 
@@ -80,12 +78,12 @@
 </script>
 
 <style>
-.paginator-container {
-  margin: 1rem;
+.pagination-container {
   width:100%;
+  // margin:0 23rem;
   text-align:center;
 }
-.paginator {
+.pagination {
   display:inline-block;
 }
 .prev-page-link,
@@ -93,15 +91,14 @@
   display:block;
   float:left;
   cursor:pointer;
-  margin-right:3px;
-  font-size:20px;
-  border:1px solid gray;
-  padding:3px;
+  font-size:4re,;
+  border:0.1rem solid gray;
+  padding:0.3rem;
   text-align:center;
   margin:0;
   color:gray;
-  padding-left:10px;
-  padding-right:10px;
+  padding-left:2rem;
+  padding-right:2rem;
   user-select: none;
 }
 .prev-page-link:hover,
@@ -113,7 +110,7 @@
   display:block;
   float:left;
   cursor:pointer;
-  font-size: 2rem;
+  font-size: 1.4rem;
   padding: 0.3rem;
   border: 0.1rem solid gray;
   text-align:center;
@@ -124,6 +121,9 @@
 }
 .page-link:hover {
   background-color:#eee;
+}
+.page-link:has(.active) {
+  background-color: pink;
 }
 .lastpage {
   border-right: 0.1rem solid gray;

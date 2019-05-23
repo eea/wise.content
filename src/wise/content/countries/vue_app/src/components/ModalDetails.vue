@@ -2,14 +2,14 @@
   <div>
     <transition name="modal">
     <div class="modal-mask">
-      <div class="modal-wrapper">
-        <div class="modal-container">
-          <div class="modal-header">
+      <div class="modal-wrapper" @click="$emit('close')">
+        <div class="modal-container" @click.stop>
+          <div class="modal-header" v-bind:class="typeClass()">
             <span class="modal-title">
               {{ item.Title }}
             </span>
             <button class="modal-default-button" @click="$emit('close')">
-              ×
+              x
             </button>
           </div>
           <div style="clear:both"></div>
@@ -32,16 +32,20 @@
 </template>
 
 <script>
+export default {
+  props: [ 'item' ],
 
-  export default {
-    props: [ 'item' ],
-
-    data() {
-      return {
-        showModal: false
-      }
+  data() {
+    return {
+      showModal: false
+    }
+  },
+  methods: {
+    typeClass() {
+      return this.item.Type.toLowerCase().split(' ').join('-');
     }
   }
+}
 
 </script>
 
@@ -79,9 +83,22 @@
 .modal-header {
   text-align: center;
 }
+.modal-header.area {
+  background-color: #fa6800;
+}
+.modal-header.region {
+  background-color: #dc4fad;
+}
+.modal-header.competent-authority {
+  background-color: #00aba9;
+}
+.modal-header.marine-reporting-unit {
+  background-color: #CE352C;
+}
+
 .modal-header h3 {
   margin-top: 2rem;
-  color: #42b983;
+  color: #337ab7;
 }
 
 .modal-body {
@@ -95,10 +112,6 @@
   width:100%;
   height:100%;
   overflow:auto;
-}
-
-.modal-default-button {
-  float: right;
 }
 
 /*
@@ -119,8 +132,8 @@
 }
 
 .modal-enter .modal-container,
-.modal-leave-active .modal-container {
   -webkit-transform: scale(1.1);
+.modal-leave-active .modal-container {
   transform: scale(1.1);
 }
 
@@ -147,7 +160,7 @@ dd.value {
   box-sizing:border-box;
   display:block;
   float: left;
-  /*   max-width: 63.5rem;*/
+  max-width: 63.5rem;
   max-width:765px;
   margin-left: -1px;
   margin-top: .4rem;
@@ -165,16 +178,24 @@ dd.value {
 }
 
 .modal-default-button {
-  font-size:30px;
+  border: 0rem;
+  float: right;
+  color: #337ab7;
   cursor: pointer;
-  background-color: transparent;
-  border: 0;
+  font-size:3rem;
+  font-size: 2.5rem;
+  margin: -2rem -0.5rem 0 0;
   -webkit-appearance: none;
+  background-color: transparent;
+}
+
+.modal-default-button:hover {
+  color: red;
 }
 
 .modal-title {
-  color: #0071b3;
-  font-weight:bold;
+  color: white;
   font-size: 3rem;
+  font-weight:bold;
 }
 </style>

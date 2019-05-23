@@ -1,10 +1,10 @@
 <template>
   <div class="result-item" v-bind:class="typeClass()">
-    <div> {{ item.Type }}</div>
-    <div style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</div>
-    <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
-    <ModalDetails v-if="showModal" @close="showModal = false" :item="item">
-    </ModalDetails>
+      <div> {{ item.Type }}</div>
+      <div style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</div>
+      <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
+      <ModalDetails v-if="showModal" @close="showModal = false" :item="item">
+      </ModalDetails>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
   components: { ModalDetails },
   props: [ 'item' ],
   data() {
-    return {      
+    return {
       showModal: false
     }
   },
@@ -24,50 +24,66 @@ export default {
     }
   }
 }
-
 </script>
+
 <style>
   .area {
-    background-color: #ffdbe1a8;
+    background-color: #fa6800;
   }
+
   .region {
-    background-color: #a6d5ff54;
+    background-color: #dc4fad;
   }
-  
+
   .competent-authority {
-    background-color: #d6ffe13b;
+    background-color: #00aba9;
   }
   
   .marine-reporting-unit {
-    background-color: #fcffd47d;
+    background-color: #CE352C;
   }
   
+  .area:hover, .region:hover, .competent-authority:hover, .marine-reporting-unit:hover {
+    background-color: #60a917;
+  }
+
   .result-item {
-    margin: 3.5rem;
-    border:0.1rem solid gray;
-    width: 27rem;
     float:left;
-    height: 17rem;
+    color:white;
+    margin: 5rem;
+    width: 27rem;
     padding:1em; 
+    height: 17rem;
+    font-size: 1.5rem;
     position:relative;
-    }
+    border:0.1rem solid gray;
+  }
   
   h5.result-item {
     font-weight: bold;
-     margin: 2rem 0rem 2rem 1rem;
+    margin: 2rem 0rem;
   }
-  
   .details-button {
-    font-size: 1rem;
+    font-size: 1.5rem;
     position: absolute;
-    max-height: 2.5rem;
     right: 0.5rem;
-    bottom: 0.5rem;
+    bottom: 0.25rem;
     margin-right: 1rem; 
     margin-bottom: 1rem;
-    }
-
+  }
+  .result-table {
+    font-size: 2rem;
+  }
   .result-table > tr > td.key {
     font-weight: bold;
+  }
+  
+  @media screen and (max-width: 1024px){
+    .items-per-page {
+      margin-left: 4.3rem;
     }
+    .result-item {
+      margin-left: 1.5rem;
+    }
+  }
 </style>
