@@ -1,5 +1,5 @@
 <template>
-  <div class="result-item" v-bind:class="typeClass()">
+  <div class="result-item" v-bind:class="typeClass">
       <div> {{ item.Type }}</div>
       <div style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</div>
       <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
@@ -10,6 +10,7 @@
 
 <script>
 import ModalDetails from './ModalDetails.vue';
+import typeClass from './ModalDetails.vue';
 export default {
   components: { ModalDetails },
   props: [ 'item' ],
@@ -18,7 +19,7 @@ export default {
       showModal: false
     }
   },
-  methods: {
+  computed: {
     typeClass() {
       return this.item.Type.toLowerCase().split(' ').join('-');
     }
@@ -42,10 +43,6 @@ export default {
   .marine-reporting-unit {
     background-color: #CE352C;
   }
-  
-  .area:hover, .region:hover, .competent-authority:hover, .marine-reporting-unit:hover {
-    background-color: #60a917;
-  }
 
   .result-item {
     float:left;
@@ -59,6 +56,10 @@ export default {
     border:0.1rem solid gray;
   }
   
+  .result-item:hover {
+    background-color: #60a917;
+  }
+
   h5.result-item {
     font-weight: bold;
     margin: 2rem 0rem;

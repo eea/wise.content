@@ -4,7 +4,7 @@
     <div class="modal-mask">
       <div class="modal-wrapper" @click="$emit('close')">
         <div class="modal-container" @click.stop>
-          <div class="modal-header" v-bind:class="typeClass()">
+          <div class="modal-header" v-bind:class="typeClass">
             <span class="modal-title">
               {{ item.Title }}
             </span>
@@ -40,12 +40,12 @@ export default {
       showModal: false
     }
   },
-  methods: {
+ computed: {
     typeClass() {
       return this.item.Type.toLowerCase().split(' ').join('-');
     }
   }
-}
+ }
 
 </script>
 
