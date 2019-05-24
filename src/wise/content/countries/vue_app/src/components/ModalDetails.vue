@@ -161,7 +161,6 @@ dd.value {
   display:block;
   float: left;
   max-width: 63.5rem;
-  max-width:765px;
   margin-left: -1px;
   margin-top: .4rem;
   background-color: #EEE;
@@ -190,7 +189,6 @@ dd.value {
 
 .modal-default-button:hover {
   color: red;
-  font-size: 3rem;
 }
 
 .modal-title {
