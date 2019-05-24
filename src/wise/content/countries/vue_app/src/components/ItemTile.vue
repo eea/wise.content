@@ -48,8 +48,8 @@ export default {
     float:left;
     color:white;
     margin: 5rem;
+    padding:1rem; 
     width: 27rem;
-    padding:1em; 
     height: 17rem;
     font-size: 1.5rem;
     position:relative;
@@ -72,6 +72,10 @@ export default {
     margin-right: 1rem; 
     margin-bottom: 1rem;
   }
+  .details-button:hover {
+    font-size: 1.55rem;
+  }
+
   .result-table {
     font-size: 2rem;
   }

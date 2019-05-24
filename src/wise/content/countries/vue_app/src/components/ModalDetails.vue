@@ -182,7 +182,6 @@ dd.value {
   float: right;
   color: #337ab7;
   cursor: pointer;
-  font-size:3rem;
   font-size: 2.5rem;
   margin: -2rem -0.5rem 0 0;
   -webkit-appearance: none;
@@ -191,6 +190,7 @@ dd.value {
 
 .modal-default-button:hover {
   color: red;
+  font-size: 3rem;
 }
 
 .modal-title {

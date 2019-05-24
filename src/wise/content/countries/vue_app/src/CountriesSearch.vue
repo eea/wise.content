@@ -15,7 +15,6 @@ export default {
     axios.get(window.ajax_target)
       .then(
         (response) => this.$emit('data-download', response.data)
-        //CountryData.getUrl();
       );
   },
 }
@@ -136,6 +135,10 @@ input.type-checkbox,
   margin: 0.16rem 0 0;
   float:left;
 }
+li.country-item:hover, 
+li.type-item:hover {
+  background-color: #F6F5F5;
+}
 .country-name, .type-name {
   float:left;
   margin-left: 0.25rem;
@@ -143,7 +146,6 @@ input.type-checkbox,
 .country-count, .type-count {
   float:right; color:gray
 }
-
 .items-per-page {
   width: 100%;
 }
