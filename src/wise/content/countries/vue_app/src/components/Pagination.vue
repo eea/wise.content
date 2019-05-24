@@ -80,7 +80,6 @@
 <style>
 .pagination-container {
   width:100%;
-  // margin:0 23rem;
   text-align:center;
 }
 .pagination {
