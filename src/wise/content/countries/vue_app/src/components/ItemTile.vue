@@ -86,6 +86,7 @@ export default {
   @media screen and (max-width: 1024px){
     .items-per-page {
       margin-left: 4.3rem;
+      object-fit: cover;
     }
     .result-item {
       margin-left: 1.5rem;

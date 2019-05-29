@@ -188,7 +188,7 @@ dd.value {
 }
 
 .modal-default-button:hover {
-  color: red;
+  color: black;
 }
 
 .modal-title {

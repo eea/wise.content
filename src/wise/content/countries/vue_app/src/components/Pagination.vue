@@ -31,17 +31,15 @@
 
 <script>
   export default {
-
     components: {},
-
+    
     props: [ 'count', 'page', 'batchSize' ],
     computed: {
       pages(){
         return Math.ceil(this.count / this.batchSize);
       },
-      pageNumbers () {
+      pageNumbers() {
         let res = []
-
         for (var x = 0; x < this.pages; x++ ) {
           if (x < 3) {
             res.push(x)
@@ -55,13 +53,14 @@
             res.push(x)
             continue
           }
-
           res.push(-1)
         }
         res = res.filter((el, i) => el !== res[i - 1])
+        
         return res
       }
     },
+
     methods: {
       goToPrevPage(){
         this.$emit("onPageChanged", this.page - 1)
@@ -90,14 +89,14 @@
   display:block;
   float:left;
   cursor:pointer;
-  font-size:4re,;
+  font-size:1.5rem;
   border:0.1rem solid gray;
   padding:0.3rem;
   text-align:center;
   margin:0;
   color:gray;
-  padding-left:2rem;
-  padding-right:2rem;
+  padding-left:1rem;
+  padding-right:1rem;
   user-select: none;
 }
 .prev-page-link:hover,
@@ -109,7 +108,7 @@
   display:block;
   float:left;
   cursor:pointer;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   padding: 0.3rem;
   border: 0.1rem solid gray;
   text-align:center;
@@ -130,5 +129,10 @@
 span.active {
   color:#346f83;
   font-weight:bold;
+}
+@media screen and (max-width: 1024px){
+  .pagination-container {
+    margin-left: -3.5rem;
+  }
 }
 </style>
