@@ -70,6 +70,7 @@
     .country-filter {
       width:92.5%;
       height: 220px;
+      margin-left: 4.9rem;
       margin-right: 25rem;
       background-color: #F6FAFD;
     }
