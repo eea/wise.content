@@ -51,7 +51,7 @@ export default {
   .item-title {
     text-align:center;
     height: 4.5rem;
-    line-height: 4.5rem;
+    // line-height: 4.5rem;
     width: 26.8rem;
     margin: -2rem 0 0rem -2rem;
     background-color: #009590;
