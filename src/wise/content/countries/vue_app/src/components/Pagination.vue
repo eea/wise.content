@@ -18,12 +18,11 @@
           <span>...</span>
         </div>
       </template>
-
       <div
         v-if="page < (pages - 1)"
         class="next-page-link"
-        @click="goToNextPage">Next</div>
-
+        @click="goToNextPage">Next
+      </div>
       <div style="clear:both"></div>
     </div>
   </div>
@@ -40,6 +39,10 @@
       },
       pageNumbers() {
         let res = []
+        var spaces = []
+        var fixed_res= []
+        var res_end = [-1]; 
+        
         for (var x = 0; x < this.pages; x++ ) {
           if (x < 3) {
             res.push(x)
@@ -57,15 +60,33 @@
         }
         res = res.filter((el, i) => el !== res[i - 1])
         
+        for (var x = 0; x < res.length; x++) {
+          if (res[x] === -1) {
+            spaces.push(x);
+          }
+        }
+        if (spaces.length < 2 && res.length > 7) {
+          res_end = res[res.length-1];
+          if(this.page > 5) {
+            fixed_res = res.slice(spaces[0], spaces[0]+4);
+            fixed_res.push(-1, res_end);
+            fixed_res.unshift(0);
+          }
+          if (this.page < 5) {
+            fixed_res = [res[0], -1, this.page-1, 
+            this.page, this.page+1, -1, res_end];
+          }
+          return fixed_res;
+        }
         return res
       }
     },
 
     methods: {
-      goToPrevPage(){
+      goToPrevPage() {
         this.$emit("onPageChanged", this.page - 1)
       },
-      goToNextPage(){
+      goToNextPage() {
         this.$emit("onPageChanged", this.page + 1)
       },
       changePage(page) {
@@ -84,14 +105,15 @@
 .pagination {
   display:inline-block;
 }
+
 .prev-page-link,
 .next-page-link {
   display:block;
   float:left;
   cursor:pointer;
-  font-size:1.5rem;
   border:0.1rem solid gray;
   padding:0.3rem;
+  font-size:1.5rem;
   text-align:center;
   margin:0;
   color:gray;

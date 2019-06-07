@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import CountryFilter from './CountryFilter.vue';
 import TypeFilter from './TypeFilter.vue';
+import CountryFilter from './CountryFilter.vue';
 import CountryListing from './CountryListing.vue';
 
 export default {

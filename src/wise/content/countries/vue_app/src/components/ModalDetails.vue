@@ -6,7 +6,7 @@
         <div class="modal-container" @click.stop>
           <div class="modal-header" v-bind:class="typeClass">
             <span class="modal-title">
-              {{ item.Title }}
+              {{ item.Title }}, {{ item.Country }}
             </span>
             <button class="modal-default-button" @click="$emit('close')">
               x
@@ -18,7 +18,7 @@
               <dl class="result-table">
                 <template v-for="field in Object.keys(item.fields)" v-if="field">
                   <dt class="key"><span>{{ field }}</span></dt>
-                  <dd class="value"><span><span>{{ item.fields[field] }}</span></span></dd>
+                  <dd class="value"><span><span> {{item.fields[field]}}</span></span></dd>
                 </template>
               </dl>
             </div>
@@ -40,11 +40,6 @@ export default {
       showModal: false
     }
   },
- computed: {
-    typeClass() {
-      return this.item.Type.toLowerCase().split(' ').join('-');
-    }
-  }
  }
 
 </script>
@@ -72,28 +67,16 @@ export default {
   max-width: 1000px;
   max-height: 600px;
   margin: 0px auto;
-  /*  padding: 20px 30px;*/
-  background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  background-color: #fff;
   transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
   font-family: Helvetica, Arial, sans-serif;
 }
 
 .modal-header {
   text-align: center;
-}
-.modal-header.area {
-  background-color: #fa6800;
-}
-.modal-header.region {
-  background-color: #dc4fad;
-}
-.modal-header.competent-authority {
-  background-color: #00aba9;
-}
-.modal-header.marine-reporting-unit {
-  background-color: #CE352C;
+  background-color: #009590;
 }
 
 .modal-header h3 {

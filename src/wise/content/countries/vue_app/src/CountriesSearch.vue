@@ -8,22 +8,21 @@
   import axios from 'axios';
   import CountryData from './components/CountryData.vue';
 
-export default {
-  name: "CountriesSearch",
-  components: {CountryData},
-  mounted() {
-    axios.get(window.ajax_target)
-      .then(
-        (response) => this.$emit('data-download', response.data)
-      );
-  },
-}
+  export default {
+    name: "CountriesSearch",
+    components: {CountryData},
+    mounted() {
+      axios.get(window.ajax_target)
+        .then(
+          (response) => this.$emit('data-download', response.data)
+        );
+    },
+  }
 </script>
 
 <style>
   .vue_app {
-    margin-top: 1.5rem;
-    font-family: 'Open Sans',Verdana,Helvetica,Arial,sans-serif;
+    font-family: 'Open Sans', Verdana, Helvetica, Arial, sans-serif;
   }
   #countries-list, #type-list {
     margin-top: 0.3125rem;
@@ -42,6 +41,14 @@ export default {
   }
 
   @media screen and (min-width: 1024px){        
+    .vue_app {
+      margin-top: 1.5rem;
+      margin-left: -5rem;
+      margin-right: -15rem;
+    }
+    .pagination {
+      margin-left: -20rem;
+    }
     #countries-list {
       columns:3;
     }
@@ -64,14 +71,16 @@ export default {
       columns: 1;
     }
     .country-filter {
-      width:110%;
-      margin-right: 25rem;
+      width:92.5%;
       height: 220px;
+      margin-right: 25rem;
+      background-color: #F6FAFD;
     }
     .type-filter {
-      width:90%;
+      width:92.5%;
       height: 85px;
       margin: 0 2.2rem 0 4.9rem;
+      background-color: #F6FAFD;
      }
   }
 
@@ -88,7 +97,7 @@ export default {
     margin-right: 1rem;
     height:100%;
     float:left;
-    background-color: #0071b3;
+    background-color: #009590;
     -webkit-flex: 0.5;
     -moz-flex: 0.5;
     -ms-flex: 0.5;
@@ -147,6 +156,7 @@ li.type-item:hover {
   float:right; color:gray
 }
 .items-per-page {
+  margin-left: 3rem;
   width: 100%;
 }
 

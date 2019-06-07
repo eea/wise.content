@@ -51,7 +51,7 @@ export default {
   },
   data () {
     return {
-      'batchSize': 9,
+      'batchSize': 20,
       'page': 0,
     }
   },

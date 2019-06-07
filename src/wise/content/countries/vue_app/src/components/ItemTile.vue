@@ -1,16 +1,20 @@
 <template>
-  <div class="result-item" v-bind:class="typeClass">
-      <div> {{ item.Type }}</div>
-      <div style="font-weight: bold; margin: 2rem 0 2rem 1rem;">{{ item.Title }}</div>
-      <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
-      <ModalDetails v-if="showModal" @close="showModal = false" :item="item">
-      </ModalDetails>
+  <div>
+    <div class="result-item">
+      <div>
+        <div class="item-title">
+          <div>{{item.Type}}: {{item.Title}}</div>
+        </div>
+        <ModalDetails v-if="showModal" @close="showModal = false" :item="item"></ModalDetails>
+        <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
+      </div>
+      <div class="image"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import ModalDetails from './ModalDetails.vue';
-import typeClass from './ModalDetails.vue';
 export default {
   components: { ModalDetails },
   props: [ 'item' ],
@@ -19,51 +23,44 @@ export default {
       showModal: false
     }
   },
-  computed: {
-    typeClass() {
-      return this.item.Type.toLowerCase().split(' ').join('-');
-    }
-  }
 }
 </script>
 
 <style>
-  .area {
-    background-color: #fa6800;
-  }
-
-  .region {
-    background-color: #dc4fad;
-  }
-
-  .competent-authority {
-    background-color: #00aba9;
-  }
-  
-  .marine-reporting-unit {
-    background-color: #CE352C;
-  }
-
-  .result-item {
+  .result-item{
     float:left;
     color:white;
-    margin: 5rem;
-    padding:1rem; 
+    margin: 1rem;
     width: 27rem;
+    padding: 2rem;
     height: 17rem;
+    display: block;
     font-size: 1.5rem;
     position:relative;
     border:0.1rem solid gray;
   }
-  
-  .result-item:hover {
-    background-color: #60a917;
+
+  .image {
+    height: 90%;
+    display: block;
+    overflow: hidden;
+    background-size: cover;
+    background-image: url("https://www.eea.europa.eu/portal_depiction/country-profile/image_preview");
   }
 
-  h5.result-item {
-    font-weight: bold;
-    margin: 2rem 0rem;
+  .item-title {
+    text-align:center;
+    height: 4.5rem;
+    line-height: 4.5rem;
+    width: 26.8rem;
+    margin: -2rem 0 0rem -2rem;
+    background-color: #009590;
   }
+  .item-title p {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
   .details-button {
     font-size: 1.5rem;
     position: absolute;
@@ -75,7 +72,6 @@ export default {
   .details-button:hover {
     font-size: 1.55rem;
   }
-
   .result-table {
     font-size: 2rem;
   }
