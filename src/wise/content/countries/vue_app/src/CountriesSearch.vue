@@ -26,11 +26,10 @@
   }
   #countries-list, #type-list {
     margin-top: 0.3125rem;
-    padding-left: 0.5em;
   }
   .country-filter {
     width:66.5%;
-    margin-left: 4.9rem;
+    margin-left: 9rem;
   }
   .type-filter {
     width: 20%;
@@ -38,16 +37,14 @@
   .country-filter, .type-filter {
     float:left;
     height: 16rem;
+    background-color: #F6FAFD;
   }
 
   @media screen and (min-width: 1024px){        
     .vue_app {
       margin-top: 1.5rem;
       margin-left: -5rem;
-      margin-right: -15rem;
-    }
-    .pagination {
-      margin-left: -20rem;
+      margin-right: -7rem;
     }
     #countries-list {
       columns:3;
@@ -156,8 +153,8 @@ li.type-item:hover {
   float:right; color:gray
 }
 .items-per-page {
-  margin-left: 3rem;
-  width: 100%;
+  margin-left: 10rem;
+  width: 80%;
 }
 
 .filter-wrapper {

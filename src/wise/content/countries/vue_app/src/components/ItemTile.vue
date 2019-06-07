@@ -3,7 +3,7 @@
     <div class="result-item">
       <div>
         <div class="item-title">
-          <div>{{item.Type}}: {{item.Title}}</div>
+          {{item.Type}}: {{item.Title}}
         </div>
         <ModalDetails v-if="showModal" @close="showModal = false" :item="item"></ModalDetails>
         <button type="button" class="btn btn-primary details-button" @click="showModal = true">Details</button>
@@ -27,38 +27,38 @@ export default {
 </script>
 
 <style>
-  .result-item{
-    float:left;
-    color:white;
-    margin: 1rem;
+  .result-item {
+    float: left;
+    color: white;
     width: 27rem;
-    padding: 2rem;
-    height: 17rem;
+    height: 20rem;
     display: block;
     font-size: 1.5rem;
-    position:relative;
-    border:0.1rem solid gray;
-  }
+    position: relative;
+    border: 0.1rem solid gray;
+}
 
   .image {
-    height: 90%;
+    margin-top:4rem;
+    height: 80%;
     display: block;
     overflow: hidden;
     background-size: cover;
+    background-position: center center;
     background-image: url("https://www.eea.europa.eu/portal_depiction/country-profile/image_preview");
   }
 
   .item-title {
-    text-align:center;
-    height: 4.5rem;
-    // line-height: 4.5rem;
+    top: 0;
+    left: 0;
+    right: 0;
     width: 26.8rem;
-    margin: -2rem 0 0rem -2rem;
-    background-color: #009590;
-  }
-  .item-title p {
+    padding: 5px;
+    text-align:center;
+    position: absolute;
     display: inline-block;
     vertical-align: middle;
+    background-color: #009590;
   }
 
   .details-button {
@@ -80,12 +80,18 @@ export default {
   }
   
   @media screen and (max-width: 1024px){
-    .items-per-page {
-      margin-left: 4.3rem;
-      object-fit: cover;
-    }
     .result-item {
-      margin-left: 1.5rem;
+      margin: 1rem;
+    }
+    .items-per-page {
+      width: 100%;
+      object-fit: cover;
+      margin-left: 4.3rem;
+    }
+  }
+  @media screen and (min-width: 1024px){
+    .result-item {
+      margin: 3rem;
     }
   }
 </style>
