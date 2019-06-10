@@ -1,15 +1,14 @@
 <template>
   <div class="results">
     <div style="clear:both"></div>
-    <div style="margin-top: 1rem;margin-left: 2.2rem">
-      <span style="margin-left: 3rem;">Results:</span> <span class="results-number">{{displayData.length}}</span>
-    </div>
-    <div style="margin-left: 3rem">
-      <span style="margin-left: 2.2rem;"> Showing:</span>
+    <div class="showing">
+      <div><span>Results:</span><span class="results-number">{{displayData.length}}</span></div>
+      <div><span> Showing:</span>
       <span class="from-to">
         {{ page * batchSize}} -
         {{ Math.min(page * batchSize + batchSize, displayData.length)}}
       </span>
+      </div>
     </div>
     <div style="clear:both"></div>
 
@@ -51,7 +50,7 @@ export default {
   },
   data () {
     return {
-      'batchSize': 20,
+      'batchSize': 18,
       'page': 0,
     }
   },

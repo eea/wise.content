@@ -53,6 +53,9 @@
       margin-top: 2.9em;
       columns: 1;
     }
+    .showing {
+      margin-left: 9rem;
+    }
   }
   @media screen and (max-width: 1024px){
     li.country-item, li.type-item,
@@ -80,6 +83,9 @@
       margin: 0 2.2rem 0 4.9rem;
       background-color: #F6FAFD;
      }
+     .showing {
+      margin-left: 4.75rem;
+    }
   }
 
   .facet-title-text {
