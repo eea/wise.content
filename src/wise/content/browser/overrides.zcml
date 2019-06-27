@@ -9,28 +9,28 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="wise.content">
 
-  <browser:page
-    name="pdf.folder.body"
-    layer="eea.pdf.interfaces.ILayer"
-    for="eea.pdf.interfaces.IPDFAware"
-    class=".overrides.FolderBody"
-    permission="eea.pdf.download"
-  />
+  <!-- <browser:page -->
+  <!--   name="pdf.folder.body" -->
+  <!--   layer="eea.pdf.interfaces.ILayer" -->
+  <!--   for="eea.pdf.interfaces.IPDFAware" -->
+  <!--   class=".overrides.FolderBody" -->
+  <!--   permission="eea.pdf.download" -->
+  <!-- /> -->
+  <!--  -->
+  <!-- <browser:page -->
+  <!--   name="pdf.page.body" -->
+  <!--   layer="eea.pdf.interfaces.ILayer" -->
+  <!--   for="eea.pdf.interfaces.IPDFAware" -->
+  <!--   class=".overrides.PageBody" -->
+  <!--   permission="eea.pdf.download" -->
+  <!-- /> -->
 
-  <browser:page
-    name="pdf.page.body"
-    layer="eea.pdf.interfaces.ILayer"
-    for="eea.pdf.interfaces.IPDFAware"
-    class=".overrides.PageBody"
-    permission="eea.pdf.download"
-  />
-
-  <browser:page
-    for="plone.app.layout.navigation.interfaces.INavigationRoot"
-    name="change-password"
-    class=".overrides.PasswordAccountPanelOverride"
-    permission="cmf.SetOwnPassword"
-    layer="wise.content.interfaces.IWiseContentLayer"
-  />
+  <!-- <browser:page -->
+  <!--   for="plone.app.layout.navigation.interfaces.INavigationRoot" -->
+  <!--   name="change&#45;password" -->
+  <!--   class=".overrides.PasswordAccountPanelOverride" -->
+  <!--   permission="cmf.SetOwnPassword" -->
+  <!--   layer="wise.content.interfaces.IWiseContentLayer" -->
+  <!-- /> -->
 
 </configure>
