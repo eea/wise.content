@@ -4,7 +4,7 @@ from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from Products.CMFPlone.utils import getToolByName
 from Products.Five.browser import BrowserView
-from plone.app.controlpanel.form import ControlPanelForm
+# from plone.app.controlpanel.form import ControlPanelForm
 from plone.app.iterate.interfaces import ICheckinCheckoutPolicy
 from plone.fieldsets.fieldsets import FormFieldsets
 from redminelib import Redmine
@@ -93,15 +93,15 @@ baseset.id = 'redmine-configuration'
 baseset.label = _(u'Redmine configuration')
 
 
-class RedmineControlPanel(ControlPanelForm):
-    """ """
-    form_fields = FormFieldsets(baseset)
+# class RedmineControlPanel(ControlPanelForm):
+#     """ """
+#     form_fields = FormFieldsets(baseset)
 
-    label = _('Redmine settings')
-    description = _("Configure settings for redmine. This is used in a "
-                    "ploneformgen form for the purpose of creating issues in "
-                    "projects.")
-    form_name = _('Redmine Settings')
+#     label = _('Redmine settings')
+#     description = _("Configure settings for redmine. This is used in a "
+#                     "ploneformgen form for the purpose of creating issues in "
+#                     "projects.")
+#     form_name = _('Redmine Settings')
 
 
 class IssueCreate(BrowserView):
