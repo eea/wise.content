@@ -6,7 +6,7 @@ from Products.CMFPlone.utils import getToolByName
 from Products.Five.browser import BrowserView
 # from plone.app.controlpanel.form import ControlPanelForm
 from plone.app.iterate.interfaces import ICheckinCheckoutPolicy
-from plone.fieldsets.fieldsets import FormFieldsets
+# from plone.fieldsets.fieldsets import FormFieldsets
 from redminelib import Redmine
 from wise.content import _
 from zope.component import adapts
@@ -88,10 +88,9 @@ class RedmineControlPanelAdapter(BaseControlPanelAdapter):
     project = ProxyFieldProperty(IRedmineSchema['project'])
 
 
-baseset = FormFieldsets(IRedmineSchema)
-baseset.id = 'redmine-configuration'
-baseset.label = _(u'Redmine configuration')
-
+# baseset = FormFieldsets(IRedmineSchema)
+# baseset.id = 'redmine-configuration'
+# baseset.label = _(u'Redmine configuration')
 
 # class RedmineControlPanel(ControlPanelForm):
 #     """ """
