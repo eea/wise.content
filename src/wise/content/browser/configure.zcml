@@ -57,12 +57,12 @@
   <!-- Redmine control panel entry -->
   <adapter factory=".misc.RedmineControlPanelAdapter" />
 
-  <browser:page
+  <!--browser:page
     name="redmine-settings"
     for="Products.CMFPlone.interfaces.IPloneSiteRoot"
     class=".misc.RedmineControlPanel"
     permission="cmf.ManagePortal"
-    />
+    /-->
 
   <browser:page
       class=".misc.IssueCreate"
