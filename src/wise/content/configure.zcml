@@ -41,13 +41,13 @@
   </class>
 
   <!-- Enable blocks transformed -->
-  <class class=".browser.overrides.PageBody">
+  <!--class class=".browser.overrides.PageBody">
       <implements interface="plone.app.blocks.interfaces.IBlocksTransformEnabled" />
-  </class>
+  </class-->
 
-  <class class=".browser.overrides.FolderBody">
+  <!--class class=".browser.overrides.FolderBody">
     <implements interface="plone.app.blocks.interfaces.IBlocksTransformEnabled" />
-  </class>
+  </class-->
 
   <class class="plone.namedfile.field.NamedBlobImage">
     <implements interface="plone.rfc822.interfaces.IPrimaryField" />
