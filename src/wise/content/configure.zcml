@@ -88,10 +88,10 @@
          zope.lifecycleevent.interfaces.IObjectCreatedEvent"
     handler=".events.set_title_description"
   />
-
+  
   <adapter factory=".marshaller.File2Surf" />
   <adapter factory=".marshaller.Image2Surf" />
-  <adapter factory=".marshaller.RichImage2Surf" />
+  <adapter factory=".marshaller.RichImage2Surf"/>
 
   <adapter name="getObjSize" factory=".indexers.getObjSize_image" />
 

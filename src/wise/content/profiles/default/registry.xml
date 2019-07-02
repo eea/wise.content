@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <registry>
 <!-- interface="Products.CMFPlone.interfaces.controlpanel.IImagingSchema" field="allowed_sizes" -->
-  <record name="plone.allowed_sizes" >
+  <!-- <record name="plone.allowed_sizes" >
     <field type="plone.registry.field.List">
       <title>Image Scales Allowed sizes</title>
       <value_type type="plone.registry.field.TextLine"></value_type>
@@ -16,5 +16,5 @@
       <element>icon 32:32</element>
       <element>listing 16:16</element>
     </value>
-  </record>
+  </record> -->
 </registry>
